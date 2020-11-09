@@ -1,5 +1,8 @@
-#build
+# build
 Debug/
+
+# Ignore Folder
+.vs/
 
 # Prerequisites
 *.d
