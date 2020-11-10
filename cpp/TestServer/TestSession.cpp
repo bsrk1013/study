@@ -12,12 +12,16 @@ TestSession::TestSession(TestServer* server, io_context& context)
 }
 
 void TestSession::start() {
-	socket.async_read_some(buffer(bufferData, maxBufferSize),
-		boost::bind(&TestSession::handleRead, shared_from_this(),
-			placeholders::error, placeholders::bytes_transferred));
+	read();
 	/*async_write(socket, buffer(bufferData, maxBufferSize),
 		boost::bind(&TestSession::handleWrite, shared_from_this(),
 			placeholders::error, placeholders::bytes_transferred));*/
+}
+
+void TestSession::read() {
+	socket.async_read_some(buffer(bufferData, maxBufferSize),
+		boost::bind(&TestSession::handleRead, shared_from_this(),
+			placeholders::error, placeholders::bytes_transferred));
 }
 
 void TestSession::handleRead(const error_code& error, size_t bytesTransfrred) {
@@ -26,8 +30,11 @@ void TestSession::handleRead(const error_code& error, size_t bytesTransfrred) {
 		return;
 	}
 
+	std::cout << bufferData << std::endl;
+	memset(bufferData, 0, sizeof(bufferData));
 
-	auto first = buffer_cast<const char*>(bufferData);
+	read();
+	//auto first = buffer_cast<const char*>(bufferData);
 	/*auto a = &bufferData;
 	for (size_t i = 0; i < bytesTransfrred; i++) {
 		auto b = a[i];

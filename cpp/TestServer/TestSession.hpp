@@ -19,13 +19,14 @@ public:
 
 private:
 	TestSession(TestServer* server, io_context& context);
+	void read();
 	void handleRead(const error_code& error, size_t bytesTransfrred);
+	void write();
 	void handleWrite(const error_code& error, size_t bytesTransferred);
 
 private:
 	static const size_t maxBufferSize = 8192;
 	TestServer* server;
 	ip::tcp::socket socket;
-	mutable_buffer bufferData;
-	streambuf streamBuffer;
+	char bufferData[maxBufferSize];
 };
