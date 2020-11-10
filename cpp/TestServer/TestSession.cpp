@@ -1,47 +1,39 @@
-#include "TestSession.h"
 #include <iostream>
+#include <boost/bind.hpp>
+#include "TestSession.hpp"
+#include "TestServer.hpp"
 
-TestSession::TestSession(ip::tcp::socket socket, int sessionId) 
-: socket(std::move(socket)), sessionId(sessionId){
+TestSession::pointer TestSession::create(TestServer* server, io_context& context) {
+	return TestSession::pointer(new TestSession(server, context));
 }
 
-TestSession::~TestSession() {
-	if (socket.is_open()) {
-		socket.close();
-	}
+TestSession::TestSession(TestServer* server, io_context& context)
+: socket(context){
 }
 
-void TestSession::startRead() {
-	read();
-}
-
-void TestSession::read() {
-	auto self = shared_from_this();
+void TestSession::start() {
 	socket.async_read_some(buffer(bufferData, maxBufferSize),
-		[this, self](error_code error, size_t readLength) {
-		if (!error) {
-			write(readLength);
-		}
-		else {
-			sessionDisconnected();
-		}
-	});
+		boost::bind(&TestSession::handleRead, shared_from_this(),
+			placeholders::error, placeholders::bytes_transferred));
+	/*async_write(socket, buffer(bufferData, maxBufferSize),
+		boost::bind(&TestSession::handleWrite, shared_from_this(),
+			placeholders::error, placeholders::bytes_transferred));*/
 }
 
-void TestSession::write(size_t readLength) {
-	auto self = shared_from_this();
-	async_write(socket, buffer(bufferData, readLength),
-		[this, self](error_code error, size_t writeLength) {
-		if (!error) {
-			read();
-		}
-		else {
-			sessionDisconnected();
-		}
-	});
+void TestSession::handleRead(const error_code& error, size_t bytesTransfrred) {
+	if (error) {
+		std::cerr << "session disconnected... error: " << error << std::endl;
+		return;
+	}
+
+
+	auto first = buffer_cast<const char*>(bufferData);
+	/*auto a = &bufferData;
+	for (size_t i = 0; i < bytesTransfrred; i++) {
+		auto b = a[i];
+	}*/
 }
 
-void TestSession::sessionDisconnected() {
-	std::cout << "session disconnected... id: " << sessionId << std::endl;
+void TestSession::handleWrite(const error_code& error, size_t bytesTransferred) {
 
 }
