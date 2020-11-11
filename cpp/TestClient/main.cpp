@@ -7,57 +7,8 @@ using boost::asio::ip::tcp;
 
 enum { max_length = 1024 };
 
-static const size_t Bit = 1;
-static const size_t Byte = 8 * Bit;
-
-template<typename T>
-void serialize(char* buffer, const T& value, size_t size) {
-    char data[size];
-    for (size_t i = 0; i < size; i++) {
-        data[i] = 
-    }
-}
-
 int main()
 {
-    int age1 = 10;
-    short kg1 = 62;
-    size_t ageSize = sizeof(age1);
-    size_t kgSize = sizeof(kg1);
-    size_t totalSize = ageSize + kgSize;
-    char* buffer = new char[totalSize];
-
-    for (size_t i = 0; i < ageSize; i++) {
-        unsigned char temp = (age1 >> (i * Byte));
-        std::cout << "[" << i << "] : " << temp << std::endl;
-        buffer[i] = temp;
-    }
-
-    std::cout << buffer << std::endl;
-
-    int age2 = 0;
-    memcpy(&age2, buffer, ageSize);
-
-    std::cout << age2 << std::endl;
-
-    /*buffer = (char*)memcpy(buffer, &age1, ageSize);
-    buffer = (char*)memcpy(buffer, &name1, nameSize);
-
-    for (int i = 0; i < totalSize; i++) {
-        char a = buffer[i];
-        std::cout << "[" << i << "] = " << a << std::endl;
-    }
-
-    int age2 = 0;
-    std::string name2 = "";
-    
-    memcpy(&age2, buffer, ageSize);
-    memcpy(&name2, buffer, nameSize);
-
-    std::cout << "age : " << age2 << ", name : " << name2 << std::endl;*/
-
-    return 0;
-
     try
     {
         boost::asio::io_context io_context;

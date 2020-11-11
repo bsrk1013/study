@@ -6,6 +6,9 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace TestProject
 {
+	static const size_t bit = 1;
+	static const size_t byte = bit * 8;
+
 	class Buffer {
 	public:
 		Buffer(size_t size) {
@@ -53,27 +56,42 @@ namespace TestProject
 
 	class Serialize {
 	public:
+		Serialize(Buffer* buffer) {
+			this->buffer = buffer;
+		}
+
 		template<typename T>
-		void write(Buffer* buffer, const T& value) {
-			size_t size = sizeof(value);
+		void write(const T& value) {
+			size_t size = sizeof(T);
 			for (size_t i = 0; i < size; i++) {
 				char data = value >> i * byte;
 				buffer->putByte(data);
 			}
 		}
 
-		template<>
-		void write(Buffer* buffer, const std::string& value) {
+		void write(const std::string& value) {
 			size_t strSize = value.length();
-			write(buffer, strSize);
+			write(strSize);
 			for (size_t i = 0; i < value.length(); i++) {
 				char data = value[i];
 				buffer->putByte(data);
 			}
 		}
 
+	private:
+		Buffer* buffer;
+	};
+
+	class Deserialize {
+	public:
+		Deserialize(Buffer* buffer) {
+			this->buffer = buffer;
+		}
+
+	public:
+
 		template<typename T>
-		T read(Buffer* buffer) {
+		T read() {
 			size_t size = sizeof(T);
 			char* dataBuffer = buffer->readByte(size);
 			T data;
@@ -85,16 +103,28 @@ namespace TestProject
 		}
 
 		template<>
-		std::string read(Buffer* buffer) {
-			size_t strSize = read<size_t>(buffer);
+		std::string read() {
+			size_t strSize = read<size_t>();
 			char* dataBuffer = buffer->readByte(strSize);
 			std::string str(&dataBuffer[0], &dataBuffer[0] + strSize);
 			return str;
 		}
+
+	private:
+		Buffer* buffer;
 	};
 
-	static const size_t bit = 1;
-	static const size_t byte = bit * 8;
+	class Cell {
+	public:
+		virtual ~Cell();
+
+	public:
+		virtual void serialize(Serialize* serialize) = 0;
+		virtual void deserialize(Deserialize* deserialize) = 0;
+
+	protected:
+		virtual size_t getSize() = 0;
+	};
 
 	TEST_CLASS(TestProject)
 	{
@@ -204,36 +234,54 @@ namespace TestProject
 		}
 
 		TEST_METHOD(StructToBytes) {
-			struct Test {
+			class Test : Cell{
+			public:
+				Test() {};
+				Test(const int a, const std::string& b) {
+					this->a = a;
+					this->b = b;
+				}
+				Test(const int a, const char* b) 
+				: a(a), b(b){
+				}
+
+				virtual ~Test() {};
+
+			public:
+				virtual void serialize(Serialize* serialize) {
+					serialize->write(getSize());
+					serialize->write(a);
+					serialize->write(b);
+				}
+
+				virtual void deserialize(Deserialize* deserialize) {
+					size_t size = deserialize->read<size_t>();
+					a = deserialize->read<int>();
+					b = deserialize->read<std::string>();
+				}
+
+			protected:
+				virtual size_t getSize() {
+					return sizeof(a) + b.length();
+				}
+
+			private:
 				int a;
 				std::string b;
-
-				size_t getSize() {
-					return sizeof(a) + b.length();;
-				}
 			};
 
-			Test testData{ 29, "Doby" };
-			size_t size = testData.getSize();
-
-			Serialize serialize;
+			Test testData(29, "Doby");
 			Buffer buffer(1024);
-
-			serialize.write(&buffer, size);
-			serialize.write(&buffer, testData.a);
-			serialize.write(&buffer, testData.b);
-
+			
+			Serialize serialize(&buffer);
+			testData.serialize(&serialize);
 			buffer.setBufferOffset(0);
-
-			size_t readSize = serialize.read<size_t>(&buffer);
-			int a = serialize.read<int>(&buffer);
-			std::string b = serialize.read<std::string>(&buffer);
-			int c = serialize.read<int>(&buffer);
-
-			Test testData2{ a, b };
-
-			Assert::AreEqual(testData.a, testData2.a);
-			Assert::AreEqual(testData.b, testData2.b);
+			
+			Deserialize deserialize(&buffer);
+			Test testData2;
+			testData2.deserialize(&deserialize);
+			//Assert::AreEqual(testData.a, testData2.a);
+			//Assert::AreEqual(testData.b, testData2.b);
 		}
 	};
 }
