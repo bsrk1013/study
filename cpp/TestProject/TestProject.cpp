@@ -42,14 +42,62 @@ namespace TestProject
 
 			Assert::AreEqual(a, c);
 			Assert::AreEqual(b, d);
+		}
 
-			//do {
-			//	char byte = static_cast<char>(a >> 8 * index);
-			//	std::cout << "a: " << (a >> 8 * index) << ", byte: " << byte << std::endl;
-			//	if (index++ > 5) {
-			//		break;
-			//	}
-			//} while (true);
+		TEST_METHOD(ShortToBytes) {
+			short a = 156, b = 421;
+			size_t totalSize = sizeof(a) * 2;
+			char* buffer = new char[totalSize];
+			size_t bufferOffset = 0;
+
+			for (size_t i = 0; i < sizeof(a); i++) {
+				char data = static_cast<char>(a >> i * byte);
+				buffer[bufferOffset++] = data;
+			}
+
+			for (size_t i = 0; i < sizeof(a); i++) {
+				char data = static_cast<char>(b >> i * byte);
+				buffer[bufferOffset++] = data;
+			}
+
+			short c = 0, d = 0;
+			bufferOffset = 0;
+			memcpy(&c, buffer + bufferOffset, sizeof(c));
+			bufferOffset += sizeof(c);
+			memcpy(&d, buffer + bufferOffset, sizeof(c));
+
+			Assert::AreEqual(a, c);
+			Assert::AreEqual(b, d);
+		}
+
+		TEST_METHOD(StringToBytes) {
+
+		}
+
+		TEST_METHOD(BooleanToBytes) {
+			bool a = false, b = true;
+			size_t totalSize = sizeof(a) * 2;
+			char* buffer = new char[totalSize];
+			size_t bufferOffset = 0;
+
+			for (size_t i = 0; i < sizeof(a); i++) {
+				char data = static_cast<char>(a >> i * byte);
+				buffer[bufferOffset++] = data;
+			}
+
+			for (size_t i = 0; i < sizeof(a); i++) {
+				char data = static_cast<char>(b >> i * byte);
+				buffer[bufferOffset++] = data;
+			}
+
+			bool c = false, d = false;
+			bufferOffset = 0;
+			memcpy(&c, buffer + bufferOffset, sizeof(c));
+			bufferOffset += sizeof(c);
+			memcpy(&d, buffer + bufferOffset, sizeof(c));
+
+			Assert::AreEqual(a, c);
+			Assert::AreEqual(b, d);
 		}
 	};
 }
