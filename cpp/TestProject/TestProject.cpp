@@ -116,7 +116,7 @@ namespace TestProject
 
 	class Cell {
 	public:
-		virtual ~Cell();
+		virtual ~Cell() {};
 
 	public:
 		virtual void serialize(Serialize* serialize) = 0;
@@ -265,7 +265,7 @@ namespace TestProject
 					return sizeof(a) + b.length();
 				}
 
-			private:
+			public:
 				int a;
 				std::string b;
 			};
@@ -280,8 +280,8 @@ namespace TestProject
 			Deserialize deserialize(&buffer);
 			Test testData2;
 			testData2.deserialize(&deserialize);
-			//Assert::AreEqual(testData.a, testData2.a);
-			//Assert::AreEqual(testData.b, testData2.b);
+			Assert::AreEqual(testData.a, testData2.a);
+			Assert::AreEqual(testData.b, testData2.b);
 		}
 	};
 }
