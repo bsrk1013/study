@@ -36,6 +36,16 @@ namespace TestProject
 			}
 		}
 
+		TEST_METHOD(VectorToBytes) {
+			std::vector<int> a;
+			a.push_back(10);
+			a.push_back(20);
+			DBBD::Buffer buffer(8192);
+			DBBD::Serialize serialize(&buffer);
+
+			serialize.writeIterator(a.cbegin(), a.cend());
+		}
+
 		TEST_METHOD(StructToBytes) {
 			class Test : DBBD::Cell{
 			public:

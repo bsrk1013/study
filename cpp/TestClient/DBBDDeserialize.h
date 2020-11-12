@@ -37,7 +37,7 @@ namespace DBBD {
 		// Array Read
 	public:
 		template<typename T>
-		void readArray(T* values) {
+		void readArray(T*& values) {
 			size_t arraySize;
 			read(arraySize);
 

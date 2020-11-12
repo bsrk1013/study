@@ -22,6 +22,11 @@ namespace DBBD
 			}
 		}
 
+		template<typename T>
+		void write(const T& value) {
+
+		}
+
 		template<>
 		void write(const std::string& value) {
 			size_t strSize = value.length();
@@ -52,6 +57,10 @@ namespace DBBD
 				T value = values[i];
 				write(value);
 			}
+		}
+
+		template<typename Iter>
+		void writeIterator() {
 		}
 
 	private:

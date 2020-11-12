@@ -4,7 +4,6 @@
 namespace DBBD {
 	static const size_t bit = 1;
 	static const size_t byte = 8 * bit;
-	static const size_t kbyte = 1024 * byte;
 
 	class Buffer {
 	public:
@@ -21,8 +20,8 @@ namespace DBBD {
 		}
 
 	public:
-		void putByte(const char byte) {
-			buffer[bufferOffset++] = byte;
+		void putByte(const char byteData) {
+			buffer[bufferOffset++] = byteData;
 			bufferLastPos++;
 		}
 
