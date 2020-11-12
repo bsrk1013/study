@@ -2,10 +2,12 @@
 #include <cstring>
 #include <iostream>
 #include <boost/asio.hpp>
+#include "DBBDBuffer.h"
+#include "DBBDSerialize.h"
 
 using boost::asio::ip::tcp;
 
-enum { max_length = 1024 };
+static const int maxBufferSize = 8192;
 
 int main()
 {
@@ -17,13 +19,17 @@ int main()
         tcp::resolver resolver(io_context);
         boost::asio::connect(s, resolver.resolve("127.0.0.1", "8100"));
 
-        static const size_t maxBufferSize = 8192;
+		DBBD::Buffer buffer(8192);
+
         for (;;)
         {
             std::cout << "Enter message: ";
-            char request[max_length];
-            std::cin.getline(request, max_length);
+            char request[maxBufferSize];
+            std::cin.getline(request, maxBufferSize);
 
+			/*DBBD::Serialize serialize(&buffer);
+
+			serialize.write(request);*/
 
             size_t request_length = std::strlen(request);
             boost::asio::write(s, boost::asio::buffer(request, request_length));

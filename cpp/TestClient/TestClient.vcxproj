@@ -148,6 +148,12 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DBBDBuffer.h" />
+    <ClInclude Include="DBBDCell.h" />
+    <ClInclude Include="DBBDDeserialize.h" />
+    <ClInclude Include="DBBDSerialize.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
