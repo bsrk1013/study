@@ -43,7 +43,17 @@ namespace TestProject
 			DBBD::Buffer buffer(8192);
 			DBBD::Serialize serialize(&buffer);
 
-			serialize.writeIterator(a.cbegin(), a.cend());
+			serialize.writeVector<std::vector<int>, int>(a);
+
+			buffer.setBufferOffset(0);
+
+			DBBD::Deserialize deserialize(&buffer);
+
+			std::vector<int> b;
+			deserialize.readVector<std::vector<int>, int>(b);
+
+			Assert::AreEqual(a[0], b[0]);
+			Assert::AreEqual(a[1], b[1]);
 		}
 
 		TEST_METHOD(StructToBytes) {
@@ -85,7 +95,8 @@ namespace TestProject
 			DBBD::Buffer sendBuffer(1024);
 			
 			DBBD::Serialize serialize(&sendBuffer);
-			testData.serialize(&serialize);
+			serialize.write(testData);
+			//testData.serialize(&serialize);
 
 			char* temp = sendBuffer.getBuffer();
 

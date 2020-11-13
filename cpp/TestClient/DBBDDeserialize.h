@@ -49,6 +49,18 @@ namespace DBBD {
 			}
 		}
 
+		template<typename T1, typename T2>
+		void readVector(T1& vec) {
+			size_t vecSize;
+			read(vecSize);
+
+			for (size_t i = 0; i < vecSize; i++) {
+				T2 value;
+				read(value);
+				vec.push_back(value);
+			}
+		}
+
 	private:
 		DBBD::Buffer* buffer;
 	};

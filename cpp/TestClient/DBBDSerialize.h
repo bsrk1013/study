@@ -4,6 +4,7 @@
 namespace DBBD
 {
 	class Buffer;
+	class Cell;
 	class Serialize
 	{
 	public:
@@ -15,16 +16,16 @@ namespace DBBD
 	public:
 		template<typename T>
 		void write(const T& value) {
-			size_t size = sizeof(T);
-			for (size_t i = 0; i < size; i++) {
-				char data = value >> i * byte;
-				buffer->putByte(data);
+			bool isCellType = std::is_base_of<Cell, int>::value;
+			if (isCellType) {
 			}
-		}
-
-		template<typename T>
-		void write(const T& value) {
-
+			else {
+				size_t size = sizeof(T);
+				for (size_t i = 0; i < size; i++) {
+					char data = value >> i * byte;
+					buffer->putByte(data);
+				}
+			}
 		}
 
 		template<>
@@ -59,8 +60,14 @@ namespace DBBD
 			}
 		}
 
-		template<typename Iter>
-		void writeIterator() {
+		template<typename T1, typename T2>
+		void writeVector(const T1& vec) {
+			size_t vecSize = vec.size();
+			write(vecSize);
+			for (auto it = vec.begin(); it != vec.end(); it++) {
+				T2 data = *it;
+				write(data);
+			}
 		}
 
 	private:
