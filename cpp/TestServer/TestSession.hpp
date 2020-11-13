@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include "DBBDBuffer.h"
 
 using namespace boost::asio;
 using namespace boost::system;
@@ -21,12 +22,12 @@ private:
 	TestSession(TestServer* server, io_context& context);
 	void read();
 	void handleRead(const error_code& error, size_t bytesTransfrred);
-	void write();
+	void write(const std::string& data);
 	void handleWrite(const error_code& error, size_t bytesTransferred);
 
 private:
-	static const size_t maxBufferSize = 8192;
 	TestServer* server;
 	ip::tcp::socket socket;
-	char bufferData[maxBufferSize];
+	DBBD::Buffer sendBuffer;
+	DBBD::Buffer receiveBuffer;
 };

@@ -2,13 +2,16 @@
 #include <boost/bind.hpp>
 #include "TestSession.hpp"
 #include "TestServer.hpp"
+#include "DBBDSerialize.h"
+#include "DBBDDeserialize.h"
 
 TestSession::pointer TestSession::create(TestServer* server, io_context& context) {
 	return TestSession::pointer(new TestSession(server, context));
 }
 
 TestSession::TestSession(TestServer* server, io_context& context)
-: socket(context){
+: socket(context), sendBuffer(8192), receiveBuffer(8192){
+
 }
 
 void TestSession::start() {
@@ -19,7 +22,7 @@ void TestSession::start() {
 }
 
 void TestSession::read() {
-	socket.async_read_some(buffer(bufferData, maxBufferSize),
+	socket.async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 		boost::bind(&TestSession::handleRead, shared_from_this(),
 			placeholders::error, placeholders::bytes_transferred));
 }
@@ -30,17 +33,33 @@ void TestSession::handleRead(const error_code& error, size_t bytesTransfrred) {
 		return;
 	}
 
-	std::cout << bufferData << std::endl;
-	memset(bufferData, 0, sizeof(bufferData));
+	receiveBuffer.setBufferLastPos(bytesTransfrred);
+	DBBD::Deserialize deserialize(&receiveBuffer);
+
+	std::string data;
+	deserialize.read(data);
+
+	std::cout << "recieveData[" << bytesTransfrred << "] : " << data << std::endl;
+
+	write(data);
+
+	receiveBuffer.clearBuffer();
 
 	read();
-	//auto first = buffer_cast<const char*>(bufferData);
-	/*auto a = &bufferData;
-	for (size_t i = 0; i < bytesTransfrred; i++) {
-		auto b = a[i];
-	}*/
+}
+
+void TestSession::write(const std::string& data) {
+
+	DBBD::Serialize serialize(&sendBuffer);
+
+	serialize.write(data);
+
+	async_write(socket,
+		buffer(sendBuffer.getBuffer(), sendBuffer.getBufferLastPos()),
+			boost::bind(&TestSession::handleWrite, shared_from_this(),
+				placeholders::error, placeholders::bytes_transferred));
 }
 
 void TestSession::handleWrite(const error_code& error, size_t bytesTransferred) {
-
+	sendBuffer.clearBuffer();
 }

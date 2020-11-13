@@ -11,6 +11,75 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace TestProject
 {
+	class Test : DBBD::Cell {
+	public:
+		Test() {};
+		Test(const int a, const std::string& b) {
+			this->a = a;
+			this->b = b;
+		}
+		Test(const int a, const char* b)
+			: a(a), b(b) {
+		}
+
+		Test(const Test& a) {
+			this->a = a.a;
+			this->b = a.b;
+		}
+
+		virtual ~Test() {};
+
+	public:
+		virtual void serialize(DBBD::Serialize* serialize) {
+			serialize->write(a);
+			serialize->write(b);
+		}
+
+		virtual void deserialize(DBBD::Deserialize* deserialize) {
+			deserialize->read(a);
+			deserialize->read(b);
+		}
+
+		virtual size_t getSize() {
+			return sizeof(a) + b.length();
+		}
+
+	public:
+		int a;
+		std::string b;
+	};
+
+	class Test2 : DBBD::Cell {
+	public:
+		Test2() {};
+		Test2(const Test& a) {
+			this->a = a;
+		}
+
+		virtual ~Test2() {}
+	
+	public:
+		virtual void serialize(DBBD::Serialize* serialize) {
+			a.serialize(serialize);
+		}
+
+		virtual void deserialize(DBBD::Deserialize* deserialize) {
+			a.deserialize(deserialize);
+		}
+
+	public:
+		Test& getData() { return a; }
+
+	protected:
+		virtual size_t getSize() {
+			return a.getSize();
+		}
+
+	private:
+		Test a;
+
+	};
+
 	TEST_CLASS(TestProject)
 	{
 	public:
@@ -57,46 +126,11 @@ namespace TestProject
 		}
 
 		TEST_METHOD(StructToBytes) {
-			class Test : DBBD::Cell{
-			public:
-				Test() {};
-				Test(const int a, const std::string& b) {
-					this->a = a;
-					this->b = b;
-				}
-				Test(const int a, const char* b) 
-				: a(a), b(b){
-				}
-
-				virtual ~Test() {};
-
-			public:
-				virtual void serialize(DBBD::Serialize* serialize) {
-					serialize->write(a);
-					serialize->write(b);
-				}
-
-				virtual void deserialize(DBBD::Deserialize* deserialize) {
-					deserialize->read(a);
-					deserialize->read(b);
-				}
-
-			protected:
-				virtual size_t getSize() {
-					return sizeof(a) + b.length();
-				}
-
-			public:
-				int a;
-				std::string b;
-			};
-
 			Test testData(29, "Doby");
 			DBBD::Buffer sendBuffer(1024);
 			
 			DBBD::Serialize serialize(&sendBuffer);
-			serialize.write(testData);
-			//testData.serialize(&serialize);
+			testData.serialize(&serialize);
 
 			char* temp = sendBuffer.getBuffer();
 
@@ -108,6 +142,21 @@ namespace TestProject
 			testData2.deserialize(&deserialize);
 			Assert::AreEqual(testData.a, testData2.a);
 			Assert::AreEqual(testData.b, testData2.b);
+
+			Test2 testData3(testData);
+
+			DBBD::Buffer buffer2(1024);
+			DBBD::Serialize serialize2(&buffer2);
+
+			testData3.serialize(&serialize2);
+
+			buffer2.setBufferOffset(0);
+
+			DBBD::Deserialize deserialize2(&buffer2);
+			Test2 testData4;
+			testData4.deserialize(&deserialize2);
+			Assert::AreEqual(testData3.getData().a, testData4.getData().a);
+			Assert::AreEqual(testData3.getData().b, testData4.getData().b);
 		}
 	};
 }

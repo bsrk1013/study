@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{017d8c26-edc4-4ea8-9d5b-ed6972db5139}</ProjectGuid>
-    <RootNamespace>TestServer</RootNamespace>
+    <ProjectGuid>{b3075808-ef91-4576-9c72-d262e5707a3f}</ProjectGuid>
+    <RootNamespace>DBBD</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -72,8 +72,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <ReferencePath>%BOOST_ROOT%;$(ReferencePath)</ReferencePath>
-    <LibraryPath>%BOOST_ROOT%\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -90,12 +88,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%BOOST_ROOT%;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%BOOST_ROOT%\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,19 +141,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="TestServer.cpp" />
-    <ClCompile Include="TestSession.cpp" />
-    <ClCompile Include="User.cpp" />
+    <ClInclude Include="Buffer.h" />
+    <ClInclude Include="Deserialize.h" />
+    <ClInclude Include="ICell.h" />
+    <ClInclude Include="Serialize.h" />
+    <ClInclude Include="TcpClient.h" />
+    <ClInclude Include="TcpServer.h" />
+    <ClInclude Include="TcpSession.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DBBDBuffer.h" />
-    <ClInclude Include="DBBDCell.h" />
-    <ClInclude Include="DBBDDeserialize.h" />
-    <ClInclude Include="DBBDSerialize.h" />
-    <ClInclude Include="TestServer.hpp" />
-    <ClInclude Include="TestSession.hpp" />
-    <ClInclude Include="User.h" />
+    <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="Deserialize.cpp" />
+    <ClCompile Include="Serialize.cpp" />
+    <ClCompile Include="TcpClient.cpp" />
+    <ClCompile Include="TcpServer.cpp" />
+    <ClCompile Include="TcpSession.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
