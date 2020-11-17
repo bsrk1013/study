@@ -2,63 +2,78 @@
 #include <boost/bind.hpp>
 #include "TcpSession.h"
 #include "TcpServer.h"
+#include "Serialize.h"
+#include "Deserialize.h"
 
 namespace DBBD {
 	TcpSession::pointer TcpSession::create(TcpServer* server, io_context& context) {
 		return TcpSession::pointer(new TcpSession(server, context));
 	}
 
-	TcpSession::TcpSession(TcpServer* server, io_context& context)
-		: socket(context), sendBuffer(8192), receiveBuffer(8192) {
+	TcpSession::pointer TcpSession::create(std::shared_ptr<ip::tcp::socket> socket) {
+		return TcpSession::pointer(new TcpSession(socket));
+	}
 
+	TcpSession::TcpSession(TcpServer* server_context, io_context& context)
+		: server(server_context), sendBuffer(8192), receiveBuffer(8192) {
+		socket = std::make_shared<ip::tcp::socket>(context);
+	}
+
+	TcpSession::TcpSession(std::shared_ptr<ip::tcp::socket> socket)
+	: sendBuffer(8192), receiveBuffer(8192){
+		this->socket = socket;
 	}
 
 	void TcpSession::start() {
 		read();
-		/*async_write(socket, buffer(bufferData, maxBufferSize),
-			boost::bind(&TestSession::handleWrite, shared_from_this(),
-				placeholders::error, placeholders::bytes_transferred));*/
 	}
 
 	void TcpSession::read() {
-		socket.async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
+		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 			boost::bind(&TcpSession::handleRead, shared_from_this(),
 				placeholders::error, placeholders::bytes_transferred));
 	}
 
-	void TcpSession::handleRead(const error_code& error, size_t bytesTransfrred) {
+	void TcpSession::handleRead(const error_code& error, size_t bytesTransferred) {
 		if (error) {
-			std::cerr << "session disconnected... error: " << error << std::endl;
+			std::cerr << "session disconnected..." << " sessionId: " << sessionId
+				<< ", error: " << error << std::endl;
+
+			dieconnect();
 			return;
 		}
 
-		//receiveBuffer.setBufferLastPos(bytesTransfrred);
-		//Deserialize deserialize(&receiveBuffer);
+		receiveBuffer.setBufferLastPos(bytesTransferred);
+		std::string data;
+		Deserialize::read(&receiveBuffer, data);
 
-		//std::string data;
-		//deserialize.read(data);
+		std::cout << "recieveData[" << bytesTransferred << "] : " << data << std::endl;
 
-		//std::cout << "recieveData[" << bytesTransfrred << "] : " << data << std::endl;
+		write(data);
 
-		//write(data);
+		receiveBuffer.clearBuffer();
 
-		//receiveBuffer.clearBuffer();
-
-		//read();
+		read();
 	}
 
 	void TcpSession::write(const std::string& data) {
-		/*Serialize serialize(&sendBuffer);
 
-		serialize.write(data);
+		Serialize::write(&sendBuffer, data);
 
-		async_write(socket,
+		async_write(*socket,
 			buffer(sendBuffer.getBuffer(), sendBuffer.getBufferLastPos()),
-			boost::bind(&TestSession::handleWrite, shared_from_this(),
-				placeholders::error, placeholders::bytes_transferred));*/
+			boost::bind(&TcpSession::handleWrite, shared_from_this(),
+				placeholders::error, placeholders::bytes_transferred));
 	}
 
 	void TcpSession::handleWrite(const error_code& error, size_t bytesTransferred) {
+		std::cout << "sendData[" << bytesTransferred << "]" << std::endl;
 		sendBuffer.clearBuffer();
+	}
+
+	void TcpSession::dieconnect() {
+		if (server != nullptr) {
+			server->sessionDisconnected(sessionId);
+		}
 	}
 }

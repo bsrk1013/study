@@ -20,7 +20,7 @@ namespace DBBD {
 		size_t getBufferOffset() { return bufferOffset; }
 		void setBufferOffset(size_t value) { bufferOffset = value; }
 
-	private:
+	public:
 		static const size_t bit = 1;
 		static const size_t byte = 8 * bit;
 

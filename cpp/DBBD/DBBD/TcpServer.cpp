@@ -3,47 +3,54 @@
 #include "TcpServer.h"
 
 namespace DBBD {
-	TcpServer::TcpServer(io_context& context)
-		: TcpServer(context, 8100) {
+	TcpServer::TcpServer(std::string name)
+		: TcpServer(name, 8100) {}
 
-	}
+	TcpServer::TcpServer(std::string name, short port)
+		: TcpServer(name, "127.0.0.1", port) {}
 
-	TcpServer::TcpServer(io_context& context, short port)
-		: TcpServer(context, "127.0.0.1", port) {
-	}
+	TcpServer::TcpServer(std::string name, std::string address)
+		: TcpServer(name, address, 8100) {}
 
-	TcpServer::TcpServer(io_context& context, std::string address)
-		: TcpServer(context, address, 8100) {
+	TcpServer::TcpServer(std::string name, std::string address, short port)
+		: name(name) {
 
-	}
+		context = std::make_unique<io_context>();
+		acceptor = std::make_unique<ip::tcp::acceptor>(*context,
+			ip::tcp::endpoint(ip::address_v4::from_string(address), port));
 
-	TcpServer::TcpServer(io_context& context, std::string address, short port)
-		: context(context), acceptor(context, ip::tcp::endpoint(ip::address_v4::from_string(address), port)) {
+		std::cout << name << " Server started..." << std::endl;
 		startAccept();
+
+		context->run();
 	}
 
 	TcpServer::~TcpServer() {
-		/*if (sessionMap.size() > 0) {
-			for (auto pair : sessionMap) {
-				auto session = pair.second;
-				session->sessionClose();
-			}
-		}*/
+		if (acceptor &&
+				acceptor->is_open()) {
+			acceptor->close();
+		}
 
-		if (acceptor.is_open()) {
-			acceptor.close();
+		if (context) {
+			context->stop();
 		}
 	}
 
 	void TcpServer::startAccept() {
-		auto session = TcpSession::create(this, context);
-		acceptor.async_accept(session->getSocket(),
+		auto session = TcpSession::create(this, *context);
+		acceptor->async_accept(*session->getSocket(),
 			boost::bind(&TcpServer::handleAccept, this, session, placeholders::error));
 	}
 
 	void TcpServer::handleAccept(TcpSession::pointer session, const error_code& error) {
 		if (!error) {
 			size_t sessionId = increaseAndGetSessionId();
+			session->setSessionId(sessionId);
+
+			sessionMap[sessionId] = session;
+
+			//implementAccept(session);
+
 			session->start();
 			std::cout << "session connected... id: " << sessionId << std::endl;
 		}
