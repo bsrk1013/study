@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include "TcpSession.h"
 
 using namespace boost::asio;
@@ -34,8 +36,11 @@ namespace DBBD {
 	private:
 		std::string name;
 		std::unique_ptr<io_context> context;
+		std::shared_ptr<executor_work_guard<io_context::executor_type>> guard;
 		std::unique_ptr<ip::tcp::acceptor> acceptor;
 		std::atomic<size_t> sessionIdCounter = 0;
 		std::map<size_t, TcpSession::pointer> sessionMap;
+		boost::thread_group threads;
+		std::mutex lockObject;
 	};
 }

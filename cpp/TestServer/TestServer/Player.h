@@ -5,7 +5,9 @@ class Player
 {
 public:
 	Player(DBBD::TcpSession::pointer session);
-	~Player();
+	virtual ~Player();
+
+public:
 
 private:
 	DBBD::TcpSession::pointer session;

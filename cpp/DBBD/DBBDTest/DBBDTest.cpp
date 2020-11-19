@@ -70,6 +70,10 @@ namespace DBBDTest
 					Deserialize::read(buffer, level);
 				}
 
+				virtual size_t getLength() {
+					return 0;
+				}
+
 			public:
 				std::string name;
 				short level;
@@ -95,6 +99,10 @@ namespace DBBDTest
 					Deserialize::read(buffer, age);
 					Deserialize::read(buffer, dynamic_cast<Cell*>(&equip));
 				}
+				
+				virtual size_t getLength() {
+					return 0;
+				}
 
 			public:
 				std::string name;
@@ -118,6 +126,89 @@ namespace DBBDTest
 			Assert::AreEqual(person.age, person2.age);
 			Assert::AreEqual(person.equip.name, person2.equip.name);
 			Assert::AreEqual(person.equip.level, person2.equip.level);
+		}
+
+		TEST_METHOD(RequestTest) {
+			class Request{
+			public:
+				virtual ~Request() = 0;
+
+			public:
+				virtual void serialize(Buffer* buffer) = 0;
+				virtual void deserialize(Buffer* buffer) = 0;
+				virtual size_t getLength() = 0;
+
+			protected:
+				size_t typeId;
+			};
+
+			class User : public Cell {
+			public:
+				User() {}
+				User(std::string nickname, short level) :nickname(nickname), level(level) {}
+				virtual ~User() {}
+			
+			public:
+				virtual void serialize(Buffer* buffer) {
+					Serialize::write(buffer, nickname);
+					Serialize::write(buffer, level);
+				}
+
+				virtual void deserialize(Buffer* buffer) {
+					Deserialize::read(buffer, nickname);
+					Deserialize::read(buffer, level);
+				}
+
+				virtual size_t getLength() {
+					return nickname.size(); + sizeof(level);
+				}
+
+			private:
+				std::string nickname;
+				short level;
+			};
+
+			class LoginReq : public Request {
+			public:
+				LoginReq() {}
+				virtual ~LoginReq() {}
+			
+			public:
+				virtual void serialize(Buffer* buffer) {
+					Serialize::write(buffer, typeId);
+					Serialize::write(buffer, dynamic_cast<Cell*>(&user));
+				}
+
+				virtual void deserialize(Buffer* buffer) {
+					Deserialize::read(buffer, typeId);
+					Deserialize::read(buffer, dynamic_cast<Cell*>(&user));
+				}
+
+				virtual size_t getLength() {
+					return sizeof(typeId) + user.getLength();
+				}
+
+			protected:
+				size_t typeId = 1;
+
+			public:
+				void setUser(User value) {
+					user = value;
+				}
+
+			private:
+				User user;
+			};
+
+			LoginReq req;
+			User user{"doby", 99};
+
+			req.setUser(user);
+
+			Buffer buffer(8192);
+
+			Serialize::write(&buffer, req.getLength());
+			//Serialize::write(&buffer, req);
 		}
 	};
 }

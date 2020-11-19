@@ -1,12 +1,11 @@
 #pragma once
+#include "Cell.h"
+
 namespace DBBD {
-	class Serialize;
-	class Deserialize;
-	class Cell
+	class Buffer;
+	class Request : public Cell
 	{
 	public:
-		virtual ~Cell() = 0;
-
 	public:
 		virtual void serialize(Buffer* buffer) = 0;
 		virtual void deserialize(Buffer* buffer) = 0;

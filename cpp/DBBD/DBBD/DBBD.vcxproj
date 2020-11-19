@@ -24,6 +24,7 @@
     <ProjectGuid>{b3075808-ef91-4576-9c72-d262e5707a3f}</ProjectGuid>
     <RootNamespace>DBBD</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>DBBD</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -144,6 +145,7 @@
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Deserialize.h" />
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="Request.h" />
     <ClInclude Include="Serialize.h" />
     <ClInclude Include="TcpClient.h" />
     <ClInclude Include="TcpServer.h" />
@@ -152,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Deserialize.cpp" />
+    <ClCompile Include="Request.cpp" />
     <ClCompile Include="Serialize.cpp" />
     <ClCompile Include="TcpClient.cpp" />
     <ClCompile Include="TcpServer.cpp" />

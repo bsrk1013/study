@@ -43,22 +43,26 @@ namespace DBBD {
 			return;
 		}
 
+		readLock.lock();
 		receiveBuffer.setBufferLastPos(bytesTransferred);
 		std::string data;
 		Deserialize::read(&receiveBuffer, data);
-
 		std::cout << "recieveData[" << bytesTransferred << "] : " << data << std::endl;
+		readLock.unlock();
 
 		write(data);
 
+		readLock.lock();
 		receiveBuffer.clearBuffer();
+		readLock.unlock();
 
 		read();
 	}
 
 	void TcpSession::write(const std::string& data) {
-
+		writeLock.lock();
 		Serialize::write(&sendBuffer, data);
+		writeLock.unlock();
 
 		async_write(*socket,
 			buffer(sendBuffer.getBuffer(), sendBuffer.getBufferLastPos()),
@@ -67,8 +71,10 @@ namespace DBBD {
 	}
 
 	void TcpSession::handleWrite(const error_code& error, size_t bytesTransferred) {
+		writeLock.lock();
 		std::cout << "sendData[" << bytesTransferred << "]" << std::endl;
 		sendBuffer.clearBuffer();
+		writeLock.unlock();
 	}
 
 	void TcpSession::dieconnect() {

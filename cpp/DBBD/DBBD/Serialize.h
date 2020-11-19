@@ -10,6 +10,7 @@ namespace DBBD
 		// Value Write
 	public:
 		static void write(Buffer* buffer, const short& value);
+		static void write(Buffer* buffer, const size_t& value);
 		static void write(Buffer* buffer, const std::string& value);
 		static void write(Buffer* buffer, char* const& value);
 

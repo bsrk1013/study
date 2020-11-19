@@ -16,6 +16,10 @@ namespace DBBD {
 		write<short>(buffer, value);
 	}
 
+	void Serialize::write(Buffer* buffer, const size_t& value) {
+		write<size_t>(buffer, value);
+	}
+
 	void Serialize::write(Buffer* buffer, const std::string& value) {
 		size_t strSize = value.length();
 		write(buffer, strSize);
@@ -37,6 +41,10 @@ namespace DBBD {
 	void Serialize::write(Buffer* buffer, Cell* value) {
 		value->serialize(buffer);
 	}
+
+	/*void Serialize::write(Buffer* buffer, Request* value) {
+		value->
+	}*/
 
 	template<typename T, size_t size>
 	void Serialize::writeArray(Buffer* buffer, const T(&values)[size]) {

@@ -48,6 +48,9 @@
     <ClInclude Include="Cell.h">
       <Filter>헤더 파일\Data</Filter>
     </ClInclude>
+    <ClInclude Include="Request.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TcpSession.cpp">
@@ -67,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="Deserialize.cpp">
       <Filter>소스 파일\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Request.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "Buffer.h"
@@ -16,6 +17,8 @@ namespace DBBD {
 		static pointer create(TcpServer* server_context, io_context& context);
 		static pointer create(std::shared_ptr<ip::tcp::socket> socket);
 		void start();
+		void send();
+		void broadcast();
 
 		// getter, setter
 	public:
@@ -40,5 +43,7 @@ namespace DBBD {
 		Buffer sendBuffer;
 		Buffer receiveBuffer;
 		size_t sessionId;
+		std::mutex readLock;
+		std::mutex writeLock;
 	};
 }

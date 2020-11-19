@@ -9,6 +9,7 @@ namespace DBBD {
 		// Value Read
 	public:
 		static void read(Buffer* buffer, short& value);
+		static void read(Buffer* buffer, size_t& value);
 		static void read(Buffer* buffer, std::string& value);
 		static void read(Buffer* buffer, char* value);
 

@@ -1,5 +1,7 @@
 #include <iostream>
 #include <boost/bind.hpp>
+#include <thread>
+#include <mutex>
 #include "TcpServer.h"
 
 namespace DBBD {
@@ -15,25 +17,37 @@ namespace DBBD {
 	TcpServer::TcpServer(std::string name, std::string address, short port)
 		: name(name) {
 
-		context = std::make_unique<io_context>();
+		context = std::make_unique<io_context>(5);
+		auto tempGuard = make_work_guard(*context);
+		//guard = new executor_work_guard<io_context::executor_type>(context.get());
+
 		acceptor = std::make_unique<ip::tcp::acceptor>(*context,
 			ip::tcp::endpoint(ip::address_v4::from_string(address), port));
+		acceptor->set_option(ip::tcp::acceptor::reuse_address(true));
+		acceptor->listen();
 
-		std::cout << name << " Server started..." << std::endl;
+		for (size_t i = 0; i < 3; i++) {
+			threads.create_thread(boost::bind(&io_context::run, &(*context)));
+		}
+
 		startAccept();
 
-		context->run();
+		std::cout << name << " Server Started..." << std::endl;
+
+		//context->run();
 	}
 
 	TcpServer::~TcpServer() {
-		if (acceptor &&
-				acceptor->is_open()) {
+		if (acceptor && acceptor->is_open()) {
 			acceptor->close();
 		}
 
 		if (context) {
 			context->stop();
+			context->restart();
 		}
+
+		threads.join_all();
 	}
 
 	void TcpServer::startAccept() {
@@ -45,22 +59,26 @@ namespace DBBD {
 	void TcpServer::handleAccept(TcpSession::pointer session, const error_code& error) {
 		if (!error) {
 			size_t sessionId = increaseAndGetSessionId();
-			session->setSessionId(sessionId);
 
+			lockObject.lock();
+			session->setSessionId(sessionId);
 			sessionMap[sessionId] = session;
+			session->start();
+			lockObject.unlock();
 
 			//implementAccept(session);
-
-			session->start();
-			std::cout << "session connected... id: " << sessionId << std::endl;
+			auto id = std::this_thread::get_id();
+			std::cout << "[" << id << "]session connected... id: " << sessionId << std::endl;
 		}
 
 		startAccept();
 	}
 
 	void TcpServer::sessionDisconnected(size_t sessionId) {
+		lockObject.lock();
 		sessionMap.erase(sessionId);
 		std::cout << "session map count: " << sessionMap.size() << std::endl;
+		lockObject.unlock();
 	}
 
 	size_t TcpServer::increaseAndGetSessionId() {

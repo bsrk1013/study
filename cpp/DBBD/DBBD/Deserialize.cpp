@@ -15,12 +15,17 @@ namespace DBBD {
 		read<short>(buffer, value);
 	}
 
+	void Deserialize::read(Buffer* buffer, size_t& value) {
+		read<size_t>(buffer, value);
+	}
+
 	void Deserialize::read(Buffer* buffer, std::string& value) {
 		size_t strSize;
 		read(buffer, strSize);
 		char* dataBuffer = buffer->readByteBlock(strSize);
 		std::string str(&dataBuffer[0], &dataBuffer[0] + strSize);
 		value = str;
+		delete[] dataBuffer;
 	}
 
 	void Deserialize::read(Buffer* buffer, char* value) {
