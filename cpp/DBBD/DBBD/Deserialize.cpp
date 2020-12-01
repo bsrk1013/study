@@ -8,7 +8,6 @@ namespace DBBD {
 	void Deserialize::read(Buffer* buffer, T& value) {
 		char* dataBuffer = buffer->readByteBlock(sizeof(T));
 		memcpy(&value, dataBuffer, sizeof(T));
-		delete[] dataBuffer;
 	}
 
 	void Deserialize::read(Buffer* buffer, short& value){
@@ -25,7 +24,6 @@ namespace DBBD {
 		char* dataBuffer = buffer->readByteBlock(strSize);
 		std::string str(&dataBuffer[0], &dataBuffer[0] + strSize);
 		value = str;
-		delete[] dataBuffer;
 	}
 
 	void Deserialize::read(Buffer* buffer, char* value) {

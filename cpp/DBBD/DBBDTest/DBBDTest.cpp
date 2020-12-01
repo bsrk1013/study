@@ -4,6 +4,8 @@
 #include "../DBBD/Cell.h"
 #include "../DBBD/Serialize.h"
 #include "../DBBD/Deserialize.h"
+#include "../DBBD/Request.h"
+#include "../DBBD/Random.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -58,6 +60,7 @@ namespace DBBDTest
 			public:
 				Equip() {}
 				Equip(std::string name, short level):name(name), level(level) {}
+				virtual ~Equip() {}
 
 			public:
 				virtual void serialize(Buffer* buffer) {
@@ -82,7 +85,8 @@ namespace DBBDTest
 			class User : public Cell {
 			public:
 				User() {}
-				User(std::string name, short age, Equip equip) :name(name), age(age), equip(equip) {}
+				User(std::string name, short age, Equip equip) 
+					:name(name), age(age), equip(equip) {}
 				virtual ~User() {}
 
 			private:
@@ -90,8 +94,6 @@ namespace DBBDTest
 					Serialize::write(buffer, name);
 					Serialize::write(buffer, age);
 					Serialize::write(buffer, dynamic_cast<Cell*>(&equip));
-					//equip.serialize(buffer);
-					//Serialize::write(buffer, equip);
 				}
 
 				virtual void deserialize(Buffer* buffer) {
@@ -129,19 +131,6 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(RequestTest) {
-			class Request{
-			public:
-				virtual ~Request() = 0;
-
-			public:
-				virtual void serialize(Buffer* buffer) = 0;
-				virtual void deserialize(Buffer* buffer) = 0;
-				virtual size_t getLength() = 0;
-
-			protected:
-				size_t typeId;
-			};
-
 			class User : public Cell {
 			public:
 				User() {}
@@ -160,10 +149,10 @@ namespace DBBDTest
 				}
 
 				virtual size_t getLength() {
-					return nickname.size(); + sizeof(level);
+					return sizeof(size_t) + nickname.length(); + sizeof(level);
 				}
 
-			private:
+			public:
 				std::string nickname;
 				short level;
 			};
@@ -188,6 +177,10 @@ namespace DBBDTest
 					return sizeof(typeId) + user.getLength();
 				}
 
+			public:
+				size_t getTypeId() { return typeId; }
+				User getUser() { return user; }
+
 			protected:
 				size_t typeId = 1;
 
@@ -205,10 +198,68 @@ namespace DBBDTest
 
 			req.setUser(user);
 
-			Buffer buffer(8192);
+			Buffer sendBuffer(8192);
 
-			Serialize::write(&buffer, req.getLength());
-			//Serialize::write(&buffer, req);
+			Serialize::write(&sendBuffer, req.getLength());
+			Serialize::write(&sendBuffer, dynamic_cast<Cell*>(&req));
+
+			Buffer receiveBuffer(8192);
+
+			sendBuffer.setBufferOffset(0);
+			LoginReq loginReq;
+			while (true) {
+				size_t currentOffset = sendBuffer.getBufferOffset();
+				int transfrred = Random::instance().next(1, 10);
+
+				if (transfrred + currentOffset > sendBuffer.getBufferLastPos()) {
+					transfrred = transfrred + currentOffset - sendBuffer.getBufferLastPos();
+				}
+
+				char* block1 = sendBuffer.readByteBlock(static_cast<size_t>(transfrred));
+				for (size_t i = 0; i < transfrred; i++) {
+					receiveBuffer.putByte(block1[i]);
+				}
+
+				if (sizeof(size_t) > receiveBuffer.getBufferLastPos()) {
+					continue;
+				}
+
+				char* lengthBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
+				size_t length = 0;
+				memcpy(&length, lengthBlock, sizeof(size_t));
+				if (receiveBuffer.getBufferLastPos() < length) {
+					continue;
+				}
+
+				receiveBuffer.readByteBlock(sizeof(size_t));
+				char* typeIdBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
+				size_t typeId = 0;
+				memcpy(&typeId, typeIdBlock, sizeof(size_t));
+
+				if (typeId == 1) {
+					Deserialize::read(&receiveBuffer, dynamic_cast<Cell*>(&loginReq));
+					receiveBuffer.clearBuffer();
+					break;
+				}
+			}
+
+			Assert::AreEqual(req.getTypeId(), loginReq.getTypeId());
+			Assert::AreEqual(req.getUser().nickname, loginReq.getUser().nickname);
+			Assert::AreEqual(req.getUser().level, loginReq.getUser().level);
+		}
+
+		TEST_METHOD(RandomTest) {
+			for (size_t i = 0; i < 1000; i++) {
+				int irandom = Random::instance().next(0, 10);
+				Assert::IsTrue(0 <= irandom && irandom <= 10);
+				Assert::IsTrue(!(irandom < 0) || !(irandom > 10));
+			}
+
+			for (size_t i = 0; i < 1000; i++) {
+				float frandom = Random::instance().next(0.0f, 10.0f);
+				Assert::IsTrue(0.0f <= frandom && frandom <= 10.0f);
+				Assert::IsTrue(!(frandom < 0.0f) || !(frandom > 10.0f));
+			}
 		}
 	};
 }

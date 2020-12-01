@@ -4,6 +4,8 @@
 namespace DBBD {
 	Buffer::Buffer(const size_t& size) {
 		buffer = new char[size];
+		blockSize = size / 16;
+		block = new char[blockSize];
 	}
 
 	Buffer::Buffer(const char* bufferBlock) {
@@ -14,24 +16,35 @@ namespace DBBD {
 		if (buffer != nullptr) {
 			delete[] buffer;
 		}
+
+		if (block != nullptr) {
+			delete[] block;
+		}
 	}
 
-	void Buffer::putByte(const char byteData) {
-		buffer[bufferOffset++] = byteData;
-		bufferLastPos++;
+	void Buffer::putByte(const char& byteData) {
+		buffer[bufferLastPos++] = byteData;
 	}
 
-	char* Buffer::readByteBlock(const size_t& size) {
-		if ((bufferOffset + size) > bufferLastPos) {
+	char* Buffer::readByteBlock(const size_t& size, const bool& incOffset) {
+		/*if ((bufferOffset + size) > bufferLastPos) {
+			throw std::exception("Out of Range");
+		}*/
+
+		if (size > blockSize) {
+			blockSize *= 2;
+			delete[] block;
+			block = new char[blockSize];
 		}
 
-		char* block = new char[size];
 		size_t dataIndex = 0;
 		for (size_t i = bufferOffset; i < bufferOffset + size; i++) {
 			block[dataIndex++] = buffer[i];
 		}
 
-		bufferOffset += size;
+		if (incOffset) {
+			bufferOffset += size;
+		}
 
 		return block;
 	}

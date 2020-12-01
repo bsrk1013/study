@@ -5,7 +5,7 @@ namespace DBBD {
 	class Cell
 	{
 	public:
-		virtual ~Cell() = 0;
+		virtual ~Cell() {};
 
 	public:
 		virtual void serialize(Buffer* buffer) = 0;

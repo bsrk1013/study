@@ -25,6 +25,12 @@
     <Filter Include="소스 파일\Data">
       <UniqueIdentifier>{fb67d630-d9c5-4655-9e1f-c182b3326a17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Util">
+      <UniqueIdentifier>{ead5b6d7-75ce-407b-bc45-66b0c8b08433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Util">
+      <UniqueIdentifier>{2bf19520-bd93-4abd-88bf-ee20928262b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSession.h">
@@ -49,7 +55,10 @@
       <Filter>헤더 파일\Data</Filter>
     </ClInclude>
     <ClInclude Include="Request.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>헤더 파일\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -71,8 +80,8 @@
     <ClCompile Include="Deserialize.cpp">
       <Filter>소스 파일\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Request.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Random.cpp">
+      <Filter>소스 파일\Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

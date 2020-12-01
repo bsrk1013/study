@@ -9,8 +9,8 @@ namespace DBBD {
 		~Buffer();
 
 	public:
-		void putByte(const char byteData);
-		char* readByteBlock(const size_t& size);
+		void putByte(const char& byteData);
+		char* readByteBlock(const size_t& size, const bool& incOffset = true);
 		void clearBuffer();
 
 	public:
@@ -26,6 +26,8 @@ namespace DBBD {
 
 	private:
 		char* buffer = nullptr;
+		char* block = nullptr;
+		size_t blockSize = 0;
 		size_t bufferOffset = 0;
 		size_t bufferLastPos = 0;
 	};
