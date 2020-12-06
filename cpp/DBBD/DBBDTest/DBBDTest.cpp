@@ -199,12 +199,11 @@ namespace DBBDTest
 			req.setUser(user);
 
 			Buffer sendBuffer(8192);
+			Buffer receiveBuffer(8192);
 
 			size_t length = req.getLength();
 			Serialize::write(&sendBuffer, length);
 			Serialize::write(&sendBuffer, dynamic_cast<Cell*>(&req));
-
-			Buffer receiveBuffer(8192);
 
 			sendBuffer.setBufferOffset(0);
 			LoginReq loginReq;
@@ -212,8 +211,9 @@ namespace DBBDTest
 				size_t currentOffset = sendBuffer.getBufferOffset();
 				int transfrred = Random::instance().next(1, 10);
 
-				if (transfrred + currentOffset > sendBuffer.getBufferLastPos()) {
-					transfrred = transfrred + currentOffset - sendBuffer.getBufferLastPos();
+				size_t lastPos = sendBuffer.getBufferLastPos();
+				if (transfrred + currentOffset > lastPos) {
+					transfrred = transfrred + currentOffset - lastPos;
 				}
 
 				char* block1 = sendBuffer.readByteBlock(static_cast<size_t>(transfrred));
@@ -228,7 +228,7 @@ namespace DBBDTest
 				char* lengthBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
 				size_t length = 0;
 				memcpy(&length, lengthBlock, sizeof(size_t));
-				if (receiveBuffer.getBufferLastPos() < length) {
+				if (receiveBuffer.getBufferLastPos() - sizeof(size_t) < length) {
 					continue;
 				}
 
