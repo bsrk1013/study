@@ -149,7 +149,7 @@ namespace DBBDTest
 				}
 
 				virtual size_t getLength() {
-					return sizeof(size_t) + nickname.length(); + sizeof(level);
+					return sizeof(size_t) + nickname.length() + sizeof(level);
 				}
 
 			public:
@@ -200,7 +200,8 @@ namespace DBBDTest
 
 			Buffer sendBuffer(8192);
 
-			Serialize::write(&sendBuffer, req.getLength());
+			size_t length = req.getLength();
+			Serialize::write(&sendBuffer, length);
 			Serialize::write(&sendBuffer, dynamic_cast<Cell*>(&req));
 
 			Buffer receiveBuffer(8192);
