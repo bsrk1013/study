@@ -164,11 +164,14 @@ namespace DBBDTest
 			
 			public:
 				virtual void serialize(Buffer* buffer) {
+					Serialize::write(buffer, getLength());
 					Serialize::write(buffer, typeId);
 					Serialize::write(buffer, dynamic_cast<Cell*>(&user));
 				}
 
 				virtual void deserialize(Buffer* buffer) {
+					size_t length = 0;
+					Deserialize::read(buffer, length);
 					Deserialize::read(buffer, typeId);
 					Deserialize::read(buffer, dynamic_cast<Cell*>(&user));
 				}
@@ -202,7 +205,6 @@ namespace DBBDTest
 			Buffer receiveBuffer(8192);
 
 			size_t length = req.getLength();
-			Serialize::write(&sendBuffer, length);
 			Serialize::write(&sendBuffer, dynamic_cast<Cell*>(&req));
 
 			sendBuffer.setBufferOffset(0);
@@ -232,7 +234,6 @@ namespace DBBDTest
 					continue;
 				}
 
-				receiveBuffer.readByteBlock(sizeof(size_t));
 				char* typeIdBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
 				size_t typeId = 0;
 				memcpy(&typeId, typeIdBlock, sizeof(size_t));
