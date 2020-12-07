@@ -177,7 +177,7 @@ namespace DBBDTest
 				}
 
 				virtual size_t getLength() {
-					return sizeof(typeId) + user.getLength();
+					return sizeof(size_t) + sizeof(typeId) + user.getLength();
 				}
 
 			public:
@@ -230,19 +230,19 @@ namespace DBBDTest
 				char* lengthBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
 				size_t length = 0;
 				memcpy(&length, lengthBlock, sizeof(size_t));
-				if (receiveBuffer.getBufferLastPos() - sizeof(size_t) < length) {
+				if (receiveBuffer.getBufferLastPos() < length) {
 					continue;
 				}
 
-				char* typeIdBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
+				/*char* typeIdBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
 				size_t typeId = 0;
-				memcpy(&typeId, typeIdBlock, sizeof(size_t));
+				memcpy(&typeId, typeIdBlock, sizeof(size_t));*/
 
-				if (typeId == 1) {
+				/*if (typeId == 1) {
 					Deserialize::read(&receiveBuffer, dynamic_cast<Cell*>(&loginReq));
 					receiveBuffer.clearBuffer();
 					break;
-				}
+				}*/
 			}
 
 			Assert::AreEqual(req.getTypeId(), loginReq.getTypeId());

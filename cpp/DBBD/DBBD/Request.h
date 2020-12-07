@@ -8,6 +8,11 @@ namespace DBBD {
 	public:
 		virtual ~Request() {};
 
+	public:
+		virtual void serialize(Buffer* buffer);
+		virtual void deserialize(Buffer* buffer);
+		virtual void getLength();
+
 	protected:
 		size_t typeId;
 	};
