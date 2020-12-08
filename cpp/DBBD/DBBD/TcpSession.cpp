@@ -46,7 +46,7 @@ namespace DBBD {
 		readLock.lock();
 		receiveBuffer.setBufferLastPos(bytesTransferred);
 		std::string data;
-		Deserialize::read(&receiveBuffer, data);
+		Deserialize::read(receiveBuffer, data);
 		std::cout << "recieveData[" << bytesTransferred << "] : " << data << std::endl;
 		readLock.unlock();
 
@@ -61,7 +61,7 @@ namespace DBBD {
 
 	void TcpSession::write(const std::string& data) {
 		writeLock.lock();
-		Serialize::write(&sendBuffer, data);
+		Serialize::write(sendBuffer, data);
 		writeLock.unlock();
 
 		async_write(*socket,

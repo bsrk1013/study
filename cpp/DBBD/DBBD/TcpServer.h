@@ -35,7 +35,7 @@ namespace DBBD {
 
 	private:
 		std::string name;
-		std::unique_ptr<io_context> context;
+		std::shared_ptr<io_context> context;
 		std::shared_ptr<executor_work_guard<io_context::executor_type>> guard;
 		std::unique_ptr<ip::tcp::acceptor> acceptor;
 		std::atomic<size_t> sessionIdCounter = 0;

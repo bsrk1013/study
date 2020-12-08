@@ -17,20 +17,21 @@ namespace DBBD {
 	TcpServer::TcpServer(std::string name, std::string address, short port)
 		: name(name) {
 
-		context = std::make_unique<io_context>(5);
+		context = std::make_shared<io_context>(5);
 		auto tempGuard = make_work_guard(*context);
 		//guard = new executor_work_guard<io_context::executor_type>(context.get());
 
 		acceptor = std::make_unique<ip::tcp::acceptor>(*context,
 			ip::tcp::endpoint(ip::address_v4::from_string(address), port));
 		acceptor->set_option(ip::tcp::acceptor::reuse_address(true));
-		acceptor->listen();
+
+		startAccept();
 
 		for (size_t i = 0; i < 3; i++) {
 			threads.create_thread(boost::bind(&io_context::run, &(*context)));
 		}
 
-		startAccept();
+		//acceptor->listen();
 
 		std::cout << name << " Server Started..." << std::endl;
 

@@ -63,12 +63,12 @@ namespace DBBDTest
 				virtual ~Equip() {}
 
 			public:
-				virtual void serialize(Buffer* buffer) {
+				virtual void serialize(Buffer& buffer) {
 					Serialize::write(buffer, name);
 					Serialize::write(buffer, level);
 				}
 
-				virtual void deserialize(Buffer* buffer) {
+				virtual void deserialize(Buffer& buffer) {
 					Deserialize::read(buffer, name);
 					Deserialize::read(buffer, level);
 				}
@@ -90,13 +90,13 @@ namespace DBBDTest
 				virtual ~User() {}
 
 			private:
-				virtual void serialize(Buffer* buffer) {
+				virtual void serialize(Buffer& buffer) {
 					Serialize::write(buffer, name);
 					Serialize::write(buffer, age);
 					Serialize::write(buffer, dynamic_cast<Cell*>(&equip));
 				}
 
-				virtual void deserialize(Buffer* buffer) {
+				virtual void deserialize(Buffer& buffer) {
 					Deserialize::read(buffer, name);
 					Deserialize::read(buffer, age);
 					Deserialize::read(buffer, dynamic_cast<Cell*>(&equip));
@@ -116,13 +116,13 @@ namespace DBBDTest
 
 			Buffer buffer(8192);
 
-			Serialize::write(&buffer, dynamic_cast<Cell*>(&person));
+			Serialize::write(buffer, dynamic_cast<Cell*>(&person));
 
 			buffer.setBufferOffset(0);
 
 			User person2;
 
-			Deserialize::read(&buffer, dynamic_cast<Cell*>(&person2));
+			Deserialize::read(buffer, dynamic_cast<Cell*>(&person2));
 
 			Assert::AreEqual(person.name, person2.name);
 			Assert::AreEqual(person.age, person2.age);
@@ -138,12 +138,12 @@ namespace DBBDTest
 				virtual ~User() {}
 			
 			public:
-				virtual void serialize(Buffer* buffer) {
+				virtual void serialize(Buffer& buffer) {
 					Serialize::write(buffer, nickname);
 					Serialize::write(buffer, level);
 				}
 
-				virtual void deserialize(Buffer* buffer) {
+				virtual void deserialize(Buffer& buffer) {
 					Deserialize::read(buffer, nickname);
 					Deserialize::read(buffer, level);
 				}
@@ -159,22 +159,22 @@ namespace DBBDTest
 
 			class LoginReq : public Request {
 			public:
-				LoginReq() :Request(1) {}
+				LoginReq() {}
 				virtual ~LoginReq() {}
 
 			public:
-				virtual void serialize(Buffer* buffer) {
-					Request::serialize(buffer);
+				virtual void serialize(Buffer& buffer) {
+					Request::writeHeader(buffer, getLength());
 					Serialize::write(buffer, dynamic_cast<Cell*>(&user));
 				}
 
-				virtual void deserialize(Buffer* buffer) {
-					Request::deserialize(buffer);
+				virtual void deserialize(Buffer& buffer) {
+					Request::readHeader(buffer);
 					Deserialize::read(buffer, dynamic_cast<Cell*>(&user));
 				}
 
 				virtual size_t getLength() {
-					return Request::getLength() + user.getLength();
+					return sizeof(size_t) + Request::getLength() + user.getLength();
 				}
 
 			public:
@@ -198,9 +198,7 @@ namespace DBBDTest
 			Buffer sendBuffer(8192);
 			Buffer receiveBuffer(8192);
 
-			size_t length = req.getLength();
-			Serialize::write(&sendBuffer, length);
-			Serialize::write(&sendBuffer, dynamic_cast<Cell*>(&req));
+			Serialize::write(sendBuffer, dynamic_cast<Cell*>(&req));
 
 			sendBuffer.setBufferOffset(0);
 			LoginReq loginReq;
@@ -218,29 +216,33 @@ namespace DBBDTest
 					receiveBuffer.putByte(block1[i]);
 				}
 
-				if (sizeof(size_t) > receiveBuffer.getBufferLastPos()) {
+				if (HeaderSize > receiveBuffer.getBufferLastPos()) {
 					continue;
 				}
 
-				char* lengthBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
+				auto headerBlock = receiveBuffer.readByteBlock(HeaderSize, false);
+				Header header(headerBlock);
+				if (receiveBuffer.getBufferLastPos() < header.length) {
+					continue;
+				}
+
+				/*char* lengthBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
 				size_t length = 0;
 				memcpy(&length, lengthBlock, sizeof(size_t));
 				size_t a = receiveBuffer.getBufferLastPos();
-				size_t b = sizeof(size_t);
-				if (a - b < length) {
+				if (a < length) {
 					continue;
 				}
-				receiveBuffer.readByteBlock(sizeof(size_t));
 
 				char* typeIdBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
 				size_t typeId = 0;
 				memcpy(&typeId, typeIdBlock, sizeof(size_t));
 
 				if (typeId == 1) {
-					Deserialize::read(&receiveBuffer, dynamic_cast<Cell*>(&loginReq));
+					Deserialize::read(receiveBuffer, dynamic_cast<Cell*>(&loginReq));
 					receiveBuffer.clearBuffer();
 					break;
-				}
+				}*/
 			}
 
 			Assert::AreEqual(req.getTypeId(), loginReq.getTypeId());
