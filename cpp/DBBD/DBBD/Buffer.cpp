@@ -26,11 +26,23 @@ namespace DBBD {
 		buffer[bufferLastPos++] = byteData;
 	}
 
-	char* Buffer::readByteBlock(const size_t& size, const bool& incOffset) {
+	char* Buffer::viewByteBlock(const size_t& size) {
+		return readByte(size);;
+	}
+
+	char* Buffer::readByteBlock(const size_t& size) {
 		/*if ((bufferOffset + size) > bufferLastPos) {
 			throw std::exception("Out of Range");
 		}*/
 
+		readByte(size);
+
+		bufferOffset += size;
+
+		return block;
+	}
+
+	char* Buffer::readByte(const size_t& size) {
 		if (size > blockSize) {
 			blockSize *= 2;
 			delete[] block;
@@ -40,10 +52,6 @@ namespace DBBD {
 		size_t dataIndex = 0;
 		for (size_t i = bufferOffset; i < bufferOffset + size; i++) {
 			block[dataIndex++] = buffer[i];
-		}
-
-		if (incOffset) {
-			bufferOffset += size;
 		}
 
 		return block;

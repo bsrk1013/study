@@ -1,6 +1,8 @@
 #pragma once
 
 namespace DBBD {
+	static const size_t HeaderSize = sizeof(size_t) + sizeof(size_t);
+
 	class Buffer
 	{
 	public:
@@ -10,8 +12,12 @@ namespace DBBD {
 
 	public:
 		void putByte(const char& byteData);
-		char* readByteBlock(const size_t& size, const bool& incOffset = true);
+		char* readByteBlock(const size_t& size);
+		char* viewByteBlock(const size_t& size);
 		void clearBuffer();
+
+	private:
+		char* readByte(const size_t& size);
 
 	public:
 		char* getBuffer() { return buffer; }

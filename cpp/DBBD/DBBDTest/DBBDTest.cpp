@@ -22,7 +22,7 @@ namespace DBBDTest
 	class B : public A {
 	public:
 		B() {}
-		virtual ~B(){}
+		virtual ~B() {}
 	public:
 		virtual std::string getType() {
 			return std::string("B");
@@ -55,11 +55,74 @@ namespace DBBDTest
 			Assert::AreEqual(result2, std::string("B"));
 		}
 
+		TEST_METHOD(PointerTest) {
+			typedef unsigned char BYTE;
+			BYTE* buffer = new BYTE[8192];
+
+			int nLevel = 99;
+			wchar_t strNickname[256] = L"Doby";
+
+			// ==================== Write
+			int nCurWriteBufferPos = 0;
+
+			*(int*)(buffer + nCurWriteBufferPos) = nLevel;
+			nCurWriteBufferPos += sizeof(nLevel);
+
+			memcpy(buffer + nCurWriteBufferPos, strNickname, sizeof(strNickname));
+			nCurWriteBufferPos += sizeof(strNickname);
+			// ==================== Write
+
+			// ==================== Read
+			int nTempLevel = 0;
+			wchar_t strTempNickname[256] = L"";
+
+			int nCurReadBufferPos = 0;
+
+			nTempLevel = *(int*)(buffer + nCurReadBufferPos);
+			nCurReadBufferPos += sizeof(nTempLevel);
+
+			memcpy(strTempNickname, (buffer + nCurReadBufferPos), sizeof(strTempNickname));
+			nCurReadBufferPos += sizeof(strTempNickname);
+			// ==================== Read
+
+			Assert::AreEqual(nLevel, nTempLevel);
+			Assert::AreEqual(strNickname, strTempNickname);
+
+			class BasePlayer {
+			public:
+				BasePlayer() {}
+				BasePlayer(int _nLevel, wchar_t _strNickname[256])
+					:m_nLevel(_nLevel)
+				{
+					wcscpy_s(m_strNickname, _strNickname);
+				}
+
+			public:
+				const int GetLevel() { return m_nLevel; }
+				const wchar_t* GetNickname() { return m_strNickname; }
+
+			private:
+				int m_nLevel;
+				wchar_t m_strNickname[256];
+			};
+
+			BasePlayer player(99, L"Doby2");
+			memcpy(buffer + nCurWriteBufferPos, (void*)&player, sizeof(BasePlayer));
+			nCurWriteBufferPos += sizeof(BasePlayer);
+
+			BasePlayer tempPlayer;
+			memcpy((void*)&tempPlayer, buffer + nCurReadBufferPos, sizeof(BasePlayer));
+			nCurReadBufferPos += sizeof(BasePlayer);
+
+			Assert::AreEqual(player.GetLevel(), tempPlayer.GetLevel());
+			Assert::AreEqual(player.GetNickname(), tempPlayer.GetNickname());
+		}
+
 		TEST_METHOD(BufferTest) {
 			class Equip : public Cell {
 			public:
 				Equip() {}
-				Equip(std::string name, short level):name(name), level(level) {}
+				Equip(std::string name, short level) :name(name), level(level) {}
 				virtual ~Equip() {}
 
 			public:
@@ -85,7 +148,7 @@ namespace DBBDTest
 			class User : public Cell {
 			public:
 				User() {}
-				User(std::string name, short age, Equip equip) 
+				User(std::string name, short age, Equip equip)
 					:name(name), age(age), equip(equip) {}
 				virtual ~User() {}
 
@@ -101,7 +164,7 @@ namespace DBBDTest
 					Deserialize::read(buffer, age);
 					Deserialize::read(buffer, dynamic_cast<Cell*>(&equip));
 				}
-				
+
 				virtual size_t getLength() {
 					return 0;
 				}
@@ -136,7 +199,7 @@ namespace DBBDTest
 				User() {}
 				User(std::string nickname, short level) :nickname(nickname), level(level) {}
 				virtual ~User() {}
-			
+
 			public:
 				virtual void serialize(Buffer& buffer) {
 					Serialize::write(buffer, nickname);
@@ -159,7 +222,9 @@ namespace DBBDTest
 
 			class LoginReq : public Request {
 			public:
-				LoginReq() {}
+				LoginReq() {
+					typeId = 1;
+				}
 				virtual ~LoginReq() {}
 
 			public:
@@ -174,7 +239,7 @@ namespace DBBDTest
 				}
 
 				virtual size_t getLength() {
-					return sizeof(size_t) + Request::getLength() + user.getLength();
+					return Request::getLength() + user.getLength();
 				}
 
 			public:
@@ -191,7 +256,7 @@ namespace DBBDTest
 			};
 
 			LoginReq req;
-			User user{"doby", 99};
+			User user{ "doby", 99 };
 
 			req.setUser(user);
 
@@ -220,29 +285,17 @@ namespace DBBDTest
 					continue;
 				}
 
-				auto headerBlock = receiveBuffer.readByteBlock(HeaderSize, false);
+				auto headerBlock = receiveBuffer.viewByteBlock(HeaderSize);
 				Header header(headerBlock);
 				if (receiveBuffer.getBufferLastPos() < header.length) {
 					continue;
 				}
 
-				/*char* lengthBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
-				size_t length = 0;
-				memcpy(&length, lengthBlock, sizeof(size_t));
-				size_t a = receiveBuffer.getBufferLastPos();
-				if (a < length) {
-					continue;
-				}
-
-				char* typeIdBlock = receiveBuffer.readByteBlock(sizeof(size_t), false);
-				size_t typeId = 0;
-				memcpy(&typeId, typeIdBlock, sizeof(size_t));
-
-				if (typeId == 1) {
+				if (header.typeId == 1) {
 					Deserialize::read(receiveBuffer, dynamic_cast<Cell*>(&loginReq));
 					receiveBuffer.clearBuffer();
 					break;
-				}*/
+				}
 			}
 
 			Assert::AreEqual(req.getTypeId(), loginReq.getTypeId());
@@ -250,17 +303,68 @@ namespace DBBDTest
 			Assert::AreEqual(req.getUser().level, loginReq.getUser().level);
 		}
 
+		TEST_METHOD(RequestTest2) {
+			class LoginReq : public Request {
+			public:
+				LoginReq() {
+					typeId = 1;
+				}
+				virtual ~LoginReq() {}
+
+			public:
+				virtual void serialize(Buffer& buffer) {
+					Request::writeHeader(buffer, getLength());
+					Serialize::write(buffer, token);
+					Serialize::write(buffer, deviceId);
+				}
+
+				virtual void deserialize(Buffer& buffer) {
+					Request::readHeader(buffer);
+					Deserialize::read(buffer, token);
+					Deserialize::read(buffer, deviceId);
+				}
+
+				virtual size_t getLength() {
+					return Request::getLength();
+				}
+
+			public:
+				std::string token;
+				std::string deviceId;
+			};
+
+			LoginReq req;
+			req.token = "fdagjdkasldgjiafd1fdaw5432";
+			req.deviceId = "android";
+
+			Buffer sendBuffer(8192);
+			Buffer receiveBuffer(8192);
+
+			Serialize::write(sendBuffer, (Cell*)&req);
+
+			char* byteBlock = sendBuffer.viewByteBlock(sendBuffer.getBufferLastPos());
+			for (size_t i = 0; i < sendBuffer.getBufferLastPos(); i++) {
+				receiveBuffer.putByte(byteBlock[i]);
+			}
+
+			LoginReq tempReq;
+			Deserialize::read(receiveBuffer, (Cell*)&tempReq);
+
+			Assert::AreEqual(req.token, tempReq.token);
+			Assert::AreEqual(req.deviceId, tempReq.deviceId);
+		}
+
 		TEST_METHOD(RandomTest) {
 			for (size_t i = 0; i < 1000; i++) {
-				int irandom = Random::instance().next(0, 10);
-				Assert::IsTrue(0 <= irandom && irandom <= 10);
-				Assert::IsTrue(!(irandom < 0) || !(irandom > 10));
+				int nRandom = Random::instance().next(0, 10);
+				Assert::IsTrue(0 <= nRandom && nRandom <= 10);
+				Assert::IsTrue(!(nRandom < 0) || !(nRandom > 10));
 			}
 
 			for (size_t i = 0; i < 1000; i++) {
-				float frandom = Random::instance().next(0.0f, 10.0f);
-				Assert::IsTrue(0.0f <= frandom && frandom <= 10.0f);
-				Assert::IsTrue(!(frandom < 0.0f) || !(frandom > 10.0f));
+				float fRandom = Random::instance().next(0.0f, 10.0f);
+				Assert::IsTrue(0.0f <= fRandom && fRandom <= 10.0f);
+				Assert::IsTrue(!(fRandom < 0.0f) || !(fRandom > 10.0f));
 			}
 		}
 	};

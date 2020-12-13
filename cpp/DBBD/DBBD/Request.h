@@ -2,10 +2,12 @@
 #include "Cell.h"
 
 namespace DBBD {
-	static const size_t HeaderSize = sizeof(size_t) + sizeof(size_t);
 	struct Header {
 		Header(char* block) {
-
+			size_t pos = 0;
+			memcpy(&length, block + pos, sizeof(size_t));
+			pos += sizeof(size_t);
+			memcpy(&typeId, (block + pos), sizeof(size_t));
 		}
 
 		size_t length;
@@ -21,25 +23,22 @@ namespace DBBD {
 	public:
 		void writeHeader(Buffer& buffer, size_t length) {
 			Serialize::write(buffer, length);
-			serialize(buffer);
+			Serialize::write(buffer, typeId);
 		}
 
 		void readHeader(Buffer& buffer) {
 			size_t temp = 0;
 			Deserialize::read(buffer, temp);
-			deserialize(buffer);
-		}
-
-		virtual void serialize(Buffer& buffer) {
-			Serialize::write(buffer, typeId);
-		}
-
-		virtual void deserialize(Buffer& buffer) {
 			Deserialize::read(buffer, typeId);
 		}
+
+		virtual void serialize(Buffer& buffer) = 0;
+		virtual void deserialize(Buffer& buffer) = 0;
 		virtual size_t getLength() {
-			return sizeof(typeId);
+			return sizeof(Header);
 		}
+
+		size_t getTypeId() { return typeId; }
 
 	protected:
 		size_t typeId;
