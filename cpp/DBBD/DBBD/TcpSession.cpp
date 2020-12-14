@@ -29,10 +29,6 @@ namespace DBBD {
 	}
 
 	void TcpSession::read() {
-		// streambuf ??
-		/*socket->async_read_some(receiveBuffer.getBuffer(),
-			boost::bind(&TcpSession::handleRead, shared_from_this(),
-				placeholders::error, placeholders::bytes_transferred));*/
 		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 			boost::bind(&TcpSession::handleRead, shared_from_this(),
 				placeholders::error, placeholders::bytes_transferred));
@@ -47,14 +43,16 @@ namespace DBBD {
 			return;
 		}
 
-		receiveBuffer.setBufferLastPos(bytesTransferred);
+		std::cout << "Bytes : " << bytesTransferred << std::endl;
+
+		/*receiveBuffer.setBufferLastPos(bytesTransferred);
 		std::string data;
 		Deserialize::read(receiveBuffer, data);
 		std::cout << "recieveData[" << bytesTransferred << "] : " << data << std::endl;
 
 		write(data);
 
-		receiveBuffer.clearBuffer();
+		receiveBuffer.clearBuffer();*/
 
 		read();
 	}
