@@ -8,6 +8,7 @@ using namespace boost::asio;
 using namespace boost::system;
 
 namespace DBBD {
+	class Cell;
 	class TcpServer;
 	class TcpSession 
 		: public boost::enable_shared_from_this<TcpSession>
@@ -25,7 +26,7 @@ namespace DBBD {
 		std::shared_ptr<ip::tcp::socket> getSocket() { return socket; }
 		size_t getSessionId() { return sessionId; }
 		void setSessionId(size_t value) { sessionId = value; }
-		void write(const std::string& data);
+		void write(Cell* data);
 
 	private:
 		TcpSession(TcpServer* server, io_context& context);

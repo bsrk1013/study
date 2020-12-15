@@ -1,7 +1,8 @@
 #include <boost/bind.hpp>
 #include <thread>
+#include <iostream>
 #include "TcpClient.h"
-#include "iostream"
+#include "Cell.h"
 
 namespace DBBD {
 	TcpClient::TcpClient(const std::string& address, const short& port) {
@@ -47,7 +48,7 @@ namespace DBBD {
 		}
 	}
 
-	void TcpClient::send(const std::string& data) {
+	void TcpClient::send(Cell* data) {
 		session->write(data);
 	}
 

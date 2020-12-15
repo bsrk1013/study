@@ -8,6 +8,7 @@ using namespace boost::asio;
 using namespace boost::system;
 
 namespace DBBD {
+	class Cell;
 	class TcpClient
 	{
 	public:
@@ -15,7 +16,7 @@ namespace DBBD {
 		~TcpClient();
 		
 	public:
-		void send(const std::string& data);
+		void send(Cell* data);
 
 	public:
 		TcpSession::pointer getSession() { return session; }

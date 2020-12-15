@@ -8,7 +8,11 @@
 #include <map>
 #include <list>
 #include <algorithm>
-#include "DBBD\TcpClient.h"
+#include "DBBD/TcpClient.h"
+#include "DBBD/Request.h"
+#include "DBBD/Serialize.h"
+#include "DBBD/Deserialize.h"
+#include "DBBD/Cell.h"
 
 using namespace std;
 
@@ -337,16 +341,47 @@ void baram5() {
     std::cout << "answer5 : " << endl;
 }
 
+class ChattingReq : DBBD::Request {
+public:
+    ChattingReq() { typeId = 1; }
+    virtual ~ChattingReq() {}
+
+    // Request을(를) 통해 상속됨
+    virtual void serialize(DBBD::Buffer& buffer)
+    {
+        writeHeader(buffer, getLength());
+        DBBD::Serialize::write(buffer, msg);
+    }
+    virtual void deserialize(DBBD::Buffer& buffer)
+    {
+        readHeader(buffer);
+        DBBD::Deserialize::read(buffer, msg);
+    }
+
+    virtual size_t getLength() {
+        return Request::getLength() + sizeof(size_t) + msg.size();
+    }
+
+public:
+    std::string getMsg() { return msg; }
+    void setMsg(std::string value) { msg = value; }
+
+private:
+    std::string msg;
+};
+
 int main() {
-    baram1();
+    /*baram1();
     baram2();
     baram3();
     baram4();
-    baram5();
+    baram5();*/
     /*program1();
     program2();
     program3();*/
-	/*try {
+
+
+	try {
 		DBBD::TcpClient client("127.0.0.1", 8100);
 		while (true) {
 			std::string a;
@@ -356,12 +391,15 @@ int main() {
 				break;
 			}
 
-			client.send(a);
+            ChattingReq chatReq;
+            chatReq.setMsg(a);
+
+			client.send((DBBD::Cell*)&chatReq);
 		}
 	}
 	catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
-	}*/
+	}
 
 	return 0;
 }

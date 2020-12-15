@@ -4,6 +4,7 @@
 #include "TcpServer.h"
 #include "Serialize.h"
 #include "Deserialize.h"
+#include "Request.h"
 
 namespace DBBD {
 	TcpSession::pointer TcpSession::create(TcpServer* server, io_context& context) {
@@ -28,6 +29,35 @@ namespace DBBD {
 		read();
 	}
 
+	class ChattingReq : DBBD::Request {
+	public:
+		ChattingReq() { typeId = 1; }
+		virtual ~ChattingReq() {}
+
+		// Request을(를) 통해 상속됨
+		virtual void serialize(DBBD::Buffer& buffer)
+		{
+			writeHeader(buffer, getLength());
+			DBBD::Serialize::write(buffer, msg);
+		}
+		virtual void deserialize(DBBD::Buffer& buffer)
+		{
+			readHeader(buffer);
+			DBBD::Deserialize::read(buffer, msg);
+		}
+
+		virtual size_t getLength() {
+			return Request::getLength() + sizeof(size_t) + msg.size();
+		}
+
+	public:
+		std::string getMsg() { return msg; }
+		void setMsg(std::string value) { msg = value; }
+
+	private:
+		std::string msg;
+	};
+
 	void TcpSession::read() {
 		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 			boost::bind(&TcpSession::handleRead, shared_from_this(),
@@ -45,6 +75,17 @@ namespace DBBD {
 
 		std::cout << "Bytes : " << bytesTransferred << std::endl;
 
+		auto headerBlock = receiveBuffer.viewByteBlock(HeaderSize);
+		Header header(headerBlock);
+
+		switch (header.typeId) {
+		case 1:
+			ChattingReq req;
+			Deserialize::read(receiveBuffer, (Cell*)&req);
+			std::cout << "Read : " << req.getMsg() << std::endl;
+			break;
+		}
+
 		/*receiveBuffer.setBufferLastPos(bytesTransferred);
 		std::string data;
 		Deserialize::read(receiveBuffer, data);
@@ -57,7 +98,7 @@ namespace DBBD {
 		read();
 	}
 
-	void TcpSession::write(const std::string& data) {
+	void TcpSession::write(Cell* data) {
 		Serialize::write(sendBuffer, data);
 
 		async_write(*socket,
