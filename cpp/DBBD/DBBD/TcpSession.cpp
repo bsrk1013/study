@@ -78,24 +78,17 @@ namespace DBBD {
 		auto headerBlock = receiveBuffer.viewByteBlock(HeaderSize);
 		Header header(headerBlock);
 
-		switch (header.typeId) {
+		readInternal(header);
+
+		/*switch (header.typeId) {
 		case 1:
 			ChattingReq req;
 			Deserialize::read(receiveBuffer, (Cell*)&req);
 			std::cout << "Read : " << req.getMsg() << std::endl;
 			break;
-		}
+		}*/
 
 		receiveBuffer.clearBuffer();
-
-		/*receiveBuffer.setBufferLastPos(bytesTransferred);
-		std::string data;
-		Deserialize::read(receiveBuffer, data);
-		std::cout << "recieveData[" << bytesTransferred << "] : " << data << std::endl;
-
-		write(data);
-
-		receiveBuffer.clearBuffer();*/
 
 		read();
 	}

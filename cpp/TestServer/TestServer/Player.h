@@ -1,13 +1,13 @@
 #pragma once
-#include "DBBD\TcpSession.h"
+#include "DBBD/TcpSession.h"
 
 class Player
 {
 public:
 	Player(DBBD::TcpSession::pointer session);
-	virtual ~Player();
+	~Player();
 
-public:
+protected:
 
 private:
 	DBBD::TcpSession::pointer session;

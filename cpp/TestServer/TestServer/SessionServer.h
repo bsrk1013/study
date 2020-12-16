@@ -2,11 +2,11 @@
 #include <boost/asio.hpp>
 #include <string>
 #include <map>
-#include "DBBD\TcpServer.h"
-#include "Player.h"
+#include "DBBD/TcpServer.h"
 
 using namespace boost::asio;
 
+class Player;
 class DBBD::TcpSession;
 class SessionServer : DBBD::TcpServer {
 public:

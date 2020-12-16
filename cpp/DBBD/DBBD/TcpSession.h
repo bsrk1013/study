@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "Buffer.h"
+#include "Request.h"
 
 using namespace boost::asio;
 using namespace boost::system;
@@ -18,8 +19,6 @@ namespace DBBD {
 		static pointer create(TcpServer* server_context, io_context& context);
 		static pointer create(std::shared_ptr<ip::tcp::socket> socket);
 		void start();
-		void send();
-		void broadcast();
 
 		// getter, setter
 	public:
@@ -31,7 +30,10 @@ namespace DBBD {
 	private:
 		TcpSession(TcpServer* server, io_context& context);
 		TcpSession(std::shared_ptr<ip::tcp::socket> socket);
-		
+
+	protected:
+		virtual void readInternal(const Header& header) {};
+
 	private:
 		void read();
 		void handleRead(const error_code& error, size_t bytesTransfrred);
