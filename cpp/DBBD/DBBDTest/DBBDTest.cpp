@@ -367,5 +367,9 @@ namespace DBBDTest
 				Assert::IsTrue(!(fRandom < 0.0f) || !(fRandom > 10.0f));
 			}
 		}
+
+		TEST_METHOD(BytesTest) {
+			Buffer buffer(64);
+		}
 	};
 }

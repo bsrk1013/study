@@ -385,9 +385,9 @@ int main() {
 
 	try {
 
-        for (size_t i = 0; i < 100; i++) {
+        for (size_t i = 0; i < 10; i++) {
             std::thread* pThread = new std::thread([&clientList](){
-                for (size_t j = 0; j < 2; j++) {
+                for (size_t j = 0; j < 5; j++) {
                     DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
                     clientList.push_back(client);
                 }
