@@ -86,6 +86,8 @@ namespace DBBD {
 			break;
 		}
 
+		receiveBuffer.clearBuffer();
+
 		/*receiveBuffer.setBufferLastPos(bytesTransferred);
 		std::string data;
 		Deserialize::read(receiveBuffer, data);

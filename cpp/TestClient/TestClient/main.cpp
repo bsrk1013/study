@@ -380,9 +380,25 @@ int main() {
     program2();
     program3();*/
 
+    std::vector<DBBD::TcpClient*> clientList;
+    std::vector<std::thread*> threadList(100);
 
 	try {
-		DBBD::TcpClient client("127.0.0.1", 8100);
+
+        for (size_t i = 0; i < 100; i++) {
+            std::thread* pThread = new std::thread([&clientList](){
+                for (size_t j = 0; j < 2; j++) {
+                    DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
+                    clientList.push_back(client);
+                }
+
+                while (true) {}
+            });
+
+            threadList.push_back(pThread);
+		}
+
+		// DBBD::TcpClient client("127.0.0.1", 8100);
 		while (true) {
 			std::string a;
 			std::getline(std::cin, a);
@@ -394,7 +410,9 @@ int main() {
             ChattingReq chatReq;
             chatReq.setMsg(a);
 
-			client.send((DBBD::Cell*)&chatReq);
+            for (auto client : clientList) {
+                client->send((DBBD::Cell*)&chatReq);
+            }
 		}
 	}
 	catch (std::exception& e) {

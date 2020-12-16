@@ -12,6 +12,8 @@ namespace DBBD {
 	class TcpClient
 	{
 	public:
+		TcpClient() {}
+		TcpClient(const TcpClient&) {}
 		TcpClient(const std::string& address, const short& port);
 		~TcpClient();
 		
