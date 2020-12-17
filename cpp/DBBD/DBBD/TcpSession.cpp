@@ -58,6 +58,35 @@ namespace DBBD {
 		std::string msg;
 	};
 
+	class FooReq : DBBD::Request {
+	public:
+		FooReq() { typeId = 2; }
+		virtual ~FooReq() {}
+
+		// Request을(를) 통해 상속됨
+		virtual void serialize(DBBD::Buffer& buffer)
+		{
+			writeHeader(buffer, getLength());
+			DBBD::Serialize::write(buffer, msgSize);
+		}
+		virtual void deserialize(DBBD::Buffer& buffer)
+		{
+			readHeader(buffer);
+			DBBD::Deserialize::read(buffer, msgSize);
+		}
+
+		virtual size_t getLength() {
+			return Request::getLength() + sizeof(msgSize);
+		}
+
+	public:
+		size_t getMsgSize() { return msgSize; }
+		void setMsgSize(const size_t& value) { msgSize = value; }
+
+	private:
+		size_t msgSize;
+	};
+
 	void TcpSession::read() {
 		receiveBuffer.adjust();
 		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
@@ -93,11 +122,18 @@ namespace DBBD {
 					readInternal(header);
 
 					switch (header.typeId) {
-					case 1:
-						ChattingReq req;
-						Deserialize::read(receiveBuffer, (Cell*)&req);
-						std::cout << "Read : " << req.getMsg() << std::endl;
+					case 1: {
+						ChattingReq chatReq;
+						Deserialize::read(receiveBuffer, (Cell*)&chatReq);
+						std::cout << "CharringReq : " << chatReq.getMsg() << std::endl;
 						break;
+					}
+					case 2: {
+						FooReq fooReq;
+						Deserialize::read(receiveBuffer, (Cell*)&fooReq);
+						std::cout << "FooReq : " << fooReq.getMsgSize() << std::endl;
+						break;
+					}
 					}
 				}
 			}

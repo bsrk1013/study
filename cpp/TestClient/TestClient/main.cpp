@@ -13,6 +13,7 @@
 #include "DBBD/Serialize.h"
 #include "DBBD/Deserialize.h"
 #include "DBBD/Cell.h"
+#include "DBBD/Random.h"
 
 using namespace std;
 
@@ -364,10 +365,39 @@ public:
 
 public:
     std::string getMsg() { return msg; }
-    void setMsg(std::string value) { msg = value; }
+    void setMsg(const std::string& value) { msg = value; }
 
 private:
     std::string msg;
+};
+
+class FooReq : DBBD::Request {
+public:
+    FooReq() { typeId = 2; }
+    virtual ~FooReq() {}
+
+    // Request을(를) 통해 상속됨
+    virtual void serialize(DBBD::Buffer& buffer)
+    {
+        writeHeader(buffer, getLength());
+        DBBD::Serialize::write(buffer, msgSize);
+    }
+    virtual void deserialize(DBBD::Buffer& buffer)
+    {
+        readHeader(buffer);
+        DBBD::Deserialize::read(buffer, msgSize);
+    }
+
+    virtual size_t getLength() {
+        return Request::getLength() + sizeof(msgSize);
+    }
+
+public:
+    size_t getMsgSize() { return msgSize; }
+    void setMsgSize(const size_t& value) { msgSize = value; }
+
+private:
+    size_t msgSize;
 };
 
 int main() {
@@ -397,11 +427,24 @@ int main() {
 				break;
 			}
 
-            ChattingReq chatReq;
-            chatReq.setMsg(a);
+            int rand = DBBD::Random::instance().next(0, 100);
+            if (rand <= 50) {
+                ChattingReq chatReq;
+                chatReq.setMsg(a);
+                
+                for (auto client : clientList) {
+                    client->send((DBBD::Cell*)&chatReq);
+                }
+            }
+            else {
+                FooReq fooReq;
+                fooReq.setMsgSize(a.size());
+                /*ChattingReq chatReq;
+                chatReq.setMsg(a);*/
 
-            for (auto client : clientList) {
-                client->send((DBBD::Cell*)&chatReq);
+                for (auto client : clientList) {
+                    client->send((DBBD::Cell*)&fooReq);
+                }
             }
 		}
 	}
