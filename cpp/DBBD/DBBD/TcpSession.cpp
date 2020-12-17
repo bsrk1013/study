@@ -125,13 +125,13 @@ namespace DBBD {
 					case 1: {
 						ChattingReq chatReq;
 						Deserialize::read(receiveBuffer, (Cell*)&chatReq);
-						std::cout << "CharringReq : " << chatReq.getMsg() << std::endl;
+						std::cout << "[" << sessionId << "]CharringReq : " << chatReq.getMsg() << std::endl;
 						break;
 					}
 					case 2: {
 						FooReq fooReq;
 						Deserialize::read(receiveBuffer, (Cell*)&fooReq);
-						std::cout << "FooReq : " << fooReq.getMsgSize() << std::endl;
+						std::cout << "[" << sessionId << "]FooReq : " << fooReq.getMsgSize() << std::endl;
 						break;
 					}
 					}

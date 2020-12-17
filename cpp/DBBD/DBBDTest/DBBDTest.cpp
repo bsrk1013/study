@@ -371,5 +371,14 @@ namespace DBBDTest
 		TEST_METHOD(BytesTest) {
 			Buffer buffer(64);
 		}
+
+		TEST_METHOD(AnyTest) {
+			typedef size_t TableId;
+
+			TableId a = 1;
+			size_t b = 1;
+
+			Assert::IsTrue(std::is_same<TableId, size_t>::value);
+		}
 	};
 }
