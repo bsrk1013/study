@@ -14,7 +14,11 @@ namespace DBBD {
 		void putByte(const char& byteData);
 		char* readByteBlock(const size_t& size);
 		char* viewByteBlock(const size_t& size);
+		void adjust();
 		void clearBuffer();
+
+	public:
+		inline void increaseLastPos(size_t size) { bufferLastPos += size; }
 
 	private:
 		char* readByte(const size_t& size);

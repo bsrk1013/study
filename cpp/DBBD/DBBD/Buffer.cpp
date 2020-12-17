@@ -57,6 +57,20 @@ namespace DBBD {
 		return block;
 	}
 
+	void Buffer::adjust() {
+		size_t spare = bufferLastPos - bufferOffset;
+		if (spare == 0) {
+			bufferOffset = 0;
+			bufferLastPos = 0;
+		}
+		else if (bufferOffset > 0
+			&& spare > 0) {
+			memmove(buffer, (buffer + bufferOffset), spare);
+			bufferOffset = 0;
+			bufferLastPos = spare;
+		}
+	}
+
 	void Buffer::clearBuffer() {
 		memset(buffer, 0, bufferLastPos);
 		bufferOffset = 0;

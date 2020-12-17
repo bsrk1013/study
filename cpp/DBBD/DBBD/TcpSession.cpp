@@ -59,6 +59,7 @@ namespace DBBD {
 	};
 
 	void TcpSession::read() {
+		receiveBuffer.adjust();
 		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 			boost::bind(&TcpSession::handleRead, shared_from_this(),
 				placeholders::error, placeholders::bytes_transferred));
@@ -75,20 +76,34 @@ namespace DBBD {
 
 		std::cout << "Bytes : " << bytesTransferred << std::endl;
 
-		auto headerBlock = receiveBuffer.viewByteBlock(HeaderSize);
-		Header header(headerBlock);
+		receiveBuffer.increaseLastPos(bytesTransferred);
 
-		readInternal(header);
+		while (true) {
+			if (receiveBuffer.getBufferLastPos() < HeaderSize) {
+				break;
+			}
+			else {
+				auto headerBlock = receiveBuffer.viewByteBlock(HeaderSize);
+				Header header(headerBlock);
 
-		/*switch (header.typeId) {
-		case 1:
-			ChattingReq req;
-			Deserialize::read(receiveBuffer, (Cell*)&req);
-			std::cout << "Read : " << req.getMsg() << std::endl;
-			break;
-		}*/
+				if (receiveBuffer.getBufferLastPos() < header.length) {
+					break;
+				}
+				else {
+					readInternal(header);
 
-		receiveBuffer.clearBuffer();
+					switch (header.typeId) {
+					case 1:
+						ChattingReq req;
+						Deserialize::read(receiveBuffer, (Cell*)&req);
+						std::cout << "Read : " << req.getMsg() << std::endl;
+						break;
+					}
+				}
+			}
+		}
+
+		//receiveBuffer.clearBuffer();
 
 		read();
 	}
