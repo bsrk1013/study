@@ -6,6 +6,8 @@
 #include "../DBBD/Deserialize.h"
 #include "../DBBD/Request.h"
 #include "../DBBD/Random.h"
+#include <boost/asio.hpp>
+#include <boost/timer.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -369,6 +371,8 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(TimerTest) {
+			boost::asio::io_context context;
+			boost::asio::deadline_timer dt(context);
 		}
 
 		TEST_METHOD(AnyTest) {

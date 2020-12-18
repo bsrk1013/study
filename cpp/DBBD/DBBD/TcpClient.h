@@ -27,7 +27,7 @@ namespace DBBD {
 		void handleConnect(const error_code& error);
 
 	private:
-		std::thread* t1 = nullptr;
+		std::thread* mainThread = nullptr;
 		std::unique_ptr<io_context> context;
 		std::shared_ptr<ip::tcp::socket> socket;
 		TcpSession::pointer session;
