@@ -40,5 +40,6 @@ namespace DBBD {
 		size_t blockSize = 0;
 		size_t bufferOffset = 0;
 		size_t bufferLastPos = 0;
+		size_t bufferCapacity = 0;
 	};
 }

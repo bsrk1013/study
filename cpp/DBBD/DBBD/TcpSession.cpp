@@ -119,22 +119,33 @@ namespace DBBD {
 					break;
 				}
 				else {
-					readInternal(header);
+					if (readDelegate != nullptr) {
+						readDelegate->readInternal(header);
+					}
 
+					/////////////////////////////////////////////////////////////////////// readInternal에서 구현해야함
 					switch (header.typeId) {
 					case 1: {
 						ChattingReq chatReq;
 						Deserialize::read(receiveBuffer, (Cell*)&chatReq);
 						std::cout << "[" << sessionId << "]CharringReq : " << chatReq.getMsg() << std::endl;
+						for (size_t i = 0; i < 1000; i++) {
+							// do nothing
+						}
 						break;
 					}
 					case 2: {
 						FooReq fooReq;
 						Deserialize::read(receiveBuffer, (Cell*)&fooReq);
 						std::cout << "[" << sessionId << "]FooReq : " << fooReq.getMsgSize() << std::endl;
+						for (size_t i = 0; i < 2000; i++) {
+							// do nothing
+						}
 						break;
 					}
 					}
+					///////////////////////////////////////////////////////////////////////////////////////////////////
+					//std::this_thread::sleep_for(std::chrono::duration<float>(0.01f));
 				}
 			}
 		}

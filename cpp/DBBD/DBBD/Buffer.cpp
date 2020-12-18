@@ -3,6 +3,7 @@
 
 namespace DBBD {
 	Buffer::Buffer(const size_t& size) {
+		bufferCapacity = size;
 		buffer = new char[size];
 		blockSize = size / 16;
 		block = new char[blockSize];
@@ -59,7 +60,11 @@ namespace DBBD {
 
 	void Buffer::adjust() {
 		size_t spare = bufferLastPos - bufferOffset;
-		if (spare == 0) {
+		if (spare > bufferCapacity) {
+			bufferOffset = 0;
+			bufferLastPos = 0;
+		}
+		else if (spare == 0) {
 			bufferOffset = 0;
 			bufferLastPos = 0;
 		}

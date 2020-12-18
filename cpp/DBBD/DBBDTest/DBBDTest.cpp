@@ -368,8 +368,7 @@ namespace DBBDTest
 			}
 		}
 
-		TEST_METHOD(BytesTest) {
-			Buffer buffer(64);
+		TEST_METHOD(TimerTest) {
 		}
 
 		TEST_METHOD(AnyTest) {
