@@ -372,7 +372,20 @@ namespace DBBDTest
 
 		TEST_METHOD(TimerTest) {
 			boost::asio::io_context context;
-			boost::asio::deadline_timer dt(context);
+			boost::asio::deadline_timer dt(context, boost::posix_time::seconds(1));
+
+			dt.wait();
+			Assert::IsTrue(true);
+
+			auto test1 = [&](const boost::system::error_code& error) {
+				Assert::IsTrue(false);
+			};
+
+			dt.async_wait(&test1);
+
+			context.run();
+
+			std::this_thread::sleep_for(std::chrono::duration<int>(2));
 		}
 
 		TEST_METHOD(AnyTest) {
