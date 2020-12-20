@@ -29,64 +29,6 @@ namespace DBBD {
 		read();
 	}
 
-	class ChattingReq : DBBD::Request {
-	public:
-		ChattingReq() { typeId = 1; }
-		virtual ~ChattingReq() {}
-
-		// Request을(를) 통해 상속됨
-		virtual void serialize(DBBD::Buffer& buffer)
-		{
-			writeHeader(buffer, getLength());
-			DBBD::Serialize::write(buffer, msg);
-		}
-		virtual void deserialize(DBBD::Buffer& buffer)
-		{
-			readHeader(buffer);
-			DBBD::Deserialize::read(buffer, msg);
-		}
-
-		virtual size_t getLength() {
-			return Request::getLength() + sizeof(size_t) + msg.size();
-		}
-
-	public:
-		std::string getMsg() { return msg; }
-		void setMsg(std::string value) { msg = value; }
-
-	private:
-		std::string msg;
-	};
-
-	class FooReq : DBBD::Request {
-	public:
-		FooReq() { typeId = 2; }
-		virtual ~FooReq() {}
-
-		// Request을(를) 통해 상속됨
-		virtual void serialize(DBBD::Buffer& buffer)
-		{
-			writeHeader(buffer, getLength());
-			DBBD::Serialize::write(buffer, msgSize);
-		}
-		virtual void deserialize(DBBD::Buffer& buffer)
-		{
-			readHeader(buffer);
-			DBBD::Deserialize::read(buffer, msgSize);
-		}
-
-		virtual size_t getLength() {
-			return Request::getLength() + sizeof(msgSize);
-		}
-
-	public:
-		size_t getMsgSize() { return msgSize; }
-		void setMsgSize(const size_t& value) { msgSize = value; }
-
-	private:
-		size_t msgSize;
-	};
-
 	void TcpSession::read() {
 		receiveBuffer.adjust();
 		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
@@ -119,38 +61,22 @@ namespace DBBD {
 					break;
 				}
 				else {
-					if (readDelegate != nullptr) {
-						readDelegate->readInternal(header);
+					if (readInternal) {
+						readInternal(header, receiveBuffer);
 					}
-
-					/////////////////////////////////////////////////////////////////////// readInternal에서 구현해야함
-					switch (header.typeId) {
-					case 1: {
-						ChattingReq chatReq;
-						Deserialize::read(receiveBuffer, (Cell*)&chatReq);
-						std::cout << "[" << sessionId << "]CharringReq : " << chatReq.getMsg() << std::endl;
-						for (size_t i = 0; i < 1000; i++) {
-							// do nothing
-						}
-						break;
+					/*if (readInternal) {
+						readInternal(header, receiveBuffer);
+					}*/
+					/*if (readDelegate != nullptr) {
+						readDelegate->readInternal(header, receiveBuffer);
 					}
-					case 2: {
-						FooReq fooReq;
-						Deserialize::read(receiveBuffer, (Cell*)&fooReq);
-						std::cout << "[" << sessionId << "]FooReq : " << fooReq.getMsgSize() << std::endl;
-						for (size_t i = 0; i < 2000; i++) {
-							// do nothing
-						}
-						break;
-					}
-					}
-					///////////////////////////////////////////////////////////////////////////////////////////////////
-					//std::this_thread::sleep_for(std::chrono::duration<float>(0.01f));
+					else {
+						receiveBuffer.readByteBlock(HeaderSize);
+						receiveBuffer.readByteBlock(header.length);
+					}*/
 				}
 			}
 		}
-
-		//receiveBuffer.clearBuffer();
 
 		read();
 	}

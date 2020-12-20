@@ -14,6 +14,7 @@
 #include "DBBD/Deserialize.h"
 #include "DBBD/Cell.h"
 #include "DBBD/Random.h"
+#include <boost/asio.hpp>
 
 using namespace std;
 
@@ -414,6 +415,38 @@ int main() {
     std::vector<std::thread*> threadList(100);
 
 	try {
+        /*std::shared_ptr<boost::asio::io_context> spContext;
+        spContext = std::make_shared<boost::asio::io_context>(5);
+
+        class TimerObject {
+        public:
+            TimerObject(std::shared_ptr<boost::asio::io_context> context, std::string name) 
+                : spContext(context),
+                    name(name)
+            {
+            }
+
+        public:
+            void addTimer(void(TimerObject::* &method)(boost::system::error_code)) {
+                boost::asio::steady_timer timer(*spContext, std::chrono::milliseconds(500));
+                timer.async_wait(method);
+            }
+
+        public:
+            void printName(boost::system::error_code error) {
+                std::cout << "object name : " << name;
+            }
+
+        private:
+            std::shared_ptr<boost::asio::io_context> spContext;
+            std::string name;
+        };
+
+        auto tempGuard = boost::asio::make_work_guard(*spContext);
+        spContext->run();
+
+        TimerObject object(spContext, "doby");*/
+
         for (size_t i = 0; i < 1; i++) {
             DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
             clientList.push_back(client);

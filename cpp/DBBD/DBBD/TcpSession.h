@@ -9,14 +9,18 @@ using namespace boost::asio;
 using namespace boost::system;
 
 namespace DBBD {
-	class IReadDelegate {
-	public:
-		virtual void readInternal(Header header) = 0;
+	class ITcpSession {
+	protected:
+		void bindReadInternal(std::function<bool(const Header&, Buffer&)>& dest) {
+			dest = std::bind(&ITcpSession::readInternal, this, std::placeholders::_1, std::placeholders::_2);
+		};
+
+		virtual bool readInternal(const Header&, Buffer&) = 0;
 	};
 
 	class Cell;
 	class TcpServer;
-	class TcpSession 
+	class TcpSession
 		: public boost::enable_shared_from_this<TcpSession>
 	{
 	public:
@@ -31,7 +35,6 @@ namespace DBBD {
 		size_t getSessionId() { return sessionId; }
 		void setSessionId(size_t value) { sessionId = value; }
 		void write(Cell* data);
-		void setReadDelegate(IReadDelegate* value) { readDelegate = value; }
 
 	private:
 		TcpSession(TcpServer* server, io_context& context);
@@ -43,15 +46,15 @@ namespace DBBD {
 		void handleWrite(const error_code& error, size_t bytesTransferred);
 		void dieconnect();
 
+	public:
+		std::function<bool(const Header&, Buffer&)> readInternal;
+
 	private:
 		TcpServer* server = nullptr;
 		std::shared_ptr<ip::tcp::socket> socket;
 		Buffer sendBuffer;
 		Buffer receiveBuffer;
 		size_t sessionId;
-		
-		IReadDelegate* readDelegate = nullptr;
-
 		std::mutex readLock;
 		std::mutex writeLock;
 	};

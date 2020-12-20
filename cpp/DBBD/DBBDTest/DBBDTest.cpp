@@ -6,8 +6,10 @@
 #include "../DBBD/Deserialize.h"
 #include "../DBBD/Request.h"
 #include "../DBBD/Random.h"
+#include "../DBBD/TcpSession.h"
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
+#include <boost/bind.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -372,29 +374,58 @@ namespace DBBDTest
 
 		TEST_METHOD(TimerTest) {
 			boost::asio::io_context context;
-			boost::asio::deadline_timer dt(context, boost::posix_time::seconds(1));
 
-			dt.wait();
-			Assert::IsTrue(true);
-
-			auto test1 = [&](const boost::system::error_code& error) {
-				Assert::IsTrue(false);
+			auto foo = [&](boost::system::error_code error) {
+				Assert::IsTrue(true);
 			};
 
-			dt.async_wait(&test1);
+			boost::asio::steady_timer timer(context, std::chrono::seconds(1));
+			timer.async_wait(foo);
+			/*timer.async_wait([&](boost::system::error_code error) {
+				Assert::IsTrue(false);
+				});*/
 
 			context.run();
 
-			std::this_thread::sleep_for(std::chrono::duration<int>(2));
+			std::this_thread::sleep_for(std::chrono::seconds(2));
 		}
 
 		TEST_METHOD(AnyTest) {
-			typedef size_t TableId;
+			using fooPtr = int(*)();
 
-			TableId a = 1;
-			size_t b = 1;
+			fooPtr a = []()->int {
+				return 1;
+			};
 
-			Assert::IsTrue(std::is_same<TableId, size_t>::value);
+			fooPtr b = []()->int {
+				return 2;
+			};
+
+			Assert::AreEqual(1, a());
+			Assert::AreEqual(2, b());
+
+			class Session {
+			public:
+				std::function<int()> readInternal;
+			};
+
+			class Player {
+			public:
+				void bindReadInternal(std::function<int()>& dest) {
+					dest = std::bind(&Player::readInternal, this);
+				}
+			private:
+				int readInternal() {
+					return 1;
+				}
+			};
+
+			Session session;
+			Player player;
+
+			player.bindReadInternal(session.readInternal);
+
+			Assert::AreEqual(1, session.readInternal());
 		}
 	};
 }
