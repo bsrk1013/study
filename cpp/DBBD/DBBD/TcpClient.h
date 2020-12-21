@@ -8,14 +8,17 @@ using namespace boost::asio;
 using namespace boost::system;
 
 namespace DBBD {
+	class Cell;
 	class TcpClient
 	{
 	public:
+		TcpClient() {}
+		TcpClient(const TcpClient&) {}
 		TcpClient(const std::string& address, const short& port);
 		~TcpClient();
 		
 	public:
-		void send(const std::string& data);
+		void send(Cell* data);
 
 	public:
 		TcpSession::pointer getSession() { return session; }
@@ -24,7 +27,7 @@ namespace DBBD {
 		void handleConnect(const error_code& error);
 
 	private:
-		std::thread* t1 = nullptr;
+		std::thread* mainThread = nullptr;
 		std::unique_ptr<io_context> context;
 		std::shared_ptr<ip::tcp::socket> socket;
 		TcpSession::pointer session;

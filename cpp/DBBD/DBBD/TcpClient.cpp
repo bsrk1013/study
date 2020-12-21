@@ -1,7 +1,8 @@
 #include <boost/bind.hpp>
 #include <thread>
+#include <iostream>
 #include "TcpClient.h"
-#include "iostream"
+#include "Cell.h"
 
 namespace DBBD {
 	TcpClient::TcpClient(const std::string& address, const short& port) {
@@ -14,22 +15,9 @@ namespace DBBD {
 		socket->async_connect(endpoint,
 			boost::bind(&TcpClient::handleConnect, this, placeholders::error));
 
-		t1 = new std::thread([&]() {
+		mainThread = new std::thread([&]() {
 			context->run();
 			});
-
-		//ip::tcp::resolver resolver(*context);
-		/*ip::tcp::resolver::query query(address, port);
-		ip::tcp::resolver::iterator endpointIter = resolver.resolve(query);*/
-
-
-		/*socket->async_connect(endpointIter, 
-			boost::bind(&TcpClient::handleConnect, this, placeholders::error));*/
-
-		/*connect(*socket, resolver.resolve(address, port));
-
-		this->session = TcpSession::create(socket);;
-		this->session->start();*/
 	}
 
 	TcpClient::~TcpClient() {
@@ -41,13 +29,13 @@ namespace DBBD {
 			context->stop();
 		}
 
-		if (t1 != nullptr) {
-			t1->join();
-			delete t1;
+		if (mainThread) {
+			mainThread->join();
+			delete mainThread;
 		}
 	}
 
-	void TcpClient::send(const std::string& data) {
+	void TcpClient::send(Cell* data) {
 		session->write(data);
 	}
 
@@ -58,7 +46,4 @@ namespace DBBD {
 			std::cout << "session connected..." << std::endl;
 		}
 	}
-	/*void TcpClient::send(const T& data) {
-		session->write(data);
-	}*/
 }

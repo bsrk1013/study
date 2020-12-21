@@ -4,6 +4,7 @@
 #include "TcpServer.h"
 #include "Serialize.h"
 #include "Deserialize.h"
+#include "Request.h"
 
 namespace DBBD {
 	TcpSession::pointer TcpSession::create(TcpServer* server, io_context& context) {
@@ -29,6 +30,7 @@ namespace DBBD {
 	}
 
 	void TcpSession::read() {
+		receiveBuffer.adjust();
 		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 			boost::bind(&TcpSession::handleRead, shared_from_this(),
 				placeholders::error, placeholders::bytes_transferred));
@@ -45,19 +47,41 @@ namespace DBBD {
 
 		std::cout << "Bytes : " << bytesTransferred << std::endl;
 
-		/*receiveBuffer.setBufferLastPos(bytesTransferred);
-		std::string data;
-		Deserialize::read(receiveBuffer, data);
-		std::cout << "recieveData[" << bytesTransferred << "] : " << data << std::endl;
+		receiveBuffer.increaseLastPos(bytesTransferred);
 
-		write(data);
+		while (true) {
+			if (receiveBuffer.getBufferLastPos() < HeaderSize) {
+				break;
+			}
+			else {
+				auto headerBlock = receiveBuffer.viewByteBlock(HeaderSize);
+				Header header(headerBlock);
 
-		receiveBuffer.clearBuffer();*/
+				if (receiveBuffer.getBufferLastPos() < header.length) {
+					break;
+				}
+				else {
+					if (readInternal) {
+						readInternal(header, receiveBuffer);
+					}
+					/*if (readInternal) {
+						readInternal(header, receiveBuffer);
+					}*/
+					/*if (readDelegate != nullptr) {
+						readDelegate->readInternal(header, receiveBuffer);
+					}
+					else {
+						receiveBuffer.readByteBlock(HeaderSize);
+						receiveBuffer.readByteBlock(header.length);
+					}*/
+				}
+			}
+		}
 
 		read();
 	}
 
-	void TcpSession::write(const std::string& data) {
+	void TcpSession::write(Cell* data) {
 		Serialize::write(sendBuffer, data);
 
 		async_write(*socket,

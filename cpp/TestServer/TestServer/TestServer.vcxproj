@@ -116,12 +116,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\boost_1_74_0\;F:\GitHub\study\cpp\DBBD</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\boost_1_74_0\;$(SolutionDir)..\DBBD</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\boost_1_74_0\stage\lib;F:\GitHub\study\cpp\DBBD\x64\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\boost_1_74_0\stage\lib;$(SolutionDir)..\DBBD\x64\Debug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

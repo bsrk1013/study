@@ -8,7 +8,14 @@
 #include <map>
 #include <list>
 #include <algorithm>
-#include "DBBD\TcpClient.h"
+#include "DBBD/TcpClient.h"
+#include "DBBD/Request.h"
+#include "DBBD/Common.hpp"
+#include "DBBD/Serialize.h"
+#include "DBBD/Deserialize.h"
+#include "DBBD/Cell.h"
+#include "DBBD/Random.h"
+//#include <boost/asio.hpp>
 
 using namespace std;
 
@@ -337,17 +344,144 @@ void baram5() {
     std::cout << "answer5 : " << endl;
 }
 
+class ChattingReq : DBBD::Request {
+public:
+    ChattingReq() { typeId = 1; }
+    virtual ~ChattingReq() {}
+
+    // Request을(를) 통해 상속됨
+    virtual void serialize(DBBD::Buffer& buffer)
+    {
+        writeHeader(buffer, getLength());
+        DBBD::Serialize::write(buffer, msg);
+    }
+    virtual void deserialize(DBBD::Buffer& buffer)
+    {
+        readHeader(buffer);
+        DBBD::Deserialize::read(buffer, msg);
+    }
+
+    virtual size_t getLength() {
+        return Request::getLength() + DBBD::GetPacketLength(msg);
+    }
+
+public:
+    std::string getMsg() { return msg; }
+    void setMsg(const std::string& value) { msg = value; }
+
+private:
+    std::string msg;
+};
+
+class FooReq : DBBD::Request {
+public:
+    FooReq() { typeId = 2; }
+    virtual ~FooReq() {}
+
+    // Request을(를) 통해 상속됨
+    virtual void serialize(DBBD::Buffer& buffer)
+    {
+        writeHeader(buffer, getLength());
+        DBBD::Serialize::write(buffer, msgSize);
+    }
+    virtual void deserialize(DBBD::Buffer& buffer)
+    {
+        readHeader(buffer);
+        DBBD::Deserialize::read(buffer, msgSize);
+    }
+
+    virtual size_t getLength() {
+        return Request::getLength() + DBBD::GetPacketLength(msgSize);
+    }
+
+public:
+    size_t getMsgSize() { return msgSize; }
+    void setMsgSize(const size_t& value) { msgSize = value; }
+
+private:
+    size_t msgSize;
+};
+
 int main() {
-    baram1();
+    /*baram1();
     baram2();
     baram3();
     baram4();
-    baram5();
+    baram5();*/
     /*program1();
     program2();
     program3();*/
-	/*try {
-		DBBD::TcpClient client("127.0.0.1", 8100);
+
+    std::vector<DBBD::TcpClient*> clientList;
+    std::vector<std::thread*> threadList(100);
+
+	try {
+        class TimerObject {
+        public:
+            TimerObject(boost::asio::io_context* context, std::string name) {
+                this->context = context;
+                this->name = name;;
+
+                addTimerEvent(1, 
+                    std::bind(&TimerObject::printName, this, std::placeholders::_1),
+                    boost::posix_time::milliseconds(2000));
+
+                addTimerEvent(2,
+                    std::bind(&TimerObject::printCount, this, std::placeholders::_1),
+                    boost::posix_time::milliseconds(1000));
+            }
+
+        private:
+            void addTimerEvent(size_t eventType, 
+                std::function<void(const boost::system::error_code&)> target, 
+                boost::posix_time::milliseconds wait) {
+                auto timer = timerMap[eventType];
+                if (!timer) {
+                    timer = new boost::asio::deadline_timer(*context, wait);
+                    timerMap[eventType] = timer;
+                }
+                else {
+                    timer->expires_at(timer->expires_at() + wait);
+                }
+
+                timer->async_wait(target);
+            }
+
+            void printName(const boost::system::error_code& error) {
+                std::cout << "object name : " << name << std::endl;
+                addTimerEvent(1,
+                    std::bind(&TimerObject::printName, this, std::placeholders::_1),
+                    boost::posix_time::milliseconds(2000));
+            }
+
+            void printCount(const boost::system::error_code& error) {
+                std::cout << "count : " << count++ << std::endl;
+                addTimerEvent(2,
+                    std::bind(&TimerObject::printCount, this, std::placeholders::_1),
+                    boost::posix_time::milliseconds(1000));
+            }
+
+        private:
+            boost::asio::io_context* context;
+            std::string name;
+            size_t count = 0;
+            std::map<size_t, boost::asio::deadline_timer*> timerMap;
+        };
+
+        boost::asio::io_context context;
+
+        auto workguard = boost::asio::make_work_guard(context);
+        TimerObject timerObject(&context, "doby");
+
+        std::thread thread([&]() {
+            context.run();
+            });
+
+        for (size_t i = 0; i < 1; i++) {
+            /*DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
+            clientList.push_back(client);*/
+        }
+
 		while (true) {
 			std::string a;
 			std::getline(std::cin, a);
@@ -356,12 +490,30 @@ int main() {
 				break;
 			}
 
-			client.send(a);
+            int rand = DBBD::Random::instance().next(0, 100);
+            if (rand <= 50) {
+                ChattingReq chatReq;
+                chatReq.setMsg(a);
+                
+                for (auto client : clientList) {
+                    client->send((DBBD::Cell*)&chatReq);
+                }
+            }
+            else {
+                FooReq fooReq;
+                fooReq.setMsgSize(a.size());
+                /*ChattingReq chatReq;
+                chatReq.setMsg(a);*/
+
+                for (auto client : clientList) {
+                    client->send((DBBD::Cell*)&fooReq);
+                }
+            }
 		}
 	}
 	catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
-	}*/
+	}
 
 	return 0;
 }

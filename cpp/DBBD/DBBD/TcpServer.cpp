@@ -64,10 +64,10 @@ namespace DBBD {
 			lockObject.lock();
 			session->setSessionId(sessionId);
 			sessionMap[sessionId] = session;
-			session->start();
 			lockObject.unlock();
+			session->start();
 
-			//implementAccept(session);
+			implementAccept(session);
 			auto id = std::this_thread::get_id();
 			std::cout << "[" << id << "]session connected... id: " << sessionId << std::endl;
 		}

@@ -1,5 +1,8 @@
 #pragma once
+#include <memory>
 #include "Cell.h"
+#include "Serialize.h"
+#include "Deserialize.h"
 
 namespace DBBD {
 	struct Header {
@@ -21,7 +24,7 @@ namespace DBBD {
 		virtual ~Request() {};
 
 	public:
-		void writeHeader(Buffer& buffer, size_t length) {
+		void writeHeader(Buffer& buffer, const size_t& length) {
 			Serialize::write(buffer, length);
 			Serialize::write(buffer, typeId);
 		}

@@ -6,6 +6,10 @@
 #include "../DBBD/Deserialize.h"
 #include "../DBBD/Request.h"
 #include "../DBBD/Random.h"
+#include "../DBBD/TcpSession.h"
+#include <boost/asio.hpp>
+#include <boost/timer.hpp>
+#include <boost/bind.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -325,7 +329,7 @@ namespace DBBDTest
 				}
 
 				virtual size_t getLength() {
-					return Request::getLength();
+					return Request::getLength() + sizeof(size_t) + token.size() + sizeof(size_t) + deviceId.size();
 				}
 
 			public:
@@ -354,6 +358,10 @@ namespace DBBDTest
 			Assert::AreEqual(req.deviceId, tempReq.deviceId);
 		}
 
+		TEST_METHOD(StructTest) {
+
+		}
+
 		TEST_METHOD(RandomTest) {
 			for (size_t i = 0; i < 1000; i++) {
 				int nRandom = Random::instance().next(0, 10);
@@ -365,6 +373,126 @@ namespace DBBDTest
 				float fRandom = Random::instance().next(0.0f, 10.0f);
 				Assert::IsTrue(0.0f <= fRandom && fRandom <= 10.0f);
 				Assert::IsTrue(!(fRandom < 0.0f) || !(fRandom > 10.0f));
+			}
+		}
+
+		TEST_METHOD(TimerTest) {
+			class TimerObject {
+			public:
+				TimerObject(boost::asio::io_context* context, std::string name) {
+					this->context = context;
+					this->name = name;;
+
+					addTimerEvent(1, std::bind(&TimerObject::nameCheck, this, std::placeholders::_1), std::chrono::milliseconds(500));
+				}
+
+			private:
+				void addTimerEvent(int eventType, std::function<void(const boost::system::error_code&)> target, std::chrono::milliseconds wait) {
+					auto event = timerPool[eventType];
+					if (!event) {
+						event = new boost::asio::steady_timer(*context, wait);
+						timerPool[eventType] = event;
+					}
+
+					event->async_wait(target);
+				}
+
+				void nameCheck(const boost::system::error_code& error) {
+					//std::cout << "object name : " << name << std::endl;
+					Assert::AreEqual(name, std::string("doby"));
+				}
+
+			private:
+				boost::asio::io_context* context;
+				std::string name;
+				//boost::asio::steady_timer* timer;
+				std::map<int, boost::asio::steady_timer*> timerPool;
+			};
+
+			boost::asio::io_context context;
+
+			auto foo = [&](boost::system::error_code error) {
+				Assert::IsTrue(true);
+			};
+
+			/*boost::asio::steady_timer timer(context, std::chrono::seconds(1));
+			timer.async_wait(foo);*/
+
+			TimerObject timerObject(&context, "");
+
+			context.run();
+
+			std::this_thread::sleep_for(std::chrono::seconds(2));
+		}
+
+		TEST_METHOD(AnyTest) {
+			using fooPtr = int(*)();
+
+			fooPtr a = []()->int {
+				return 1;
+			};
+
+			fooPtr b = []()->int {
+				return 2;
+			};
+
+			Assert::AreEqual(1, a());
+			Assert::AreEqual(2, b());
+		}
+
+		TEST_METHOD(FunctionTest) {
+			class Session : public std::enable_shared_from_this<Session> {
+			public:
+				typedef std::shared_ptr<Session> pointer;
+				static pointer create() {
+					return Session::pointer(new Session());
+				}
+				
+			private:
+				Session(){}
+
+			public:
+				std::function<int(int&, int&)> readInternal;
+			};
+
+			class ITcpSession {
+			public:
+				virtual void bindReadInternal(std::function<int(int&, int&)>& dest) = 0;
+				virtual int readInternal(int&, int&) = 0;
+			};
+
+			class Player : public ITcpSession{
+			public:
+				Player(Session::pointer session)
+				: session(session) {
+					bindReadInternal(this->session->readInternal);
+				}
+
+				virtual void bindReadInternal(std::function<int(int&, int&)>& dest) override {
+					dest = std::bind(&Player::readInternal, this, std::placeholders::_1, std::placeholders::_2);
+				}
+
+				virtual int readInternal(int& a, int& b) override {
+					int tempA = a;
+					int tempB = b;
+					a = 5;
+					b = 3;
+					return tempA + tempB;
+				}
+
+			private:
+				Session::pointer session;
+			};
+
+			Session::pointer session = Session::create();
+			Player player(session);
+
+			int a = 1;
+			int b = 2;
+			if (session->readInternal) {
+				Assert::AreEqual(3, session->readInternal(a, b));
+				Assert::AreEqual(5, a);
+				Assert::AreEqual(3, b);
 			}
 		}
 	};

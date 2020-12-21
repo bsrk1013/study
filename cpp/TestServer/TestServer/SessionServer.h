@@ -2,11 +2,11 @@
 #include <boost/asio.hpp>
 #include <string>
 #include <map>
-#include "DBBD\TcpServer.h"
-#include "Player.h"
+#include "DBBD/TcpServer.h"
 
 using namespace boost::asio;
 
+class Player;
 class DBBD::TcpSession;
 class SessionServer : DBBD::TcpServer {
 public:
@@ -19,5 +19,5 @@ protected:
 	virtual void implementAccept(DBBD::TcpSession::pointer session);
 
 private:
-	std::map<size_t, Player> playerMap;
+	std::map<size_t, Player*> playerMap;
 };
