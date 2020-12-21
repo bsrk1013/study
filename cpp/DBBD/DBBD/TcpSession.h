@@ -11,11 +11,12 @@ using namespace boost::system;
 namespace DBBD {
 	class ITcpSession {
 	protected:
-		void bindReadInternal(std::function<bool(const Header&, Buffer&)>& dest) {
-			dest = std::bind(&ITcpSession::readInternal, this, std::placeholders::_1, std::placeholders::_2);
-		};
-
+		virtual void bindReadInternal(std::function<bool(const Header&, Buffer&)>&) = 0;
 		virtual bool readInternal(const Header&, Buffer&) = 0;
+		/*void bindReadInternal(std::function<bool(const Header&, Buffer&)>& dest) {
+			dest = std::bind(&ITcpSession::readInternal, this, std::placeholders::_1, std::placeholders::_2);
+		};*/
+
 	};
 
 	class Cell;

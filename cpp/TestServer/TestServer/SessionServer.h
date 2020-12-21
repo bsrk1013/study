@@ -19,5 +19,5 @@ protected:
 	virtual void implementAccept(DBBD::TcpSession::pointer session);
 
 private:
-	std::map<size_t, Player> playerMap;
+	std::map<size_t, Player*> playerMap;
 };

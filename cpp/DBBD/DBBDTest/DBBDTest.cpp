@@ -329,7 +329,7 @@ namespace DBBDTest
 				}
 
 				virtual size_t getLength() {
-					return Request::getLength();
+					return Request::getLength() + sizeof(size_t) + token.size() + sizeof(size_t) + deviceId.size();
 				}
 
 			public:
@@ -403,29 +403,62 @@ namespace DBBDTest
 
 			Assert::AreEqual(1, a());
 			Assert::AreEqual(2, b());
+		}
 
-			class Session {
+		TEST_METHOD(FunctionTest) {
+			class Session : public std::enable_shared_from_this<Session> {
 			public:
-				std::function<int()> readInternal;
-			};
-
-			class Player {
-			public:
-				void bindReadInternal(std::function<int()>& dest) {
-					dest = std::bind(&Player::readInternal, this);
+				typedef std::shared_ptr<Session> pointer;
+				static pointer create() {
+					return Session::pointer(new Session());
 				}
+				
 			private:
-				int readInternal() {
-					return 1;
-				}
+				Session(){}
+
+			public:
+				std::function<int(int&, int&)> readInternal;
 			};
 
-			Session session;
-			Player player;
+			class ITcpSession {
+			public:
+				virtual void bindReadInternal(std::function<int(int&, int&)>& dest) = 0;
+				virtual int readInternal(int&, int&) = 0;
+			};
 
-			player.bindReadInternal(session.readInternal);
+			class Player : public ITcpSession{
+			public:
+				Player(Session::pointer session)
+				: session(session) {
+					bindReadInternal(this->session->readInternal);
+				}
 
-			Assert::AreEqual(1, session.readInternal());
+				virtual void bindReadInternal(std::function<int(int&, int&)>& dest) override {
+					dest = std::bind(&Player::readInternal, this, std::placeholders::_1, std::placeholders::_2);
+				}
+
+				virtual int readInternal(int& a, int& b) override {
+					int tempA = a;
+					int tempB = b;
+					a = 5;
+					b = 3;
+					return tempA + tempB;
+				}
+
+			private:
+				Session::pointer session;
+			};
+
+			Session::pointer session = Session::create();
+			Player player(session);
+
+			int a = 1;
+			int b = 2;
+			if (session->readInternal) {
+				Assert::AreEqual(3, session->readInternal(a, b));
+				Assert::AreEqual(5, a);
+				Assert::AreEqual(3, b);
+			}
 		}
 	};
 }

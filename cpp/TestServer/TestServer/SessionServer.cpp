@@ -14,5 +14,6 @@ SessionServer::SessionServer(std::string name, std::string address, short port)
 SessionServer::~SessionServer() {}
 
 void SessionServer::implementAccept(DBBD::TcpSession::pointer session) {
-	Player player(session);
+	Player* player = new Player(session);
+	playerMap[session->getSessionId()] = player;
 }

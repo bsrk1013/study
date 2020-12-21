@@ -61,10 +61,14 @@ private:
 
 Player::Player(DBBD::TcpSession::pointer session)
 : session(session){
-	bindReadInternal(session->readInternal);
+	bindReadInternal(this->session->readInternal);
 }
 
 Player::~Player() {
+}
+
+void Player::bindReadInternal(std::function<bool(const DBBD::Header&, DBBD::Buffer&)>& dest) {
+	dest = std::bind(&Player::readInternal, this, std::placeholders::_1, std::placeholders::_2);
 }
 
 bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
