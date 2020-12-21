@@ -358,6 +358,10 @@ namespace DBBDTest
 			Assert::AreEqual(req.deviceId, tempReq.deviceId);
 		}
 
+		TEST_METHOD(StructTest) {
+
+		}
+
 		TEST_METHOD(RandomTest) {
 			for (size_t i = 0; i < 1000; i++) {
 				int nRandom = Random::instance().next(0, 10);
@@ -373,17 +377,48 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(TimerTest) {
+			class TimerObject {
+			public:
+				TimerObject(boost::asio::io_context* context, std::string name) {
+					this->context = context;
+					this->name = name;;
+
+					addTimerEvent(1, std::bind(&TimerObject::nameCheck, this, std::placeholders::_1), std::chrono::milliseconds(500));
+				}
+
+			private:
+				void addTimerEvent(int eventType, std::function<void(const boost::system::error_code&)> target, std::chrono::milliseconds wait) {
+					auto event = timerPool[eventType];
+					if (!event) {
+						event = new boost::asio::steady_timer(*context, wait);
+						timerPool[eventType] = event;
+					}
+
+					event->async_wait(target);
+				}
+
+				void nameCheck(const boost::system::error_code& error) {
+					//std::cout << "object name : " << name << std::endl;
+					Assert::AreEqual(name, std::string("doby"));
+				}
+
+			private:
+				boost::asio::io_context* context;
+				std::string name;
+				//boost::asio::steady_timer* timer;
+				std::map<int, boost::asio::steady_timer*> timerPool;
+			};
+
 			boost::asio::io_context context;
 
 			auto foo = [&](boost::system::error_code error) {
 				Assert::IsTrue(true);
 			};
 
-			boost::asio::steady_timer timer(context, std::chrono::seconds(1));
-			timer.async_wait(foo);
-			/*timer.async_wait([&](boost::system::error_code error) {
-				Assert::IsTrue(false);
-				});*/
+			/*boost::asio::steady_timer timer(context, std::chrono::seconds(1));
+			timer.async_wait(foo);*/
+
+			TimerObject timerObject(&context, "");
 
 			context.run();
 

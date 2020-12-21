@@ -1,5 +1,6 @@
-#include "Player.h"
 #include <iostream>
+#include "Player.h"
+#include "DBBD/Common.hpp"
 
 class ChattingReq : DBBD::Request {
 public:
@@ -19,7 +20,7 @@ public:
 	}
 
 	virtual size_t getLength() {
-		return Request::getLength() + sizeof(size_t) + msg.size();
+		return Request::getLength() + DBBD::GetPacketLength(msg);
 	}
 
 public:
@@ -48,7 +49,7 @@ public:
 	}
 
 	virtual size_t getLength() {
-		return Request::getLength() + sizeof(msgSize);
+		return Request::getLength() + DBBD::GetPacketLength(msgSize);
 	}
 
 public:
@@ -97,29 +98,3 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	return true;
 }
-
-//void Player::readInternal(DBBD::Header header)
-//{
-//	/////////////////////////////////////////////////////////////////////// readInternal에서 구현해야함
-//	switch (header.typeId) {
-//	case 1: {
-//		ChattingReq chatReq;
-//		DBBD::Deserialize::read(buffer, (DBBD::Cell*)&chatReq);
-//		std::cout << "[" << session->getSessionId() << "]CharringReq : " << chatReq.getMsg() << std::endl;
-//		for (size_t i = 0; i < 1000; i++) {
-//			// do nothing
-//		}
-//		break;
-//	}
-//	case 2: {
-//		FooReq fooReq;
-//		DBBD::Deserialize::read(buffer, (DBBD::Cell*)&fooReq);
-//		std::cout << "[" << session->getSessionId() << "]FooReq : " << fooReq.getMsgSize() << std::endl;
-//		for (size_t i = 0; i < 2000; i++) {
-//			// do nothing
-//		}
-//		break;
-//	}
-//	}
-//	///////////////////////////////////////////////////////////////////////////////////////////////////
-//}

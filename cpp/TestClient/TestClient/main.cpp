@@ -10,11 +10,12 @@
 #include <algorithm>
 #include "DBBD/TcpClient.h"
 #include "DBBD/Request.h"
+#include "DBBD/Common.hpp"
 #include "DBBD/Serialize.h"
 #include "DBBD/Deserialize.h"
 #include "DBBD/Cell.h"
 #include "DBBD/Random.h"
-#include <boost/asio.hpp>
+//#include <boost/asio.hpp>
 
 using namespace std;
 
@@ -361,7 +362,7 @@ public:
     }
 
     virtual size_t getLength() {
-        return Request::getLength() + sizeof(size_t) + msg.size();
+        return Request::getLength() + DBBD::GetPacketLength(msg);
     }
 
 public:
@@ -390,7 +391,7 @@ public:
     }
 
     virtual size_t getLength() {
-        return Request::getLength() + sizeof(msgSize);
+        return Request::getLength() + DBBD::GetPacketLength(msgSize);
     }
 
 public:
@@ -415,41 +416,70 @@ int main() {
     std::vector<std::thread*> threadList(100);
 
 	try {
-        /*std::shared_ptr<boost::asio::io_context> spContext;
-        spContext = std::make_shared<boost::asio::io_context>(5);
-
         class TimerObject {
         public:
-            TimerObject(std::shared_ptr<boost::asio::io_context> context, std::string name) 
-                : spContext(context),
-                    name(name)
-            {
-            }
+            TimerObject(boost::asio::io_context* context, std::string name) {
+                this->context = context;
+                this->name = name;;
 
-        public:
-            void addTimer(void(TimerObject::* &method)(boost::system::error_code)) {
-                boost::asio::steady_timer timer(*spContext, std::chrono::milliseconds(500));
-                timer.async_wait(method);
-            }
+                addTimerEvent(1, 
+                    std::bind(&TimerObject::printName, this, std::placeholders::_1),
+                    boost::posix_time::milliseconds(2000));
 
-        public:
-            void printName(boost::system::error_code error) {
-                std::cout << "object name : " << name;
+                addTimerEvent(2,
+                    std::bind(&TimerObject::printCount, this, std::placeholders::_1),
+                    boost::posix_time::milliseconds(1000));
             }
 
         private:
-            std::shared_ptr<boost::asio::io_context> spContext;
+            void addTimerEvent(size_t eventType, 
+                std::function<void(const boost::system::error_code&)> target, 
+                boost::posix_time::milliseconds wait) {
+                auto timer = timerMap[eventType];
+                if (!timer) {
+                    timer = new boost::asio::deadline_timer(*context, wait);
+                    timerMap[eventType] = timer;
+                }
+                else {
+                    timer->expires_at(timer->expires_at() + wait);
+                }
+
+                timer->async_wait(target);
+            }
+
+            void printName(const boost::system::error_code& error) {
+                std::cout << "object name : " << name << std::endl;
+                addTimerEvent(1,
+                    std::bind(&TimerObject::printName, this, std::placeholders::_1),
+                    boost::posix_time::milliseconds(2000));
+            }
+
+            void printCount(const boost::system::error_code& error) {
+                std::cout << "count : " << count++ << std::endl;
+                addTimerEvent(2,
+                    std::bind(&TimerObject::printCount, this, std::placeholders::_1),
+                    boost::posix_time::milliseconds(1000));
+            }
+
+        private:
+            boost::asio::io_context* context;
             std::string name;
+            size_t count = 0;
+            std::map<size_t, boost::asio::deadline_timer*> timerMap;
         };
 
-        auto tempGuard = boost::asio::make_work_guard(*spContext);
-        spContext->run();
+        boost::asio::io_context context;
 
-        TimerObject object(spContext, "doby");*/
+        auto workguard = boost::asio::make_work_guard(context);
+        TimerObject timerObject(&context, "doby");
+
+        std::thread thread([&]() {
+            context.run();
+            });
 
         for (size_t i = 0; i < 1; i++) {
-            DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
-            clientList.push_back(client);
+            /*DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
+            clientList.push_back(client);*/
         }
 
 		while (true) {

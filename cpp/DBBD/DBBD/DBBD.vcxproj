@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="Common.hpp" />
     <ClInclude Include="Deserialize.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="Random.h" />
