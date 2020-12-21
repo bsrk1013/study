@@ -63,6 +63,12 @@
     <ClInclude Include="Common.hpp">
       <Filter>헤더 파일\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Define.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerObject.h">
+      <Filter>헤더 파일\Tcp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TcpSession.cpp">
@@ -85,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="Random.cpp">
       <Filter>소스 파일\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerObject.cpp">
+      <Filter>소스 파일\Tcp</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

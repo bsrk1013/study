@@ -52,7 +52,7 @@ namespace DBBD {
 	}
 
 	void TcpServer::startAccept() {
-		auto session = TcpSession::create(this, *context);
+		auto session = TcpSession::create(this, context);
 		acceptor->async_accept(*session->getSocket(),
 			boost::bind(&TcpServer::handleAccept, this, session, placeholders::error));
 	}

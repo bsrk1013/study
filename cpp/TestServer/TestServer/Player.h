@@ -1,7 +1,8 @@
 #pragma once
 #include "DBBD/TcpSession.h"
+#include "DBBD/TimerObject.h"
 
-class Player : DBBD::ITcpSession
+class Player : public DBBD::TimerObject, DBBD::ITcpSession
 {
 public:
 	Player(DBBD::TcpSession::pointer session);
@@ -13,5 +14,9 @@ protected:
 	virtual bool readInternal(const DBBD::Header&, DBBD::Buffer&) override;
 
 private:
+	void update(const boost::system::error_code&);
+
+private:
 	DBBD::TcpSession::pointer session;
+	size_t count = 0;
 };

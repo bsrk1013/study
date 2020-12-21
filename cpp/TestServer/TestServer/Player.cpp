@@ -61,8 +61,10 @@ private:
 };
 
 Player::Player(DBBD::TcpSession::pointer session)
-: session(session){
+: TimerObject(session->getContext()), session(session){
 	bindReadInternal(this->session->readInternal);
+
+	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
 }
 
 Player::~Player() {
@@ -97,4 +99,14 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	return true;
+}
+
+void Player::update(const boost::system::error_code& error) {
+	std::cout << "Player[" << session->getSessionId() << "] updated... {" << count++ << "}" << std::endl;
+	if (count < 10) {
+		addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
+	}
+	else {
+		removeTimerEvent(1);
+	}
 }

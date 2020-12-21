@@ -4,6 +4,7 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include "TcpSession.h"
+#include "Define.h"
 
 using namespace boost::asio;
 using namespace boost::system;
@@ -35,8 +36,7 @@ namespace DBBD {
 
 	private:
 		std::string name;
-		std::shared_ptr<io_context> context;
-		std::shared_ptr<executor_work_guard<io_context::executor_type>> guard;
+		IoContextSP context;
 		std::unique_ptr<ip::tcp::acceptor> acceptor;
 		std::atomic<size_t> sessionIdCounter = 0;
 		std::map<size_t, TcpSession::pointer> sessionMap;

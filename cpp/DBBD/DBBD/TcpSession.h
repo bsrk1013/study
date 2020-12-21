@@ -2,6 +2,7 @@
 #include <mutex>
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include "Define.h"
 #include "Buffer.h"
 #include "Request.h"
 
@@ -13,10 +14,6 @@ namespace DBBD {
 	protected:
 		virtual void bindReadInternal(std::function<bool(const Header&, Buffer&)>&) = 0;
 		virtual bool readInternal(const Header&, Buffer&) = 0;
-		/*void bindReadInternal(std::function<bool(const Header&, Buffer&)>& dest) {
-			dest = std::bind(&ITcpSession::readInternal, this, std::placeholders::_1, std::placeholders::_2);
-		};*/
-
 	};
 
 	class Cell;
@@ -26,20 +23,21 @@ namespace DBBD {
 	{
 	public:
 		typedef boost::shared_ptr<TcpSession> pointer;
-		static pointer create(TcpServer* server_context, io_context& context);
-		static pointer create(std::shared_ptr<ip::tcp::socket> socket);
+		static pointer create(TcpServer* server_context, IoContextSP context);
+		static pointer create(SocketSP socket);
 		void start();
 
 		// getter, setter
 	public:
-		std::shared_ptr<ip::tcp::socket> getSocket() { return socket; }
+		SocketSP getSocket() { return socket; }
+		IoContextSP getContext() { return context; }
 		size_t getSessionId() { return sessionId; }
 		void setSessionId(size_t value) { sessionId = value; }
 		void write(Cell* data);
 
 	private:
-		TcpSession(TcpServer* server, io_context& context);
-		TcpSession(std::shared_ptr<ip::tcp::socket> socket);
+		TcpSession(TcpServer* server, IoContextSP context);
+		TcpSession(SocketSP socket);
 
 	private:
 		void read();
@@ -52,7 +50,8 @@ namespace DBBD {
 
 	private:
 		TcpServer* server = nullptr;
-		std::shared_ptr<ip::tcp::socket> socket;
+		IoContextSP context;
+		SocketSP socket;
 		Buffer sendBuffer;
 		Buffer receiveBuffer;
 		size_t sessionId;

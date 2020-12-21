@@ -7,9 +7,11 @@
 #include "../DBBD/Request.h"
 #include "../DBBD/Random.h"
 #include "../DBBD/TcpSession.h"
+#include "../DBBD/TimerObject.h"
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
 #include <boost/bind.hpp>
+#include <boost/thread.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -376,29 +378,8 @@ namespace DBBDTest
 			}
 		}
 
+#define BINDING(method) std::bind(method, this, std::placeholders::_1)
 		TEST_METHOD(TimerTest) {
-			class TimerObject {
-			public:
-				TimerObject(std::shared_ptr<boost::asio::io_context> context) {
-					this->context = context;
-				}
-
-			protected:
-				void addTimerEvent(int eventType, std::function<void(const boost::system::error_code&)> target, size_t waitMs) {
-					auto event = timerPool[eventType];
-					if (!event) {
-						event = new boost::asio::deadline_timer(*context, boost::posix_time::microseconds(waitMs));
-						timerPool[eventType] = event;
-					}
-
-					event->async_wait(target);
-				}
-
-			private:
-				std::shared_ptr<boost::asio::io_context> context;
-				std::map<int, boost::asio::deadline_timer*> timerPool;
-			};
-
 			static const int CREATURE_UPDATE_TICK = 500;
 			enum CREATURE_TIMER_TYPE {
 				None = 0,
@@ -410,30 +391,25 @@ namespace DBBDTest
 					: TimerObject(context) {
 					
 					addTimerEvent(CREATURE_TIMER_TYPE::Update, 
-						std::bind(&Creature::update, this, std::placeholders::_1),
+						BINDING(&Creature::update),
+						//std::bind(&Creature::update, this, std::placeholders::_1),
 						CREATURE_UPDATE_TICK);
 				}
 
 			private:
 				void update(const boost::system::error_code& error) {
-					Assert::IsTrue(false);
+					Assert::IsTrue(true);
 				}
 			};
 
-			//boost::asio::io_context context;
 			std::shared_ptr<boost::asio::io_context> context;
 			context = std::make_shared<boost::asio::io_context>();
 
 			Creature doby(context);
-			std::thread thread([&]() {
-				auto workdGuard = boost::asio::make_work_guard(context);
-				context->run();
-				});
 
+			context->run();
 
-			std::this_thread::sleep_for(std::chrono::seconds(5));
-			
-			thread.join();
+			std::this_thread::sleep_for(std::chrono::seconds(10));
 		}
 
 		TEST_METHOD(AnyTest) {

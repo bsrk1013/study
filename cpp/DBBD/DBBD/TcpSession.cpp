@@ -7,20 +7,23 @@
 #include "Request.h"
 
 namespace DBBD {
-	TcpSession::pointer TcpSession::create(TcpServer* server, io_context& context) {
+	TcpSession::pointer TcpSession::create(TcpServer* server, IoContextSP context) {
 		return TcpSession::pointer(new TcpSession(server, context));
 	}
 
-	TcpSession::pointer TcpSession::create(std::shared_ptr<ip::tcp::socket> socket) {
+	TcpSession::pointer TcpSession::create(SocketSP socket) {
 		return TcpSession::pointer(new TcpSession(socket));
 	}
 
-	TcpSession::TcpSession(TcpServer* server_context, io_context& context)
-		: server(server_context), sendBuffer(8192), receiveBuffer(8192) {
-		socket = std::make_shared<ip::tcp::socket>(context);
+	TcpSession::TcpSession(TcpServer* server_context, IoContextSP context)
+		: server(server_context),
+		context(context),
+		sendBuffer(8192),
+		receiveBuffer(8192) {
+		socket = std::make_shared<ip::tcp::socket>(*context);
 	}
 
-	TcpSession::TcpSession(std::shared_ptr<ip::tcp::socket> socket)
+	TcpSession::TcpSession(SocketSP socket)
 	: sendBuffer(8192), receiveBuffer(8192){
 		this->socket = socket;
 	}

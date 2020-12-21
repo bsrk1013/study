@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Common.hpp" />
+    <ClInclude Include="Define.h" />
     <ClInclude Include="Deserialize.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="Random.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="TcpClient.h" />
     <ClInclude Include="TcpServer.h" />
     <ClInclude Include="TcpSession.h" />
+    <ClInclude Include="TimerObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
@@ -164,6 +166,7 @@
     <ClCompile Include="TcpClient.cpp" />
     <ClCompile Include="TcpServer.cpp" />
     <ClCompile Include="TcpSession.cpp" />
+    <ClCompile Include="TimerObject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
