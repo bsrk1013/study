@@ -379,50 +379,61 @@ namespace DBBDTest
 		TEST_METHOD(TimerTest) {
 			class TimerObject {
 			public:
-				TimerObject(boost::asio::io_context* context, std::string name) {
+				TimerObject(std::shared_ptr<boost::asio::io_context> context) {
 					this->context = context;
-					this->name = name;;
-
-					addTimerEvent(1, std::bind(&TimerObject::nameCheck, this, std::placeholders::_1), std::chrono::milliseconds(500));
 				}
 
-			private:
-				void addTimerEvent(int eventType, std::function<void(const boost::system::error_code&)> target, std::chrono::milliseconds wait) {
+			protected:
+				void addTimerEvent(int eventType, std::function<void(const boost::system::error_code&)> target, size_t waitMs) {
 					auto event = timerPool[eventType];
 					if (!event) {
-						event = new boost::asio::steady_timer(*context, wait);
+						event = new boost::asio::deadline_timer(*context, boost::posix_time::microseconds(waitMs));
 						timerPool[eventType] = event;
 					}
 
 					event->async_wait(target);
 				}
 
-				void nameCheck(const boost::system::error_code& error) {
-					//std::cout << "object name : " << name << std::endl;
-					Assert::AreEqual(name, std::string("doby"));
+			private:
+				std::shared_ptr<boost::asio::io_context> context;
+				std::map<int, boost::asio::deadline_timer*> timerPool;
+			};
+
+			static const int CREATURE_UPDATE_TICK = 500;
+			enum CREATURE_TIMER_TYPE {
+				None = 0,
+				Update = 1,
+			};
+			class Creature : TimerObject {
+			public:
+				Creature(std::shared_ptr<boost::asio::io_context> context)
+					: TimerObject(context) {
+					
+					addTimerEvent(CREATURE_TIMER_TYPE::Update, 
+						std::bind(&Creature::update, this, std::placeholders::_1),
+						CREATURE_UPDATE_TICK);
 				}
 
 			private:
-				boost::asio::io_context* context;
-				std::string name;
-				//boost::asio::steady_timer* timer;
-				std::map<int, boost::asio::steady_timer*> timerPool;
+				void update(const boost::system::error_code& error) {
+					Assert::IsTrue(false);
+				}
 			};
 
-			boost::asio::io_context context;
+			//boost::asio::io_context context;
+			std::shared_ptr<boost::asio::io_context> context;
+			context = std::make_shared<boost::asio::io_context>();
 
-			auto foo = [&](boost::system::error_code error) {
-				Assert::IsTrue(true);
-			};
+			Creature doby(context);
+			std::thread thread([&]() {
+				auto workdGuard = boost::asio::make_work_guard(context);
+				context->run();
+				});
 
-			/*boost::asio::steady_timer timer(context, std::chrono::seconds(1));
-			timer.async_wait(foo);*/
 
-			TimerObject timerObject(&context, "");
-
-			context.run();
-
-			std::this_thread::sleep_for(std::chrono::seconds(2));
+			std::this_thread::sleep_for(std::chrono::seconds(5));
+			
+			thread.join();
 		}
 
 		TEST_METHOD(AnyTest) {
