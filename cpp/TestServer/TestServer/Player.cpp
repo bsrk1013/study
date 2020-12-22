@@ -70,8 +70,8 @@ Player::Player(DBBD::TcpSession::pointer session)
 Player::~Player() {
 }
 
-void Player::bindReadInternal(std::function<bool(const DBBD::Header&, DBBD::Buffer&)>& dest) {
-	dest = std::bind(&Player::readInternal, this, std::placeholders::_1, std::placeholders::_2);
+void Player::bindReadInternal(DBBD::ReadInternalParam& dest) {
+	dest = READ_INTERNAL_BINDING(&Player::readInternal);
 }
 
 bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
@@ -102,11 +102,6 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 }
 
 void Player::update(const boost::system::error_code& error) {
-	std::cout << "Player[" << session->getSessionId() << "] updated... {" << count++ << "}" << std::endl;
-	if (count < 10) {
-		addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
-	}
-	else {
-		removeTimerEvent(1);
-	}
+	std::cout << "Player[" << session->getSessionId() << "] updated..." << std::endl;
+	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
 }

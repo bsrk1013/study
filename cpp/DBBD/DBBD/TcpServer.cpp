@@ -39,13 +39,17 @@ namespace DBBD {
 	}
 
 	TcpServer::~TcpServer() {
+		stop();
+	}
+
+	void TcpServer::stop() {
 		if (acceptor && acceptor->is_open()) {
 			acceptor->close();
 		}
 
 		if (context) {
 			context->stop();
-			context->restart();
+			//context->restart();
 		}
 
 		threads.join_all();

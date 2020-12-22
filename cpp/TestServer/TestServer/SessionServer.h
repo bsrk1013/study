@@ -8,7 +8,7 @@ using namespace boost::asio;
 
 class Player;
 class DBBD::TcpSession;
-class SessionServer : DBBD::TcpServer {
+class SessionServer : public DBBD::TcpServer {
 public:
 	SessionServer(std::string name);
 	SessionServer(std::string name, short port);

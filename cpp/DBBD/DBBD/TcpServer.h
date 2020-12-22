@@ -20,6 +20,8 @@ namespace DBBD {
 		TcpServer(std::string name, std::string address, short port);
 		virtual ~TcpServer();
 
+		void stop();
+
 	public:
 		void sessionDisconnected(size_t sessionId);
 

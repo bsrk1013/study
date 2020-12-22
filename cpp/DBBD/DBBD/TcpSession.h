@@ -12,17 +12,17 @@ using namespace boost::system;
 namespace DBBD {
 	class ITcpSession {
 	protected:
-		virtual void bindReadInternal(std::function<bool(const Header&, Buffer&)>&) = 0;
+		virtual void bindReadInternal(ReadInternalParam&) = 0;
 		virtual bool readInternal(const Header&, Buffer&) = 0;
 	};
 
 	class Cell;
 	class TcpServer;
 	class TcpSession
-		: public boost::enable_shared_from_this<TcpSession>
+		: public std::enable_shared_from_this<TcpSession>
 	{
 	public:
-		typedef boost::shared_ptr<TcpSession> pointer;
+		typedef std::shared_ptr<TcpSession> pointer;
 		static pointer create(TcpServer* server_context, IoContextSP context);
 		static pointer create(SocketSP socket);
 		void start();

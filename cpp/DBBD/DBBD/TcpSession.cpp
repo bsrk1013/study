@@ -67,6 +67,9 @@ namespace DBBD {
 					if (readInternal) {
 						readInternal(header, receiveBuffer);
 					}
+					else {
+						receiveBuffer.readByteBlock(header.length);
+					}
 					/*if (readInternal) {
 						readInternal(header, receiveBuffer);
 					}*/

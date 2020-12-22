@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "CppUnitTest.h"
+#include "../DBBD/TcpServer.h"
+#include "../DBBD/TcpClient.h"
+#include "../DBBD/TcpSession.h"
 #include "../DBBD/Buffer.h"
 #include "../DBBD/Cell.h"
 #include "../DBBD/Serialize.h"
@@ -354,14 +357,17 @@ namespace DBBDTest
 			}
 
 			LoginReq tempReq;
-			Deserialize::read(receiveBuffer, (Cell*)&tempReq);
+
+			auto headerBlock = receiveBuffer.viewByteBlock(HeaderSize);
+			Header header(headerBlock);
+			receiveBuffer.readByteBlock(header.length);
+
+			Assert::AreEqual(receiveBuffer.getBufferLastPos(), receiveBuffer.getBufferOffset());
+
+			/*Deserialize::read(receiveBuffer, (Cell*)&tempReq);
 
 			Assert::AreEqual(req.token, tempReq.token);
-			Assert::AreEqual(req.deviceId, tempReq.deviceId);
-		}
-
-		TEST_METHOD(StructTest) {
-
+			Assert::AreEqual(req.deviceId, tempReq.deviceId);*/
 		}
 
 		TEST_METHOD(RandomTest) {
@@ -392,7 +398,6 @@ namespace DBBDTest
 					
 					addTimerEvent(CREATURE_TIMER_TYPE::Update, 
 						BINDING(&Creature::update),
-						//std::bind(&Creature::update, this, std::placeholders::_1),
 						CREATURE_UPDATE_TICK);
 				}
 
@@ -481,6 +486,52 @@ namespace DBBDTest
 				Assert::AreEqual(5, a);
 				Assert::AreEqual(3, b);
 			}
+		}
+
+		TEST_METHOD(ServerTest) {
+			class TestSession : public ITcpSession {
+			public:
+				TestSession(DBBD::TcpSession::pointer session) :
+				session(session){
+					bindReadInternal(this->session->readInternal);
+				}
+			protected:
+				virtual void bindReadInternal(ReadInternalParam& dest) {
+					dest = READ_INTERNAL_BINDING(&TestSession::readInternal);
+				}
+
+				virtual bool readInternal(const DBBD::Header& header, DBBD::Buffer& buffer) {
+					return true;
+				}
+
+			private:
+				DBBD::TcpSession::pointer session;
+			};
+
+			class TestServer : public TcpServer {
+			public:
+				TestServer(std::string name, std::string address, int port)
+				:TcpServer(name, address, port){}
+				virtual ~TestServer(){}
+
+			protected:
+				virtual void implementAccept(TcpSession::pointer session) {
+				}
+
+			public:
+				int count = 0;
+			};
+
+			TestServer server("TestServer", "127.0.0.1", 8100);
+			TcpClient client("127.0.0.1", 8100);
+
+			while (true) {
+				if (server.count == 1) {
+					break;
+				}
+			}
+
+			server.stop();
 		}
 	};
 }

@@ -11,6 +11,7 @@ int main() {
 			std::getline(std::cin, a);
 
 			if (a == "exit") {
+				server.stop();
 				break;
 			}
 		}

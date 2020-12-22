@@ -1,6 +1,7 @@
 #pragma once
 #include "DBBD/TcpSession.h"
 #include "DBBD/TimerObject.h"
+#include "DBBD/Define.h"
 
 class Player : public DBBD::TimerObject, DBBD::ITcpSession
 {
@@ -10,7 +11,7 @@ public:
 
 protected:
 	// ITcpSession을(를) 통해 상속됨
-	virtual void bindReadInternal(std::function<bool(const DBBD::Header&, DBBD::Buffer&)>&) override;
+	virtual void bindReadInternal(DBBD::ReadInternalParam& dest) override;
 	virtual bool readInternal(const DBBD::Header&, DBBD::Buffer&) override;
 
 private:
