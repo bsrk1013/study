@@ -105,6 +105,14 @@ namespace DBBD {
 	}
 
 	void TcpSession::handleWrite(const error_code& error, size_t bytesTransferred) {
+		if (error) {
+			std::cerr << "session disconnected..." << " sessionId: " << sessionId
+				<< ", error: " << error << std::endl;
+
+			dieconnect();
+			return;
+		}
+
 		std::cout << "sendData[" << bytesTransferred << "]" << std::endl;
 		sendBuffer.clearBuffer();
 	}
@@ -114,7 +122,7 @@ namespace DBBD {
 			server->sessionDisconnected(sessionId);
 		}
 
-		if (socket->is_open()) {
+		if (socket && socket->is_open()) {
 			socket->close();
 		}
 	}

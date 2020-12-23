@@ -431,6 +431,8 @@ namespace DBBDTest
 
 			Assert::AreEqual(1, a());
 			Assert::AreEqual(2, b());
+
+			Assert::IsTrue(false);
 		}
 
 		TEST_METHOD(FunctionTest) {
@@ -715,7 +717,7 @@ namespace DBBDTest
 			size_t serverPingCount = serverSession->getPingCount();
 			size_t clientPingCount = clientSession->getPingCount();
 			Assert::AreEqual(serverPingCount, clientPingCount);
-			server->stop();
+			//server->stop();
 
 			serverThread.join();
 			clientThread.join();
