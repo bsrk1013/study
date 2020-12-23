@@ -28,8 +28,16 @@ namespace DBBD {
 		this->socket = socket;
 	}
 
+	TcpSession::~TcpSession() {
+		dieconnect();
+	}
+
 	void TcpSession::start() {
 		read();
+	}
+
+	void TcpSession::stop() {
+		dieconnect();
 	}
 
 	void TcpSession::read() {
@@ -104,6 +112,10 @@ namespace DBBD {
 	void TcpSession::dieconnect() {
 		if (server != nullptr) {
 			server->sessionDisconnected(sessionId);
+		}
+
+		if (socket->is_open()) {
+			socket->close();
 		}
 	}
 }

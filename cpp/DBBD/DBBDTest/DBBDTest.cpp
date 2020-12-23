@@ -8,6 +8,7 @@
 #include "../DBBD/Serialize.h"
 #include "../DBBD/Deserialize.h"
 #include "../DBBD/Request.h"
+#include "../DBBD/Response.h"
 #include "../DBBD/Random.h"
 #include "../DBBD/TcpSession.h"
 #include "../DBBD/TimerObject.h"
@@ -489,23 +490,146 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(ServerTest) {
-			class TestSession : public ITcpSession {
+			enum Protocol {
+				PingReq = 1,
+				PingResp = 2,
+			};
+
+			class PingCheckReq : Request {
 			public:
-				TestSession(DBBD::TcpSession::pointer session) :
-				session(session){
-					bindReadInternal(this->session->readInternal);
+				PingCheckReq() {
+					typeId = Protocol::PingReq;
 				}
+
+			public:
+				virtual void serialize(Buffer& buffer) {
+					Request::writeHeader(buffer, getLength());
+				}
+
+				virtual void deserialize(Buffer& buffer) {
+					Request::readHeader(buffer);
+				}
+
+				virtual size_t getLength() {
+					return Request::getLength();
+				}
+			};
+
+			class PingCheckResp : Response {
+			public:
+				PingCheckResp() {
+					typeId = Protocol::PingResp;
+				}
+
+			public:
+				virtual void serialize(Buffer& buffer) {
+					Response::writeHeader(buffer, getLength());
+				}
+
+				virtual void deserialize(Buffer& buffer) {
+					Response::readHeader(buffer);
+				}
+
+				virtual size_t getLength() {
+					return Response::getLength();
+				}
+			};
+
+			class TestServerSession : public ITcpSession, TimerObject {
+			public:
+				TestServerSession(TcpSession::pointer session) :
+				session(session), TimerObject(session->getContext()){
+					bindReadInternal(this->session->readInternal);
+					addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500);
+				}
+				~TestServerSession() {
+					TimerObject::~TimerObject();
+				}
+
 			protected:
 				virtual void bindReadInternal(ReadInternalParam& dest) {
-					dest = READ_INTERNAL_BINDING(&TestSession::readInternal);
+					dest = READ_INTERNAL_BINDING(&TestServerSession::readInternal);
 				}
 
 				virtual bool readInternal(const DBBD::Header& header, DBBD::Buffer& buffer) {
+					switch (header.typeId) {
+					case Protocol::PingResp: {
+						PingCheckResp pingResp;
+						Deserialize::read(buffer, (Cell*)&pingResp);
+						pingFlag = true;
+						invalidPingCount = 0;
+						pingCount++;
+						break;
+					}
+					}
+
 					return true;
 				}
 
 			private:
-				DBBD::TcpSession::pointer session;
+				void pingCheck(const boost::system::error_code& error) {
+					if (!pingFlag) {
+						invalidPingCount++;
+					}
+
+					if (invalidPingCount > 2) {
+						session->stop();
+						return;
+					}
+
+					PingCheckReq ping;
+					session->write((Cell*)&ping);
+
+					pingFlag = false;
+					addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500);
+				}
+
+			public:
+				size_t getPingCount() { return pingCount; }
+
+			private:
+				TcpSession::pointer session;
+				bool pingFlag = true;
+				size_t invalidPingCount = 0;
+				size_t pingCount = 0;
+			};
+			
+			class TestClientSession : public ITcpSession, TimerObject {
+			public:
+				TestClientSession(TcpSession::pointer session)
+					: session(session), TimerObject(session->getContext()) {
+					bindReadInternal(this->session->readInternal);
+				}
+				~TestClientSession() {}
+
+			protected:
+				virtual void bindReadInternal(ReadInternalParam& dest) {
+					dest = READ_INTERNAL_BINDING(&TestClientSession::readInternal);
+				}
+
+				virtual bool readInternal(const Header& header, Buffer& buffer) {
+					switch (header.typeId) {
+					case Protocol::PingReq: {
+						PingCheckReq pingReq;
+						Deserialize::read(buffer, (Cell*)&pingReq);
+
+						pingCount++;
+
+						PingCheckResp pingResp;
+						session->write((Cell*)&pingResp);
+						break;
+					}
+					}
+
+					return true;
+				}
+
+			public:
+				size_t getPingCount() { return pingCount; }
+
+			private:
+				TcpSession::pointer session;
+				size_t pingCount = 0;
 			};
 
 			class TestServer : public TcpServer {
@@ -514,24 +638,81 @@ namespace DBBDTest
 				:TcpServer(name, address, port){}
 				virtual ~TestServer(){}
 
+			public:
+				TestServerSession* getSession() { return testSession; }
+
 			protected:
-				virtual void implementAccept(TcpSession::pointer session) {
+				virtual void acceptInternal(TcpSession::pointer session) {
+					testSession = new TestServerSession(session);
 				}
 
 			public:
-				int count = 0;
+				TestServerSession* testSession = nullptr;
 			};
 
-			TestServer server("TestServer", "127.0.0.1", 8100);
-			TcpClient client("127.0.0.1", 8100);
+			class TestClient : public TcpClient {
+			public:
+				TestClient(std::string name, std::string address, int port)
+					: TcpClient(address, port){}
+				virtual ~TestClient() {}
+
+			public:
+				TestClientSession* getSession() { return testSession; }
+
+			protected:
+				virtual void connectInternal(TcpSession::pointer session) {
+					testSession = new TestClientSession(session);
+				}
+
+			private:
+				TestClientSession* testSession = nullptr;
+			};
+
+
+			auto start = std::chrono::system_clock::now();
+
+			/*TestServer server("TestServer", "127.0.0.1", 8100);
+			TestClient client("TestClient", "127.0.0.1", 8100);*/
+
+			TestServer* server;
+			TestClient* client;
+
+			std::string address = "127.0.0.1";
+			int port = 8100;
+
+			std::thread serverThread([&]() {
+				server = new TestServer("TestServer", address, port);
+				});
+			std::thread clientThread([&]() {
+				std::this_thread::sleep_for(std::chrono::milliseconds(500));
+				client = new TestClient("TestClient", address, port);
+				});
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
 			while (true) {
-				if (server.count == 1) {
+				auto session = server->getSession();
+				if (!session) { continue; }
+				size_t pingCount = session->getPingCount();
+				// 1초에 2번 증가
+				if (pingCount > 20) {
 					break;
 				}
 			}
 
-			server.stop();
+			auto end = std::chrono::system_clock::now();
+
+			std::chrono::duration<double> elapsed = end - start;
+
+			auto serverSession = server->getSession();
+			auto clientSession = client->getSession();
+
+			auto elapsedSecond = elapsed.count();
+			Assert::IsTrue(elapsedSecond >= 11);
+			size_t serverPingCount = serverSession->getPingCount();
+			size_t clientPingCount = clientSession->getPingCount();
+			Assert::AreEqual(serverPingCount, clientPingCount);
+			server->stop();
 		}
 	};
 }

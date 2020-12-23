@@ -15,13 +15,16 @@ namespace DBBD {
 		TcpClient() {}
 		TcpClient(const TcpClient&) {}
 		TcpClient(const std::string& address, const short& port);
-		~TcpClient();
+		virtual ~TcpClient();
 		
 	public:
 		void send(Cell* data);
 
 	public:
 		TcpSession::pointer getSession() { return session; }
+
+	protected:
+		virtual void connectInternal(TcpSession::pointer session) = 0;
 
 	private:
 		void handleConnect(const error_code& error);

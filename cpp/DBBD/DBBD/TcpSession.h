@@ -25,7 +25,10 @@ namespace DBBD {
 		typedef std::shared_ptr<TcpSession> pointer;
 		static pointer create(TcpServer* server_context, IoContextSP context);
 		static pointer create(SocketSP socket);
+
+		~TcpSession();
 		void start();
+		void stop();
 
 		// getter, setter
 	public:

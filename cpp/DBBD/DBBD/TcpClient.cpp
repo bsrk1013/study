@@ -42,6 +42,7 @@ namespace DBBD {
 	void TcpClient::handleConnect(const error_code& error) {
 		if (!error) {
 			this->session = TcpSession::create(socket);;
+			connectInternal(session);
 			this->session->start();
 			std::cout << "session connected..." << std::endl;
 		}

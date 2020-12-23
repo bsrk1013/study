@@ -6,9 +6,9 @@
 
 namespace DBBD {
 	class Buffer;
-	class Request : public Cell {
+	class Response : public Cell {
 	public:
-		virtual ~Request() {}
+		virtual ~Response() {}
 
 	public:
 		void writeHeader(Buffer& buffer, const size_t& length) {

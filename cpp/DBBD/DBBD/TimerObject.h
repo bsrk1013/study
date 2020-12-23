@@ -9,6 +9,7 @@ namespace DBBD {
 	{
 	public:
 		TimerObject(IoContextSP context);
+		~TimerObject();
 
 	protected:
 		void addTimerEvent(int eventType, TimerParam target, size_t waitMs);

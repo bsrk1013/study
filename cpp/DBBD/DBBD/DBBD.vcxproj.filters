@@ -69,6 +69,9 @@
     <ClInclude Include="TimerObject.h">
       <Filter>헤더 파일\Tcp</Filter>
     </ClInclude>
+    <ClInclude Include="Response.h">
+      <Filter>헤더 파일\Tcp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TcpSession.cpp">

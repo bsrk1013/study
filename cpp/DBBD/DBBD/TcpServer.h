@@ -29,7 +29,7 @@ namespace DBBD {
 		const std::string getName() { return name; }
 
 	protected:
-		virtual void implementAccept(TcpSession::pointer session) = 0;
+		virtual void acceptInternal(TcpSession::pointer session) = 0;
 
 	private:
 		void startAccept();

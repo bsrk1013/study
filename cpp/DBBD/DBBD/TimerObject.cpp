@@ -5,6 +5,14 @@ namespace DBBD {
 		: context(context)
 	{
 	}
+	
+	TimerObject::~TimerObject() {
+		for (auto pair: timerMap) {
+			delete pair.second;
+		}
+
+		timerMap.clear();
+	}
 
 	void TimerObject::addTimerEvent(int eventType, TimerParam target, size_t waitMs) {
 		auto waitTime = boost::posix_time::milliseconds(waitMs);
