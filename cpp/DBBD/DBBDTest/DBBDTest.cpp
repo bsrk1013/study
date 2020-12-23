@@ -585,6 +585,7 @@ namespace DBBDTest
 				}
 
 			public:
+				bool isConnect() { return session->isConnect(); }
 				size_t getPingCount() { return pingCount; }
 
 			private:
@@ -598,7 +599,7 @@ namespace DBBDTest
 			public:
 				TestClientSession(TcpSession::pointer session)
 					: session(session), TimerObject(session->getContext()) {
-					bindReadInternal(this->session->readInternal);
+					//bindReadInternal(this->session->readInternal);
 				}
 				~TestClientSession() {}
 
@@ -625,6 +626,7 @@ namespace DBBDTest
 				}
 
 			public:
+				bool isConnect() { return session->isConnect(); }
 				size_t getPingCount() { return pingCount; }
 
 			private:
@@ -693,6 +695,7 @@ namespace DBBDTest
 			while (true) {
 				auto session = server->getSession();
 				if (!session) { continue; }
+				if (!session->isConnect()) { break; }
 				size_t pingCount = session->getPingCount();
 				// 1초에 2번 증가
 				if (pingCount > 20) {
@@ -713,6 +716,9 @@ namespace DBBDTest
 			size_t clientPingCount = clientSession->getPingCount();
 			Assert::AreEqual(serverPingCount, clientPingCount);
 			server->stop();
+
+			serverThread.join();
+			clientThread.join();
 		}
 	};
 }

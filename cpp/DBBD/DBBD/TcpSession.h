@@ -32,6 +32,7 @@ namespace DBBD {
 
 		// getter, setter
 	public:
+		bool isConnect() { if (socket) { return socket->is_open(); } return false; }
 		SocketSP getSocket() { return socket; }
 		IoContextSP getContext() { return context; }
 		size_t getSessionId() { return sessionId; }
