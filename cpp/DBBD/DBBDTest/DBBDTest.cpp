@@ -431,8 +431,6 @@ namespace DBBDTest
 
 			Assert::AreEqual(1, a());
 			Assert::AreEqual(2, b());
-
-			Assert::IsTrue(false);
 		}
 
 		TEST_METHOD(FunctionTest) {
@@ -601,7 +599,7 @@ namespace DBBDTest
 			public:
 				TestClientSession(TcpSession::pointer session)
 					: session(session), TimerObject(session->getContext()) {
-					//bindReadInternal(this->session->readInternal);
+					bindReadInternal(this->session->readInternal);
 				}
 				~TestClientSession() {}
 
@@ -643,15 +641,24 @@ namespace DBBDTest
 				virtual ~TestServer(){}
 
 			public:
-				TestServerSession* getSession() { return testSession; }
+				TestServerSession* getSession() { return testClientSession; }
 
 			protected:
 				virtual void acceptInternal(TcpSession::pointer session) {
-					testSession = new TestServerSession(session);
+					testClientSession = new TestServerSession(session);
 				}
 
 			public:
-				TestServerSession* testSession = nullptr;
+				TestServerSession* testClientSession = nullptr;
+			};
+
+			class ChatServer : public TcpServer {
+			public:
+				ChatServer(std::string name, std::string address, int port)
+				:TcpServer(name, address, port) {}
+				virtual ~ChatServer() {}
+
+			public:
 			};
 
 			class TestClient : public TcpClient {
@@ -674,9 +681,6 @@ namespace DBBDTest
 
 
 			auto start = std::chrono::system_clock::now();
-
-			/*TestServer server("TestServer", "127.0.0.1", 8100);
-			TestClient client("TestClient", "127.0.0.1", 8100);*/
 
 			TestServer* server;
 			TestClient* client;
