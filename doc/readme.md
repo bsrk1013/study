@@ -20,6 +20,7 @@ loop Update
     A->>A:AI Do
 end
 A->>B: LoginReq
+Note right of B: 로그인 검사
 alt success
     B->>A: LoginResp, user info
 else fail
@@ -27,4 +28,21 @@ else fail
 end
 ```
 
-## Class diagram
+## Flowchart
+코드블럭 안에 `graph TD;` 키워드로 사용
+- a --> b a에서 B로 진행
+``` mermaid
+graph TD;
+A-->B;
+B-->C;
+C-->A;
+```
+
+<!-- ## Class diagram
+코드블럭 안에 `classDiagram` 키워드로 사용
+
+``` mermaid
+classDiagram
+TcpServer : int a
+TcpServer --* SessionServer
+``` -->
