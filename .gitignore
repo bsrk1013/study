@@ -5,6 +5,10 @@
 ### Boost ###
 boost_1_74_0/
 
+### VLD ###
+Visual Leak Detector/
+!vld-2.5.1-setup.exe
+
 ### C++ ###
 # Prerequisites
 *.d
