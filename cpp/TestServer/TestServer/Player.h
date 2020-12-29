@@ -4,7 +4,6 @@
 #include "DBBD/Define.h"
 
 class Player : 
-	public std::enable_shared_from_this<Player>,
 	public DBBD::TimerObject,
 	DBBD::ITcpSession
 {
