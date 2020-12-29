@@ -1,6 +1,7 @@
 # Boost
 
 ##### DBBD 코어 프로젝트에 세팅
+##### 다운로드 경로 : https://www.boost.org/users/history/version_1_75_0.html
 
 1. 프로젝트 빌드 시 boost 링크 오류 날 시 부스트 설치 필요
 
@@ -18,6 +19,7 @@
 # VLD
 
 ##### 하위 프로젝트에 세팅
+##### 다운로드 경로 : https://kinddragon.github.io/vld/
 
 1. 프로젝트 빌드 시 vld 링크 오류 날 시 vld 설치 필요
 
