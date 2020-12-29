@@ -30,19 +30,23 @@ namespace DBBD {
 
 	protected:
 		virtual void acceptInternal(TcpSession::pointer session) = 0;
+		virtual void disconnectInternal(size_t sessionId) = 0;
 
 	private:
 		void startAccept();
 		void handleAccept(TcpSession::pointer session, const error_code& error);
 		size_t increaseAndGetSessionId();
 
+	protected:
+			std::mutex lockObject;
+
 	private:
+		bool isDispose = false;
 		std::string name;
 		IoContextSP context;
 		std::unique_ptr<ip::tcp::acceptor> acceptor;
 		std::atomic<size_t> sessionIdCounter = 0;
-		std::map<size_t, TcpSession::pointer> sessionMap;
 		boost::thread_group threads;
-		std::mutex lockObject;
+		std::vector<boost::thread*> threadList;
 	};
 }

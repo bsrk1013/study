@@ -3,11 +3,14 @@
 #include "DBBD/TimerObject.h"
 #include "DBBD/Define.h"
 
-class Player : public DBBD::TimerObject, DBBD::ITcpSession
+class Player : 
+	public std::enable_shared_from_this<Player>,
+	public DBBD::TimerObject,
+	DBBD::ITcpSession
 {
 public:
 	Player(DBBD::TcpSession::pointer session);
-	~Player();
+	virtual ~Player();
 
 protected:
 	// ITcpSession을(를) 통해 상속됨
@@ -18,6 +21,7 @@ private:
 	void update(const boost::system::error_code&);
 
 private:
+	bool isDispose = false;
 	DBBD::TcpSession::pointer session;
 	size_t count = 0;
 };

@@ -2,6 +2,7 @@
 #include <string>
 #include <thread>
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include "TcpSession.h"
 
 using namespace boost::asio;
@@ -18,6 +19,7 @@ namespace DBBD {
 		virtual ~TcpClient();
 		
 	public:
+		void close();
 		void send(Cell* data);
 
 	public:
@@ -27,10 +29,11 @@ namespace DBBD {
 		virtual void connectInternal(TcpSession::pointer session) = 0;
 
 	private:
-		void handleConnect(const error_code& error);
+		void handleConnect(const boost::system::error_code& error);
 
 	private:
-		std::thread* mainThread = nullptr;
+		boost::thread_group threads;
+		//std::thread* mainThread = nullptr;
 		std::unique_ptr<io_context> context;
 		std::shared_ptr<ip::tcp::socket> socket;
 		TcpSession::pointer session;

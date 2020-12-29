@@ -24,11 +24,13 @@ namespace DBBD {
 	}
 
 	TcpSession::TcpSession(SocketSP socket)
-	: sendBuffer(8192), receiveBuffer(8192){
-		this->socket = socket;
+	: sendBuffer(8192),
+	receiveBuffer(8192),
+	socket(socket){
 	}
 
 	TcpSession::~TcpSession() {
+		std::cout << "~TcpSession call..." << std::endl;
 		dieconnect();
 	}
 
@@ -51,7 +53,6 @@ namespace DBBD {
 		if (error) {
 			std::cerr << "session disconnected..." << " sessionId: " << sessionId
 				<< ", error: " << error << std::endl;
-
 			dieconnect();
 			return;
 		}
@@ -78,16 +79,6 @@ namespace DBBD {
 					else {
 						receiveBuffer.readByteBlock(header.length);
 					}
-					/*if (readInternal) {
-						readInternal(header, receiveBuffer);
-					}*/
-					/*if (readDelegate != nullptr) {
-						readDelegate->readInternal(header, receiveBuffer);
-					}
-					else {
-						receiveBuffer.readByteBlock(HeaderSize);
-						receiveBuffer.readByteBlock(header.length);
-					}*/
 				}
 			}
 		}
@@ -108,7 +99,6 @@ namespace DBBD {
 		if (error) {
 			std::cerr << "session disconnected..." << " sessionId: " << sessionId
 				<< ", error: " << error << std::endl;
-
 			dieconnect();
 			return;
 		}
@@ -118,12 +108,18 @@ namespace DBBD {
 	}
 
 	void TcpSession::dieconnect() {
+		if (!isConnect()) {
+			return;
+		}
+
 		if (server != nullptr) {
 			server->sessionDisconnected(sessionId);
+			server = nullptr;
 		}
 
 		if (socket && socket->is_open()) {
 			socket->close();
+			socket.reset();
 		}
 	}
 }

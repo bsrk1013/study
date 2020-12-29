@@ -1,6 +1,7 @@
 # DBBD 서버 구조
 
 ## 서버의 종류
+
 - ### LoginServer(웹서버로 LB처리?)
   현재 SessionServer에 접속해 있는  
   유저의 수를 확인해 SessionServer를 선택해 주는  

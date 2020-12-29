@@ -5,7 +5,8 @@
 
 namespace DBBD {
 // MACRO
-#define TIMER_BINDING(method) std::bind(method, this, std::placeholders::_1)
+#define TIMER_BINDING(method, thisPtr) std::bind(method, thisPtr, std::placeholders::_1)
+
 #define READ_INTERNAL_BINDING(method) std::bind(method, this, std::placeholders::_1, std::placeholders::_2)
 
 // typedef

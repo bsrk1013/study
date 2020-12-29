@@ -17,3 +17,12 @@ void SessionServer::acceptInternal(DBBD::TcpSession::pointer session) {
 	Player* player = new Player(session);
 	playerMap[session->getSessionId()] = player;
 }
+
+void SessionServer::disconnectInternal(size_t sessionId) {
+	auto player = playerMap[sessionId];
+	playerMap.erase(sessionId);
+	if (player) {
+		delete player;
+	}
+	std::cout << "player map count: " << playerMap.size() << std::endl;
+}

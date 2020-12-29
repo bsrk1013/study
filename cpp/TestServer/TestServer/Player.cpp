@@ -61,13 +61,16 @@ private:
 };
 
 Player::Player(DBBD::TcpSession::pointer session)
-: TimerObject(session->getContext()), session(session){
+	: TimerObject(session->getContext()), session(session) {
 	bindReadInternal(this->session->readInternal);
 
-	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
+	addTimerEvent(1, TIMER_BINDING(&Player::update, shared_from_this()), 1000);
 }
 
 Player::~Player() {
+	std::cout << "~Player call..." << std::endl;
+	isDispose = true;
+	removeTimerEvent(1);
 }
 
 void Player::bindReadInternal(DBBD::ReadInternalParam& dest) {
@@ -102,6 +105,6 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 }
 
 void Player::update(const boost::system::error_code& error) {
-	std::cout << "Player[" << session->getSessionId() << "] updated..." << std::endl;
-	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
+	//std::cout << "Player[" << session->getSessionId() << "] updated..." << std::endl;
+	addTimerEvent(1, TIMER_BINDING(&Player::update, shared_from_this()), 1000);
 }

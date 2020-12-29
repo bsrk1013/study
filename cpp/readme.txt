@@ -1,3 +1,4 @@
+boost
 1. 프로젝트 빌드시 boost 링크 오류 날 시 부스트 설치 필요
  - boost_1_74_0.zip 압축 해제
  - boost_1_74_0 폴더에서 booststrap.bat 실행

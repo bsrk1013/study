@@ -14,12 +14,17 @@ namespace DBBD {
 	}
 
 	Buffer::~Buffer() {
+		std::cout << "~Buffer call..." << std::endl;
 		if (buffer != nullptr) {
+			std::cout << "buffer release..." << std::endl;
 			delete[] buffer;
+			buffer = nullptr;
 		}
 
 		if (block != nullptr) {
+			std::cout << "block release..." << std::endl;
 			delete[] block;
+			block = nullptr;
 		}
 	}
 

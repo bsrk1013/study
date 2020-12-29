@@ -27,15 +27,12 @@ namespace DBBD {
 
 		startAccept();
 
-		for (size_t i = 0; i < 3; i++) {
-			threads.create_thread(boost::bind(&io_context::run, &(*context)));
+		for (size_t i = 0; i < 8; i++) {
+			auto thread = threads.create_thread(boost::bind(&io_context::run, &(*context)));
+			threadList.push_back(thread);
 		}
 
-		//acceptor->listen();
-
 		std::cout << name << " Server Started..." << std::endl;
-
-		//context->run();
 	}
 
 	TcpServer::~TcpServer() {
@@ -43,19 +40,34 @@ namespace DBBD {
 	}
 
 	void TcpServer::stop() {
+		if (isDispose) {
+			return;
+		}
+
+		isDispose = true;
+
 		if (acceptor && acceptor->is_open()) {
-			acceptor->close();
+			acceptor->cancel();
+			//acceptor->close();
+			acceptor.reset();
 		}
 
 		if (context) {
 			context->stop();
+			context.reset();
 			//context->restart();
 		}
 
-		threads.join_all();
+		//threads.join_all();
 	}
 
 	void TcpServer::startAccept() {
+		if (!acceptor 
+			|| !acceptor->is_open()
+			|| isDispose) {
+			return;
+		}
+
 		auto session = TcpSession::create(this, context);
 		acceptor->async_accept(*session->getSocket(),
 			boost::bind(&TcpServer::handleAccept, this, session, placeholders::error));
@@ -67,11 +79,11 @@ namespace DBBD {
 
 			lockObject.lock();
 			session->setSessionId(sessionId);
-			sessionMap[sessionId] = session;
+			acceptInternal(session);
 			lockObject.unlock();
+			
 			session->start();
 
-			acceptInternal(session);
 			auto id = std::this_thread::get_id();
 			std::cout << "[" << id << "]session connected... id: " << sessionId << std::endl;
 		}
@@ -81,8 +93,7 @@ namespace DBBD {
 
 	void TcpServer::sessionDisconnected(size_t sessionId) {
 		lockObject.lock();
-		sessionMap.erase(sessionId);
-		std::cout << "session map count: " << sessionMap.size() << std::endl;
+		disconnectInternal(sessionId);
 		lockObject.unlock();
 	}
 

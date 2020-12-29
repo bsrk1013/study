@@ -15,12 +15,17 @@ namespace DBBD {
 		socket->async_connect(endpoint,
 			boost::bind(&TcpClient::handleConnect, this, placeholders::error));
 
-		mainThread = new std::thread([&]() {
+		threads.create_thread(boost::bind(&io_context::run, &(*context)));
+		/*mainThread = new std::thread([&]() {
 			context->run();
-			});
+			});*/
 	}
 
 	TcpClient::~TcpClient() {
+		close();
+	}
+
+	void TcpClient::close() {
 		if (socket) {
 			socket->close();
 		}
@@ -29,10 +34,11 @@ namespace DBBD {
 			context->stop();
 		}
 
-		if (mainThread) {
+		threads.join_all();
+		/*if (mainThread) {
 			mainThread->join();
 			delete mainThread;
-		}
+		}*/
 	}
 
 	void TcpClient::send(Cell* data) {

@@ -16,7 +16,8 @@ public:
 	SessionServer(std::string name, std::string address, short port);
 	virtual ~SessionServer();
 protected:
-	virtual void acceptInternal(DBBD::TcpSession::pointer session);
+	virtual void acceptInternal(DBBD::TcpSession::pointer session) override;
+	virtual void disconnectInternal(size_t sessionId) override;
 
 private:
 	std::map<size_t, Player*> playerMap;

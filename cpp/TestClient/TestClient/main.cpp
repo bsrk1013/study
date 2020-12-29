@@ -15,6 +15,7 @@
 #include "DBBD/Deserialize.h"
 #include "DBBD/Cell.h"
 #include "DBBD/Random.h"
+#include "DBClient.h"
 //#include <boost/asio.hpp>
 
 using namespace std;
@@ -412,12 +413,14 @@ int main() {
 	program2();
 	program3();*/
 
-	std::vector<DBBD::TcpClient*> clientList;
+    std::vector<DBClient*> clientList;
+	//std::vector<DBBD::TcpClient*> clientList;
 	std::vector<std::thread*> threadList(100);
 
 	try {
-		for (size_t i = 0; i < 1; i++) {
-			DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
+		for (size_t i = 0; i < 16; i++) {
+            DBClient* client = new DBClient("127.0.0.1", 8100);
+			//DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
 			clientList.push_back(client);
 		}
 
@@ -426,6 +429,9 @@ int main() {
 			std::getline(std::cin, a);
 
 			if (a == "exit") {
+                for (auto client : clientList) {
+                    client->close();
+                }
 				break;
 			}
 
