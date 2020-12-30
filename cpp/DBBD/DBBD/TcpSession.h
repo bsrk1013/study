@@ -23,7 +23,7 @@ namespace DBBD {
 	{
 	public:
 		typedef std::shared_ptr<TcpSession> pointer;
-		static pointer create(TcpServer* server_context, IoContextSP context);
+		static pointer create(TcpServer* server_context, IoContextSP context, SocketSP socket);
 		static pointer create(SocketSP socket);
 
 		~TcpSession();
@@ -40,7 +40,7 @@ namespace DBBD {
 		void write(Cell* data);
 
 	private:
-		TcpSession(TcpServer* server, IoContextSP context);
+		TcpSession(TcpServer* server, IoContextSP context, SocketSP socket);
 		TcpSession(SocketSP socket);
 
 	private:
@@ -59,7 +59,6 @@ namespace DBBD {
 		Buffer sendBuffer;
 		Buffer receiveBuffer;
 		size_t sessionId;
-		std::mutex readLock;
-		std::mutex writeLock;
+		std::mutex lockObject;
 	};
 }

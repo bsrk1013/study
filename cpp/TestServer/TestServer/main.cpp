@@ -19,7 +19,7 @@ static void PrintUsageInfo() {
 	size_t usedPhysMem = pmc.WorkingSetSize / 1024;
 
 	std::cout << "Used Virtual Mem : " << usedVirtualMem << "kb" << std::endl;
-	//std::cout << "Used Phys Mem : " << usedPhysMem << "kb" << std::endl;
+	std::cout << "Used Phys Mem : " << usedPhysMem << "kb" << std::endl;
 
 	/*static MEMORYSTATUSEX memInfo;
 	memInfo.dwLength = sizeof(MEMORYSTATUSEX);

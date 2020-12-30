@@ -5,13 +5,17 @@
 
 namespace DBBD {
 // MACRO
-#define TIMER_BINDING(method) std::bind(method, this, std::placeholders::_1)
+#define TIMER_BINDING(method) std::bind(method, this)
 
 #define READ_INTERNAL_BINDING(method) std::bind(method, this, std::placeholders::_1, std::placeholders::_2)
 
 // typedef
+	// shared_ptr
 	typedef std::shared_ptr<boost::asio::io_context> IoContextSP;
 	typedef std::shared_ptr<boost::asio::ip::tcp::socket> SocketSP;
-	typedef std::function<void(const boost::system::error_code&)> TimerParam;
+	typedef std::shared_ptr<boost::asio::deadline_timer> TimerSP;
+
+	// std::function
+	typedef std::function<void()> TimerParam;
 	typedef std::function<bool(const Header&, Buffer&)> ReadInternalParam;
 }

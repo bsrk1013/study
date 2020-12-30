@@ -68,20 +68,27 @@ namespace DBBD {
 			return;
 		}
 
-		auto session = TcpSession::create(this, context);
-		acceptor->async_accept(*session->getSocket(),
-			boost::bind(&TcpServer::handleAccept, this, session, placeholders::error));
+		std::cout << "start accept..." << std::endl;
+		lockObject.lock();
+		SocketSP socket = std::make_shared<ip::tcp::socket>(*context);
+		//auto session = TcpSession::create(this, context);
+		lockObject.unlock();
+		acceptor->async_accept(*socket,
+			boost::bind(&TcpServer::handleAccept, this, socket, placeholders::error));
+		/*acceptor->async_accept(*session->getSocket(),
+			boost::bind(&TcpServer::handleAccept, this, session, placeholders::error));*/
 	}
 
-	void TcpServer::handleAccept(TcpSession::pointer session, const error_code& error) {
+	void TcpServer::handleAccept(SocketSP socket, const error_code& error) {
 		if (!error) {
 			size_t sessionId = increaseAndGetSessionId();
 
 			lockObject.lock();
+			auto session = TcpSession::create(this, context, socket);
 			session->setSessionId(sessionId);
 			acceptInternal(session);
 			lockObject.unlock();
-			
+
 			session->start();
 
 			auto id = std::this_thread::get_id();

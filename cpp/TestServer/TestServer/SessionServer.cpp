@@ -14,15 +14,12 @@ SessionServer::SessionServer(std::string name, std::string address, short port)
 SessionServer::~SessionServer() {}
 
 void SessionServer::acceptInternal(DBBD::TcpSession::pointer session) {
-	Player* player = new Player(session);
+	auto player = std::make_shared<Player>(session);
 	playerMap[session->getSessionId()] = player;
 }
 
 void SessionServer::disconnectInternal(size_t sessionId) {
 	auto player = playerMap[sessionId];
 	playerMap.erase(sessionId);
-	if (player) {
-		delete player;
-	}
 	std::cout << "player map count: " << playerMap.size() << std::endl;
 }

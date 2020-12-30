@@ -3,6 +3,7 @@
 
 namespace DBBD {
 	Buffer::Buffer(const size_t& size) {
+		std::cout << "Buffer size[" << size << "]call..." << std::endl;
 		bufferCapacity = size;
 		buffer = new char[size];
 		blockSize = size / 16;
@@ -10,7 +11,7 @@ namespace DBBD {
 	}
 
 	Buffer::Buffer(const char* bufferBlock) {
-
+		std::cout << "Buffer call..." << std::endl;
 	}
 
 	Buffer::~Buffer() {

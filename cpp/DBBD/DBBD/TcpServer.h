@@ -34,7 +34,8 @@ namespace DBBD {
 
 	private:
 		void startAccept();
-		void handleAccept(TcpSession::pointer session, const error_code& error);
+		void handleAccept(SocketSP socket, const error_code& error);
+		/*void handleAccept(TcpSession::pointer session, const error_code& error);*/
 		size_t increaseAndGetSessionId();
 
 	protected:

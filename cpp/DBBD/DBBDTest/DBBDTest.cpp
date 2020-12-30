@@ -387,7 +387,7 @@ namespace DBBDTest
 
 #define BINDING(method) std::bind(method, this, std::placeholders::_1)
 		TEST_METHOD(TimerTest) {
-			static const int CREATURE_UPDATE_TICK = 500;
+			static const int CREATURE_UPDATE_TICK = 2000;
 			enum CREATURE_TIMER_TYPE {
 				None = 0,
 				Update = 1,
@@ -401,19 +401,40 @@ namespace DBBDTest
 						BINDING(&Creature::update),
 						CREATURE_UPDATE_TICK);
 				}
+				~Creature() {
+					removeTimerEvent(CREATURE_TIMER_TYPE::Update);
+				}
 
 			private:
 				void update(const boost::system::error_code& error) {
 					Assert::IsTrue(true);
+
+					addTimerEvent(CREATURE_TIMER_TYPE::Update,
+						BINDING(&Creature::update),
+						CREATURE_UPDATE_TICK);
 				}
 			};
 
 			std::shared_ptr<boost::asio::io_context> context;
 			context = std::make_shared<boost::asio::io_context>();
 
-			Creature doby(context);
+			std::vector<Creature*> mobList;
+			/*for (int i = 0; i < 100; i++) {
+				Creature* mob = new Creature(context);
+				mobList.push_back(mob);
+			}
 
-			context->run();
+			for (auto mob : mobList) {
+				delete mob;
+			}*/
+
+			Creature* doby = new Creature(context);
+
+			boost::thread_group threads;
+			threads.create_thread(boost::bind(&boost::asio::io_context::run, &(*context)));
+			
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+			delete doby;
 
 			std::this_thread::sleep_for(std::chrono::seconds(10));
 		}
@@ -646,6 +667,10 @@ namespace DBBDTest
 			protected:
 				virtual void acceptInternal(TcpSession::pointer session) {
 					testClientSession = new TestServerSession(session);
+				}
+
+				virtual void disconnectInternal(size_t sessionId) {
+					delete testClientSession;
 				}
 
 			public:

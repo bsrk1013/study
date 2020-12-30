@@ -63,14 +63,14 @@ private:
 Player::Player(DBBD::TcpSession::pointer session)
 	: TimerObject(session->getContext()), session(session) {
 	bindReadInternal(this->session->readInternal);
-
-	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
+	std::cout << "Player[" << session->getSessionId() << "] call..." << std::endl;
+	registTimerEvent();
 }
 
 Player::~Player() {
-	std::cout << "~Player call..." << std::endl;
+	std::cout << "~Player[" << session->getSessionId() << "] call..." << std::endl;
 	isDispose = true;
-	removeTimerEvent(1);
+	//removeTimerEvent(1);
 }
 
 void Player::bindReadInternal(DBBD::ReadInternalParam& dest) {
@@ -104,7 +104,13 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 	return true;
 }
 
-void Player::update(const boost::system::error_code& error) {
-	//std::cout << "Player[" << session->getSessionId() << "] updated..." << std::endl;
-	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
+void Player::registTimerEvent() {
+	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000, true);
+	//addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
+}
+
+void Player::update() {
+	size_t sessionId = this->session->getSessionId();
+	std::cout << "[" << std::this_thread::get_id() << "]Player[" << sessionId << "] updated..." << std::endl;
+	//addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
 }

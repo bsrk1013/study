@@ -7,26 +7,30 @@
 #include "Request.h"
 
 namespace DBBD {
-	TcpSession::pointer TcpSession::create(TcpServer* server, IoContextSP context) {
-		return TcpSession::pointer(new TcpSession(server, context));
+	TcpSession::pointer TcpSession::create(TcpServer* server, IoContextSP context, SocketSP socket) {
+		return TcpSession::pointer(new TcpSession(server, context, socket));
 	}
 
 	TcpSession::pointer TcpSession::create(SocketSP socket) {
 		return TcpSession::pointer(new TcpSession(socket));
 	}
 
-	TcpSession::TcpSession(TcpServer* server_context, IoContextSP context)
+	TcpSession::TcpSession(TcpServer* server_context, IoContextSP context, SocketSP socket)
 		: server(server_context),
 		context(context),
 		sendBuffer(8192),
-		receiveBuffer(8192) {
-		socket = std::make_shared<ip::tcp::socket>(*context);
+		receiveBuffer(8192),
+		sessionId(0),
+		socket(socket){
+		std::cout << "TcpSession[server] call..." << std::endl;
 	}
 
 	TcpSession::TcpSession(SocketSP socket)
 	: sendBuffer(8192),
 	receiveBuffer(8192),
+	sessionId(0),
 	socket(socket){
+		std::cout << "TcpSession[client] call..." << std::endl;
 	}
 
 	TcpSession::~TcpSession() {
@@ -43,17 +47,22 @@ namespace DBBD {
 	}
 
 	void TcpSession::read() {
+		std::cout << "session read..." << std::endl;
+		lockObject.lock();
 		receiveBuffer.adjust();
+		lockObject.unlock();
 		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 			boost::bind(&TcpSession::handleRead, shared_from_this(),
 				placeholders::error, placeholders::bytes_transferred));
 	}
 
 	void TcpSession::handleRead(const error_code& error, size_t bytesTransferred) {
+		lockObject.lock();
 		if (error) {
 			std::cerr << "session disconnected..." << " sessionId: " << sessionId
 				<< ", error: " << error << std::endl;
 			dieconnect();
+			lockObject.unlock();
 			return;
 		}
 
@@ -83,11 +92,16 @@ namespace DBBD {
 			}
 		}
 
+		lockObject.unlock();
+
 		read();
 	}
 
 	void TcpSession::write(Cell* data) {
+		std::cout << "session write..." << std::endl;
+		lockObject.lock();
 		Serialize::write(sendBuffer, data);
+		lockObject.unlock();
 
 		async_write(*socket,
 			buffer(sendBuffer.getBuffer(), sendBuffer.getBufferLastPos()),
@@ -96,15 +110,18 @@ namespace DBBD {
 	}
 
 	void TcpSession::handleWrite(const error_code& error, size_t bytesTransferred) {
+		lockObject.lock();
 		if (error) {
 			std::cerr << "session disconnected..." << " sessionId: " << sessionId
 				<< ", error: " << error << std::endl;
 			dieconnect();
+			lockObject.unlock();
 			return;
 		}
 
 		std::cout << "sendData[" << bytesTransferred << "]" << std::endl;
 		sendBuffer.clearBuffer();
+		lockObject.unlock();
 	}
 
 	void TcpSession::dieconnect() {

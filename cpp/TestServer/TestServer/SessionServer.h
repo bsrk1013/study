@@ -20,5 +20,5 @@ protected:
 	virtual void disconnectInternal(size_t sessionId) override;
 
 private:
-	std::map<size_t, Player*> playerMap;
+	std::map<size_t, std::shared_ptr<Player>> playerMap;
 };
