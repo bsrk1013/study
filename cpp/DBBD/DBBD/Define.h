@@ -14,6 +14,7 @@ namespace DBBD {
 	typedef std::shared_ptr<boost::asio::io_context> IoContextSP;
 	typedef std::shared_ptr<boost::asio::ip::tcp::socket> SocketSP;
 	typedef std::shared_ptr<boost::asio::deadline_timer> TimerSP;
+	//std::shared_ptr<TimerObject> basePtr;
 
 	// std::function
 	typedef std::function<void()> TimerParam;

@@ -22,7 +22,7 @@ private:
 	void update();
 
 private:
-	bool isDispose = false;
+	bool isDisposed = false;
 	DBBD::TcpSession::pointer session;
 	size_t count = 0;
 };

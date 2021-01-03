@@ -13,10 +13,36 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="헤더 파일\Extractor">
+      <UniqueIdentifier>{f25b7c57-28dc-4ab6-862a-6d20f08bcedd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Extractor">
+      <UniqueIdentifier>{d7b996c3-5070-47fc-8c63-e5f521d6fd3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DBBD.Extractor.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="tinyxml2.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CppExtractor.cpp">
+      <Filter>소스 파일\Extractor</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseExtractor.cpp">
+      <Filter>소스 파일\Extractor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tinyxml2.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CppExtractor.h">
+      <Filter>헤더 파일\Extractor</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseExtractor.h">
+      <Filter>헤더 파일\Extractor</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

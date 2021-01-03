@@ -69,7 +69,7 @@ Player::Player(DBBD::TcpSession::pointer session)
 
 Player::~Player() {
 	std::cout << "~Player[" << session->getSessionId() << "] call..." << std::endl;
-	isDispose = true;
+	isDisposed = true;
 	//removeTimerEvent(1);
 }
 
@@ -79,6 +79,10 @@ void Player::bindReadInternal(DBBD::ReadInternalParam& dest) {
 
 bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 {
+	if (isDisposed) {
+		return false;
+	}
+
 	/////////////////////////////////////////////////////////////////////// readInternal에서 구현해야함
 	switch (header.typeId) {
 	case 1: {
@@ -111,6 +115,6 @@ void Player::registTimerEvent() {
 
 void Player::update() {
 	size_t sessionId = this->session->getSessionId();
-	std::cout << "[" << std::this_thread::get_id() << "]Player[" << sessionId << "] updated..." << std::endl;
+	//std::cout << "[" << std::this_thread::get_id() << "]Player[" << sessionId << "] updated..." << std::endl;
 	//addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
 }

@@ -385,7 +385,7 @@ namespace DBBDTest
 			}
 		}
 
-#define BINDING(method) std::bind(method, this, std::placeholders::_1)
+#define BINDING(method) std::bind(method, this)
 		TEST_METHOD(TimerTest) {
 			static const int CREATURE_UPDATE_TICK = 2000;
 			enum CREATURE_TIMER_TYPE {
@@ -396,22 +396,22 @@ namespace DBBDTest
 			public:
 				Creature(std::shared_ptr<boost::asio::io_context> context)
 					: TimerObject(context) {
-					
-					addTimerEvent(CREATURE_TIMER_TYPE::Update, 
-						BINDING(&Creature::update),
-						CREATURE_UPDATE_TICK);
+					registTimerEvent();
 				}
 				~Creature() {
 					removeTimerEvent(CREATURE_TIMER_TYPE::Update);
 				}
 
-			private:
-				void update(const boost::system::error_code& error) {
-					Assert::IsTrue(true);
-
+			protected:
+				virtual void registTimerEvent() override {
 					addTimerEvent(CREATURE_TIMER_TYPE::Update,
 						BINDING(&Creature::update),
-						CREATURE_UPDATE_TICK);
+						CREATURE_UPDATE_TICK, true);
+				}
+
+			private:
+				void update() {
+					Assert::IsTrue(true);
 				}
 			};
 
@@ -561,13 +561,16 @@ namespace DBBDTest
 				TestServerSession(TcpSession::pointer session) :
 				session(session), TimerObject(session->getContext()){
 					bindReadInternal(this->session->readInternal);
-					addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500);
 				}
 				~TestServerSession() {
 					TimerObject::~TimerObject();
 				}
 
 			protected:
+				virtual void registTimerEvent() override {
+					addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500, true);
+				}
+
 				virtual void bindReadInternal(ReadInternalParam& dest) {
 					dest = READ_INTERNAL_BINDING(&TestServerSession::readInternal);
 				}
@@ -588,7 +591,7 @@ namespace DBBDTest
 				}
 
 			private:
-				void pingCheck(const boost::system::error_code& error) {
+				void pingCheck() {
 					if (!pingFlag) {
 						invalidPingCount++;
 					}
@@ -602,7 +605,6 @@ namespace DBBDTest
 					session->write((Cell*)&ping);
 
 					pingFlag = false;
-					addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500);
 				}
 
 			public:
@@ -625,6 +627,10 @@ namespace DBBDTest
 				~TestClientSession() {}
 
 			protected:
+				virtual void registTimerEvent() override {
+					//addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500, true);
+				}
+
 				virtual void bindReadInternal(ReadInternalParam& dest) {
 					dest = READ_INTERNAL_BINDING(&TestClientSession::readInternal);
 				}

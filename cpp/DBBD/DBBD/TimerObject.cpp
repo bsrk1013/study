@@ -51,7 +51,7 @@ namespace DBBD {
 		//method();
 	}
 
-	void TimerObject::addTimerEvent(const size_t& eventType, 
+	void TimerObject::addTimerEvent(const size_t& eventType,
 		const TimerParam& target, const size_t& waitMs, const bool& isRepeat) {
 		if (isDisposed) {
 			return;
@@ -69,6 +69,7 @@ namespace DBBD {
 			newInfo.method = target;
 			newInfo.waitMs = waitMs;
 			newInfo.isRepeat = isRepeat;
+			timerMap[eventType] = newInfo;
 		}
 		else {
 			auto existInfo = timerMap[eventType];
@@ -124,6 +125,10 @@ namespace DBBD {
 	}
 
 	bool TimerObject::existInfo(size_t eventType) {
+		if (isDisposed) {
+			return false;
+		}
+
 		auto it = timerMap.find(eventType);
 		return it != timerMap.end();
 	}
