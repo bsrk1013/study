@@ -1,4 +1,6 @@
 <root>
-	<consts namespace="">
+	<consts>
+		<const name="PingCheckReq">1001</const>
+		<const name="PingCheckResp">1002</const>
 	</consts>
 </root>

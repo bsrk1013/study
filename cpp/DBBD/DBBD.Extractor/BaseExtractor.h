@@ -13,11 +13,12 @@ enum ExtractorType {
 };
 
 enum XmlElementType {
-	Comment = 0,
-	Cell = 1,
-	Protocol = 2,
-	Const = 3,
-	Property = 4,
+	None = 0,
+	Comment,
+	Cell,
+	Protocol,
+	Const,
+	Property,
 };
 
 static inline constexpr unsigned int HashCode(const char* str)
@@ -69,9 +70,10 @@ protected:
 	virtual void writeHeader(std::ofstream& ofs) = 0;
 	virtual void writeCell(std::ofstream& ofs) = 0;
 	virtual void writeProtocol(std::ofstream& ofs) = 0;
+	virtual void writeConst(std::ofstream& ofs, std::string fileName) = 0;
 	virtual void writeContentsHeader(std::ofstream& ofs) = 0;
 	virtual void writeCellContents(std::ofstream& ofs) = 0;
-	virtual void writeProtocolContents(std::ofstream& ofs) = 0;
+	virtual void writeProtocolContents(std::ofstream& ofs, std::string base) = 0;
 
 protected:
 	std::filesystem::path getOutputPath();
@@ -80,8 +82,8 @@ protected:
 
 private:
 	void parseXml(std::string fileName);
-	void parseRoot(tinyxml2::XMLElement* node, std::ofstream& ofs);
-	void parseContents(tinyxml2::XMLElement* root, std::ofstream& ofs);
+	void parseRoot(std::ofstream& ofs, tinyxml2::XMLElement* node, std::string fileName);
+	void parseContents(std::ofstream& ofs, tinyxml2::XMLElement* node, std::string fileName);
 
 protected:
 	std::filesystem::path basePath;

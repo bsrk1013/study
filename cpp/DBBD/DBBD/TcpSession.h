@@ -11,9 +11,11 @@ using namespace boost::system;
 
 namespace DBBD {
 	class ITcpSession {
+	public:
+		virtual void send(DBBD::Cell*) = 0;
 	protected:
-		virtual void bindReadInternal(ReadInternalParam&) = 0;
-		virtual bool readInternal(const Header&, Buffer&) = 0;
+		virtual void bindReadInternal(DBBD::ReadInternalParam&) = 0;
+		virtual bool readInternal(const DBBD::Header&, DBBD::Buffer&) = 0;
 	};
 
 	class Cell;

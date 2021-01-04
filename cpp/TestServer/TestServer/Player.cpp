@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Player.h"
 #include "DBBD/Common.hpp"
+#include "BaseProtocol.hpp"
 
 class ChattingReq : DBBD::Request {
 public:
@@ -73,6 +74,10 @@ Player::~Player() {
 	//removeTimerEvent(1);
 }
 
+void Player::send(DBBD::Cell* data) {
+	session->write(data);
+}
+
 void Player::bindReadInternal(DBBD::ReadInternalParam& dest) {
 	dest = READ_INTERNAL_BINDING(&Player::readInternal);
 }
@@ -103,6 +108,12 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 		}
 		break;
 	}
+	case ProtocolType::PingCheckResp: {
+		PingCheckResp resp;
+		DBBD::Deserialize::read(buffer, (DBBD::Cell*)&resp);
+		std::cout << "[" << session->getSessionId() << "]" << "pong" << std::endl;
+		break;
+	}
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	return true;
@@ -110,6 +121,7 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 
 void Player::registTimerEvent() {
 	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000, true);
+	addTimerEvent(2, TIMER_BINDING(&Player::pingCheck), 1000, true);
 	//addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
 }
 
@@ -117,4 +129,10 @@ void Player::update() {
 	size_t sessionId = this->session->getSessionId();
 	//std::cout << "[" << std::this_thread::get_id() << "]Player[" << sessionId << "] updated..." << std::endl;
 	//addTimerEvent(1, TIMER_BINDING(&Player::update), 1000);
+}
+
+void Player::pingCheck() {
+	std::cout << "[" << session->getSessionId() << "]" << "ping" << std::endl;
+	PingCheckReq req;
+	send((DBBD::Cell*)&req);
 }

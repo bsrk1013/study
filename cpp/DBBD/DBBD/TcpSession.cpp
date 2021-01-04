@@ -48,9 +48,9 @@ namespace DBBD {
 
 	void TcpSession::read() {
 		std::cout << "session read..." << std::endl;
-		lockObject.lock();
+		//lockObject.lock();
 		receiveBuffer.adjust();
-		lockObject.unlock();
+		//lockObject.unlock();
 		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 			boost::bind(&TcpSession::handleRead, shared_from_this(),
 				placeholders::error, placeholders::bytes_transferred));
@@ -99,9 +99,9 @@ namespace DBBD {
 
 	void TcpSession::write(Cell* data) {
 		std::cout << "session write..." << std::endl;
-		lockObject.lock();
+		//lockObject.lock();
 		Serialize::write(sendBuffer, data);
-		lockObject.unlock();
+		//lockObject.unlock();
 
 		async_write(*socket,
 			buffer(sendBuffer.getBuffer(), sendBuffer.getBufferLastPos()),

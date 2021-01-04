@@ -4,41 +4,6 @@
 #include "DBBD/Response.h"
 #include "ProtocolType.hpp"
 
-// 유저 정보
-class UserInfo : public DBBD::Cell {
-public:
-	UserInfo() {}
-	UserInfo(std::string Nickname, long Level)
-		: Nickname(Nickname), Level(Level)
-	{}
-	virtual ~UserInfo() {}
-
-public:
-	virtual void serialize(DBBD::Buffer& buffer) {
-		DBBD::Serialize::write(buffer, Nickname);
-		DBBD::Serialize::write(buffer, Level);
-	}
-	virtual void deserialize(DBBD::Buffer& buffer) {
-		DBBD::Deserialize::read(buffer, Nickname);
-		DBBD::Deserialize::read(buffer, Level);
-	}
-	virtual size_t getLength() {
-		return sizeof(size_t) + Nickname.length() + sizeof(long);
-	}
-
-public:
-	std::string getNickname() { return Nickname; }
-	void setNickname(std::string value) { Nickname = value; }
-	long getLevel() { return Level; }
-	void setLevel(long value) { Level = value; }
-
-private:
-	// 닉네임
-	std::string Nickname;
-	// 레벨
-	long Level;
-}
-
 class PingCheckReq : public DBBD::Request {
 public:
 	PingCheckReq() {

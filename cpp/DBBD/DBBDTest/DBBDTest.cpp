@@ -52,9 +52,66 @@ namespace DBBDTest
 		return data->getType();
 	}
 
+	//static class ProtocolType {
+	//public:
+	//	enum Value {
+	//		PingCheckReq = 1001,
+	//		PingCheckResp = 1002,
+	//	};
+
+	//	/*ProtocolType() {
+	//		stringMap[PingCheckReq] = "PingCheckReq";
+	//		stringMap[PingCheckResp] = "PingCheckResp";
+	//	}*/
+
+	//	static std::string Get(Value value) {
+	//		auto iter = stringMap.find(value);
+	//		if (iter == stringMap.end()) {
+	//			return "";
+	//		}
+	//		return iter->second;
+	//	}
+
+	//	static std::map<Value, std::string> stringMap;
+	//	/*static std::map<Value, std::string> stringMap = {
+	//		{Value::PingCheckReq, "PingCheckReq"},
+	//		{Value::PingCheckResp, "PingCheckResp"},
+	//	};*/
+	//};
+
+	namespace ProtocolType {
+		enum Value {
+			PingCheckReq = 1001,
+			PingCheckResp = 1002,
+		};
+
+		std::map<Value, std::string> stringMap = {
+			{ PingCheckReq, "PingCheckReq" },
+			{ PingCheckResp, "PingCheckResp" },
+		};
+
+		std::string Get(Value value) {
+			auto iter = ProtocolType::stringMap.find(value);
+			if (iter == ProtocolType::stringMap.end()) {
+				return "";
+			}
+			return iter->second;
+		}
+	}
+
 	TEST_CLASS(DBBDTest)
 	{
 	public:
+		TEST_METHOD(ProtocolTypeTest) {
+			ProtocolType::Value type = ProtocolType::PingCheckReq;
+			std::string name = ProtocolType::Get(type);
+			Assert::IsTrue(type == 1001);
+			Assert::IsTrue(strcmp(ProtocolType::Get(type).c_str(), "PingCheckReq") == 0);
+			//Assert::IsTrue()
+			//Assert::IsTrue(ProtocolType::PingCheckReq == 1001);
+			//Assert::IsTrue(strcmp(ProtocolType::Get(ProtocolType::PingCheckReq).c_str(), "PingCheckReq") == 0);
+		}
+
 		TEST_METHOD(ClassTest) {
 			B b;
 
@@ -566,6 +623,11 @@ namespace DBBDTest
 					TimerObject::~TimerObject();
 				}
 
+			public:
+				virtual void send(DBBD::Cell* data) {
+					session->write(data);
+				}
+
 			protected:
 				virtual void registTimerEvent() override {
 					addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500, true);
@@ -625,6 +687,11 @@ namespace DBBDTest
 					bindReadInternal(this->session->readInternal);
 				}
 				~TestClientSession() {}
+
+			public:
+				virtual void send(DBBD::Cell* data) {
+					session->write(data);
+				}
 
 			protected:
 				virtual void registTimerEvent() override {

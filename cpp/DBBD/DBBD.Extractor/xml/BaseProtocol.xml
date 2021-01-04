@@ -1,0 +1,6 @@
+<root>
+	<protocols>
+		<protocol name="PingCheckReq" type="PingCheckReq" base="Request" />
+		<protocol name="PingCheckResp" type="PingCheckResp" base="Response" />
+	</protocols>
+</root>

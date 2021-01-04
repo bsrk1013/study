@@ -157,7 +157,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseProtocol.hpp" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="ProtocolType.hpp" />
     <ClInclude Include="SessionServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

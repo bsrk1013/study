@@ -77,39 +77,36 @@ void BaseExtractor::parseXml(std::string fileName) {
 	auto childElement = node->FirstChildElement();
 
 	writeHeader(ofs);
-	parseRoot(childElement, ofs);
+	parseRoot(ofs, childElement, fileName);
 	
 	ofs.close();
 }
 
-void BaseExtractor::parseRoot(XMLElement* elem, std::ofstream& ofs) {
+void BaseExtractor::parseRoot(std::ofstream& ofs, XMLElement* elem, std::string fileName) {
 	while (elem) {
 		switch (HashCode(elem->Name())) {
 		case HashCode("cells"):
-			parseContents(elem, ofs);
-			writeCell(ofs);
+			parseContents(ofs, elem, fileName);
 			break;
 		case HashCode("protocols"):
-			parseContents(elem, ofs);
-			writeProtocol(ofs);
+			parseContents(ofs, elem, fileName);
 			break;
 		case HashCode("consts"):
-			parseContents(elem, ofs);
+			parseContents(ofs, elem, fileName);
+			writeConst(ofs, fileName);
 			break;
 		default:
 			break;
 		}
 
-		headerInfoList.clear();
-		contentsInfoList.clear();
-
 		elem = elem->NextSiblingElement();
 	}
 }
 
-void BaseExtractor::parseContents(XMLElement* root, std::ofstream& ofs) {
+void BaseExtractor::parseContents(std::ofstream& ofs, XMLElement* root, std::string fileName) {
 	int index = 0;
 	auto child = root->FirstChild();
+	XmlElementType type = XmlElementType::None;
 	while (child) {
 		FileInfo info;
 		if (child->ToComment()) {
@@ -123,12 +120,18 @@ void BaseExtractor::parseContents(XMLElement* root, std::ofstream& ofs) {
 			auto name = elem->Name();
 			
 			if (strcmp(elem->Name(), "cell") == 0
-				|| strcmp(elem->Name(), "protocol") == 0) {
+				|| strcmp(elem->Name(), "protocol") == 0
+				|| strcmp(elem->Name(), "const") == 0) {
 				if(strcmp(elem->Name(), "cell") == 0){
-					info.fileType = XmlElementType::Cell;
+					type = info.fileType = XmlElementType::Cell;
+
 				} else if (strcmp(elem->Name(), "protocol") == 0) {
-					info.fileType = XmlElementType::Protocol;
+					type = info.fileType = XmlElementType::Protocol;
 				}
+				else if (strcmp(elem->Name(), "const") == 0) {
+					type = info.fileType = XmlElementType::Const;
+				}
+
 				auto find = elem->FindAttribute("name");
 				if (find) {
 					std::string name = find->Value();
@@ -146,6 +149,15 @@ void BaseExtractor::parseContents(XMLElement* root, std::ofstream& ofs) {
 					std::string base = find->Value();
 					info.base = base;
 				}
+
+				auto valueChild = child->FirstChild();
+				if (valueChild && valueChild->ToText()) {
+					auto valueText = valueChild->ToText();
+					std::string value = valueText->Value();
+					info.value = value;
+				}
+
+				std::string value = elem->Value();
 
 				headerInfoList.push_back(info);
 			}
@@ -178,11 +190,36 @@ void BaseExtractor::parseContents(XMLElement* root, std::ofstream& ofs) {
 					std::string value = elemChild->Value();
 					info2.value = value;
 
+					auto valueChild = elemChild->FirstChild();
+					if (valueChild && valueChild->ToText()) {
+						auto valueText = valueChild->ToText();
+						std::string value = valueText->Value();
+						info2.value = value;
+					}
+
 					contentsInfoList.push_back(info2);
 				}
 
 				cellChild = cellChild->NextSibling();
 			}
+		}
+
+		bool needInfoClear = false;
+		switch (type) {
+		case XmlElementType::Cell:
+			writeCell(ofs);
+			needInfoClear = true;
+			break;
+		case XmlElementType::Protocol:
+			writeProtocol(ofs);
+			needInfoClear = true;
+			break;
+		}
+
+		if (needInfoClear) {
+			headerInfoList.clear();
+			contentsInfoList.clear();
+			ofs << std::endl;
 		}
 
 		child = child->NextSibling();

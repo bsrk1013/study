@@ -10,4 +10,5 @@ DBClient::~DBClient() {
 
 void DBClient::connectInternal(DBBD::TcpSession::pointer session)
 {
+	playerSession = std::make_shared<PlayerSession>(session);
 }
