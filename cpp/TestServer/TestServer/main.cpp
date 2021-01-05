@@ -7,18 +7,36 @@
 #include <vld.h>
 #endif
 
+static size_t prevUsedVirtualMem = 0;
+static size_t prevUsedPhysMem = 0;
+
 static void PrintUsageInfo() {
 	PROCESS_MEMORY_COUNTERS_EX pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
 	size_t usedVirtualMem = pmc.PrivateUsage / 1024;
 	size_t usedPhysMem = pmc.WorkingSetSize / 1024;
+	
+	bool needSplit = false;
+	if (prevUsedVirtualMem != usedVirtualMem) {
+		std::cout << "현재 사용중인 가상 메모리 : " << usedVirtualMem << "kb, 변화량 : " << ((int)usedVirtualMem - (int)prevUsedVirtualMem) << "kb" << std::endl;
+		prevUsedVirtualMem = usedVirtualMem;
+		needSplit = true;
+	}
 
-	std::cout << "Used Virtual Mem : " << usedVirtualMem << "kb" << std::endl;
-	std::cout << "Used Phys Mem : " << usedPhysMem << "kb" << std::endl;
+	if (prevUsedPhysMem != usedPhysMem) {
+		std::cout << "현재 사용중인 물리 메모리 : " << usedPhysMem << "kb, 변화량 : " << ((int)usedPhysMem - (int)prevUsedPhysMem) << "kb" << std::endl;
+		prevUsedPhysMem = usedPhysMem;
+		needSplit = true;
+	}
+
+	if (needSplit) {
+		std::cout << "------------------------------------------------------------------------------------------------------------------" << std::endl << std::endl;
+	}
 }
 
 int main() {
 	bool isRunprintUsageInfo = true;
+	int* number = nullptr;
 
 	try {
 		SessionServer server("Session", "127.0.0.1", 8100);
@@ -29,7 +47,7 @@ int main() {
 				std::chrono::duration<double> elapsed = end - start;
 				auto elapsedSecond = elapsed.count();
 
-				if (elapsedSecond >= 5) {
+				if (elapsedSecond >= 1) {
 					start = std::chrono::system_clock::now();
 					PrintUsageInfo();
 				}
@@ -45,6 +63,17 @@ int main() {
 				isRunprintUsageInfo = false;
 				printing.join();
 				break;
+			}
+			else if (a == "a") {
+				if (!number) {
+					number = new int(10);
+				}
+			} 
+			else if (a == "d") {
+				if (number) {
+					delete number;
+					number = nullptr;
+				}
 			}
 		}
 	}
