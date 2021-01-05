@@ -418,7 +418,7 @@ int main() {
 	std::vector<std::thread*> threadList(100);
 
 	try {
-		for (size_t i = 0; i < 10; i++) {
+		for (size_t i = 0; i < 16; i++) {
             DBClient* client = new DBClient("127.0.0.1", 8100);
 			//DBBD::TcpClient* client = new DBBD::TcpClient("127.0.0.1", 8100);
 			clientList.push_back(client);

@@ -15,11 +15,13 @@ SessionServer::~SessionServer() {}
 
 void SessionServer::acceptInternal(DBBD::TcpSession::pointer session) {
 	auto player = std::make_shared<Player>(session);
+	player->start();
 	playerMap[session->getSessionId()] = player;
 }
 
 void SessionServer::disconnectInternal(size_t sessionId) {
 	auto player = playerMap[sessionId];
+	player->stop();
 	playerMap.erase(sessionId);
 	std::cout << "player map count: " << playerMap.size() << std::endl;
 }

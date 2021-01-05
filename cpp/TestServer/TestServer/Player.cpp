@@ -65,7 +65,6 @@ Player::Player(DBBD::TcpSession::pointer session)
 	: TimerObject(session->getContext()), session(session) {
 	bindReadInternal(this->session->readInternal);
 	std::cout << "Player[" << session->getSessionId() << "] call..." << std::endl;
-	registTimerEvent();
 }
 
 Player::~Player() {

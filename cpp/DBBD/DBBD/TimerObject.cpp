@@ -12,6 +12,14 @@ namespace DBBD {
 		dispose();
 	}
 
+	void TimerObject::start() {
+		registTimerEvent();
+	}
+
+	void TimerObject::stop() {
+		dispose();
+	}
+
 	void TimerObject::dispose() {
 		if (isDisposed) {
 			return;
@@ -33,6 +41,10 @@ namespace DBBD {
 
 	void TimerObject::methodEvent(const boost::system::error_code& error,
 		const size_t& eventType) {
+		if (error) {
+			return;
+		}
+
 		if (!existInfo(eventType)) {
 			std::cout << "timer event not found, eventType: " << eventType << std::endl;
 			return;
@@ -77,7 +89,7 @@ namespace DBBD {
 		}
 
 		auto info = timerMap[eventType];
-		info.timer->async_wait(std::bind(&TimerObject::methodEvent, this,
+		info.timer->async_wait(std::bind(&TimerObject::methodEvent, shared_from_this(),
 			std::placeholders::_1, info.type));
 
 		/*auto info = timerMap[eventType];
@@ -119,6 +131,7 @@ namespace DBBD {
 
 		// 이미 예약된 이벤트는 취소 할 수 없음
 		//eventTimer->cancel();
+		it->second.timer->cancel();
 
 		std::cout << "removeTimerEvent eventType[" << eventType << "] call..." << std::endl;
 		timerMap.erase(eventType);

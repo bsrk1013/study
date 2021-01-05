@@ -51,9 +51,11 @@ namespace DBBD {
 		//lockObject.lock();
 		receiveBuffer.adjust();
 		//lockObject.unlock();
-		socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
-			boost::bind(&TcpSession::handleRead, shared_from_this(),
-				placeholders::error, placeholders::bytes_transferred));
+		if (socket) {
+			socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
+				boost::bind(&TcpSession::handleRead, shared_from_this(),
+					placeholders::error, placeholders::bytes_transferred));
+		}
 	}
 
 	void TcpSession::handleRead(const error_code& error, size_t bytesTransferred) {
@@ -103,10 +105,12 @@ namespace DBBD {
 		Serialize::write(sendBuffer, data);
 		//lockObject.unlock();
 
-		async_write(*socket,
-			buffer(sendBuffer.getBuffer(), sendBuffer.getBufferLastPos()),
-			boost::bind(&TcpSession::handleWrite, shared_from_this(),
-				placeholders::error, placeholders::bytes_transferred));
+		if (socket) {
+			async_write(*socket,
+				buffer(sendBuffer.getBuffer(), sendBuffer.getBufferLastPos()),
+				boost::bind(&TcpSession::handleWrite, shared_from_this(),
+					placeholders::error, placeholders::bytes_transferred));
+		}
 	}
 
 	void TcpSession::handleWrite(const error_code& error, size_t bytesTransferred) {

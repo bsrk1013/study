@@ -18,11 +18,15 @@ namespace DBBD {
 		bool isRepeat;
 	};
 
-	class TimerObject
+	class TimerObject : public std::enable_shared_from_this<TimerObject>
 	{
 	public:
 		TimerObject(IoContextSP context);
 		virtual ~TimerObject();
+
+	public:
+		void start();
+		void stop();
 
 	protected:
 		virtual void registTimerEvent() = 0;
@@ -31,7 +35,6 @@ namespace DBBD {
 		void removeTimerEvent(const size_t& eventType);
 
 	private:
-		void init();
 		void methodEvent(const boost::system::error_code& error,
 			const size_t& eventType);
 		void dispose();

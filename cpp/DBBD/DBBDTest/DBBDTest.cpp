@@ -444,26 +444,60 @@ namespace DBBDTest
 
 #define BINDING(method) std::bind(method, this)
 		TEST_METHOD(TimerTest) {
-			static const int CREATURE_UPDATE_TICK = 2000;
-			enum CREATURE_TIMER_TYPE {
-				None = 0,
-				Update = 1,
-			};
-			class Creature : TimerObject {
+			class Timer : public std::enable_shared_from_this<Timer> {
 			public:
-				Creature(std::shared_ptr<boost::asio::io_context> context)
-					: TimerObject(context) {
-					registTimerEvent();
+				Timer(IoContextSP context) :
+					context(context)
+				{}
+				virtual ~Timer(){
+
 				}
-				~Creature() {
-					removeTimerEvent(CREATURE_TIMER_TYPE::Update);
+
+			public:
+				void start() {
+					registTimer();
 				}
 
 			protected:
-				virtual void registTimerEvent() override {
-					addTimerEvent(CREATURE_TIMER_TYPE::Update,
-						BINDING(&Creature::update),
-						CREATURE_UPDATE_TICK, true);
+				virtual void registTimer() = 0;
+				void addTimer(std::function<void()> method, size_t waitMs) {
+					if (!timer) {
+						timer = new boost::asio::deadline_timer(*context);
+					}
+
+					auto waitTime = boost::posix_time::milliseconds(waitMs);
+					timer->expires_from_now(waitTime);
+
+					timer->async_wait(std::bind(&Timer::timerMethod, this, std::placeholders::_1,
+						std::weak_ptr<Timer>(shared_from_this()), method));
+				}
+
+			private:
+				void timerMethod(const boost::system::error_code& error,
+					std::weak_ptr<Timer> ptr, std::function<void()> method) {
+					auto sharedPtr = ptr.lock();
+					if (!sharedPtr) {
+						return; 
+					}
+					method();
+				}
+
+			private:
+				IoContextSP context;
+				boost::asio::deadline_timer* timer = nullptr;
+			};
+
+			class FooTimer : public Timer {
+			public:
+				FooTimer(IoContextSP context) :
+				Timer(context){
+				}
+
+			protected:
+				virtual void registTimer() {
+					auto method = std::bind(&FooTimer::update, this);
+					addTimer(method, 1000);
+					//auto method = std::bind(&FooTimer::update, std::weak_ptr<Timer>(shared_from_this()), std::placeholders::_1);
 				}
 
 			private:
@@ -472,28 +506,16 @@ namespace DBBDTest
 				}
 			};
 
-			std::shared_ptr<boost::asio::io_context> context;
-			context = std::make_shared<boost::asio::io_context>();
+			IoContextSP context = std::make_shared<boost::asio::io_context>();
 
-			std::vector<Creature*> mobList;
-			/*for (int i = 0; i < 100; i++) {
-				Creature* mob = new Creature(context);
-				mobList.push_back(mob);
-			}
+			std::shared_ptr<FooTimer> foo = std::make_shared <FooTimer>(context);
+			foo->start();
 
-			for (auto mob : mobList) {
-				delete mob;
-			}*/
-
-			Creature* doby = new Creature(context);
-
-			boost::thread_group threads;
-			threads.create_thread(boost::bind(&boost::asio::io_context::run, &(*context)));
-			
-			std::this_thread::sleep_for(std::chrono::seconds(1));
-			delete doby;
+			std::thread thread([&]() {context->run(); });
 
 			std::this_thread::sleep_for(std::chrono::seconds(10));
+
+			thread.join();
 		}
 
 		TEST_METHOD(AnyTest) {
@@ -509,6 +531,30 @@ namespace DBBDTest
 
 			Assert::AreEqual(1, a());
 			Assert::AreEqual(2, b());
+
+			class Foo : public std::enable_shared_from_this<Foo> {
+			public:
+				Foo() { x = 10; }
+				virtual ~Foo() {}
+
+			public:
+				virtual int getX() {
+					auto ptr = shared_from_this();
+					return ptr->x;
+				}
+
+			protected:
+				int x;
+			};
+
+			class Foo2 : public Foo {
+			public:
+				Foo2() {}
+				virtual ~Foo2() {}
+			};
+
+			std::shared_ptr<Foo2> foo = std::shared_ptr<Foo2>(new Foo2());
+			Assert::AreEqual(foo->getX(), 10);
 		}
 
 		TEST_METHOD(FunctionTest) {
