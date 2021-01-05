@@ -49,16 +49,16 @@ namespace DBBD {
 		if (acceptor && acceptor->is_open()) {
 			acceptor->cancel();
 			//acceptor->close();
-			acceptor.reset();
+			//acceptor.reset();
 		}
 
 		if (context) {
 			context->stop();
-			context.reset();
+			//context.reset();
 			//context->restart();
 		}
 
-		//threads.join_all();
+		threads.join_all();
 	}
 
 	void TcpServer::startAccept() {
@@ -73,8 +73,10 @@ namespace DBBD {
 		SocketSP socket = std::make_shared<ip::tcp::socket>(*context);
 		//auto session = TcpSession::create(this, context);
 		lockObject.unlock();
-		acceptor->async_accept(*socket,
-			boost::bind(&TcpServer::handleAccept, this, socket, placeholders::error));
+		if (socket) {
+			acceptor->async_accept(*socket,
+				boost::bind(&TcpServer::handleAccept, this, socket, placeholders::error));
+		}
 		/*acceptor->async_accept(*session->getSocket(),
 			boost::bind(&TcpServer::handleAccept, this, session, placeholders::error));*/
 	}

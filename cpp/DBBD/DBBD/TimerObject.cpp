@@ -4,11 +4,9 @@ namespace DBBD {
 	TimerObject::TimerObject(IoContextSP context)
 		: context(context)
 	{
-		std::cout << "TimerObject call..." << std::endl;
 	}
 	
 	TimerObject::~TimerObject() {
-		std::cout << "~TimerObject call..." << std::endl;
 		dispose();
 	}
 
@@ -46,7 +44,6 @@ namespace DBBD {
 		}
 
 		if (!existInfo(eventType)) {
-			std::cout << "timer event not found, eventType: " << eventType << std::endl;
 			return;
 		}
 
@@ -59,8 +56,6 @@ namespace DBBD {
 		else {
 			removeTimerEvent(info.type);
 		}
-
-		//method();
 	}
 
 	void TimerObject::addTimerEvent(const size_t& eventType,
@@ -72,7 +67,6 @@ namespace DBBD {
 		auto waitTime = boost::posix_time::milliseconds(waitMs);
 		
 		if (!existInfo(eventType)) {
-			std::cout << "addTimerEvent eventType[" << eventType << "] call..." << std::endl;
 			auto timer = std::make_shared<boost::asio::deadline_timer>(*context, waitTime);
 			
 			TimerInfo newInfo;
@@ -91,36 +85,6 @@ namespace DBBD {
 		auto info = timerMap[eventType];
 		info.timer->async_wait(std::bind(&TimerObject::methodEvent, shared_from_this(),
 			std::placeholders::_1, info.type));
-
-		/*auto info = timerMap[eventType];
-		if (!info.timer) {
-			std::cout << "addTimerEvent eventType[" << eventType << "] call..." << std::endl;
-			auto timer = std::make_shared<boost::asio::deadline_timer>(*context, waitTime);
-			TimerInfo newInfo;
-			newInfo.type = eventType;
-			newInfo.timer = timer;
-			newInfo.method = target;
-			newInfo.
-		}
-		else {
-
-		}*/
-
-
-		/*auto waitTime = boost::posix_time::milliseconds(waitMs);
-
-		auto eventTimer = timerMap[eventType];
-		if (!eventTimer) {
-			std::cout << "addTimerEvent eventType[" << eventType << "] call..." << std::endl;
-			eventTimer = std::make_shared<boost::asio::deadline_timer>(*context, waitTime);
-			timerMap[eventType] = eventTimer;
-		}
-		else {
-			eventTimer->expires_from_now(waitTime);
-		}
-
-		eventTimer->async_wait(std::bind(&TimerObject::methodEvent, this,
-			std::placeholders::_1, eventType, target));*/
 	}
 
 	void TimerObject::removeTimerEvent(const size_t& eventType) {
@@ -129,11 +93,8 @@ namespace DBBD {
 			return;
 		}
 
-		// 이미 예약된 이벤트는 취소 할 수 없음
-		//eventTimer->cancel();
 		it->second.timer->cancel();
 
-		std::cout << "removeTimerEvent eventType[" << eventType << "] call..." << std::endl;
 		timerMap.erase(eventType);
 	}
 

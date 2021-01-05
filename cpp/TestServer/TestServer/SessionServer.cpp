@@ -23,5 +23,4 @@ void SessionServer::disconnectInternal(size_t sessionId) {
 	auto player = playerMap[sessionId];
 	player->stop();
 	playerMap.erase(sessionId);
-	std::cout << "player map count: " << playerMap.size() << std::endl;
 }

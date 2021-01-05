@@ -6,11 +6,6 @@
 #if _DEBUG
 #include <vld.h>
 #endif
-//#include <crtdbg.h>
-//#if _DEBUG
-//#define new new(_CLIENT_BLOCK, __FILE__, __LINE__)
-//#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-//#endif
 
 static void PrintUsageInfo() {
 	PROCESS_MEMORY_COUNTERS_EX pmc;
@@ -20,23 +15,9 @@ static void PrintUsageInfo() {
 
 	std::cout << "Used Virtual Mem : " << usedVirtualMem << "kb" << std::endl;
 	std::cout << "Used Phys Mem : " << usedPhysMem << "kb" << std::endl;
-
-	/*static MEMORYSTATUSEX memInfo;
-	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-
-	GlobalMemoryStatusEx(&memInfo);
-
-	static DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
-	static DWORDLONG usedPhysMem = totalPhysMem - memInfo.ullAvailPhys;
-
-	std::cout << "Total Ram : " << totalPhysMem << std::endl;
-	std::cout << "Used Ram : " << usedPhysMem << std::endl;*/
 }
 
 int main() {
-	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//int* a = new int(10);
-	
 	bool isRunprintUsageInfo = true;
 
 	try {

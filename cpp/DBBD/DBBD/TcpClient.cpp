@@ -50,7 +50,6 @@ namespace DBBD {
 			this->session = TcpSession::create(socket);;
 			connectInternal(session);
 			this->session->start();
-			std::cout << "session connected..." << std::endl;
 		}
 	}
 }

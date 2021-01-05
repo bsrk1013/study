@@ -30,11 +30,9 @@ namespace DBBD {
 	receiveBuffer(8192),
 	sessionId(0),
 	socket(socket){
-		std::cout << "TcpSession[client] call..." << std::endl;
 	}
 
 	TcpSession::~TcpSession() {
-		std::cout << "~TcpSession call..." << std::endl;
 		dieconnect();
 	}
 
@@ -47,7 +45,6 @@ namespace DBBD {
 	}
 
 	void TcpSession::read() {
-		std::cout << "session read..." << std::endl;
 		//lockObject.lock();
 		receiveBuffer.adjust();
 		//lockObject.unlock();
@@ -67,8 +64,6 @@ namespace DBBD {
 			lockObject.unlock();
 			return;
 		}
-
-		std::cout << "Bytes : " << bytesTransferred << std::endl;
 
 		receiveBuffer.increaseLastPos(bytesTransferred);
 
@@ -100,7 +95,6 @@ namespace DBBD {
 	}
 
 	void TcpSession::write(Cell* data) {
-		std::cout << "session write..." << std::endl;
 		//lockObject.lock();
 		Serialize::write(sendBuffer, data);
 		//lockObject.unlock();
@@ -123,7 +117,6 @@ namespace DBBD {
 			return;
 		}
 
-		std::cout << "sendData[" << bytesTransferred << "]" << std::endl;
 		sendBuffer.clearBuffer();
 		lockObject.unlock();
 	}
