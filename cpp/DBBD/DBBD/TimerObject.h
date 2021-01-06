@@ -36,7 +36,7 @@ namespace DBBD {
 
 	private:
 		void methodEvent(const boost::system::error_code& error,
-			const size_t& eventType);
+			std::weak_ptr<TimerObject> weakPtr, const size_t& eventType);
 		void dispose();
 
 	private:

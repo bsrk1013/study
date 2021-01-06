@@ -48,6 +48,5 @@ namespace DBBD {
 		std::unique_ptr<ip::tcp::acceptor> acceptor;
 		std::atomic<size_t> sessionIdCounter = 0;
 		boost::thread_group threads;
-		std::vector<boost::thread*> threadList;
 	};
 }

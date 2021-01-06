@@ -38,14 +38,15 @@ namespace DBBD {
 	}
 
 	void TimerObject::methodEvent(const boost::system::error_code& error,
-		const size_t& eventType) {
-		if (error) {
-			return;
+		std::weak_ptr<TimerObject> weakPtr, const size_t& eventType) {
+		if (error) { return; }
+
+		auto ptr = weakPtr.lock();
+		if (!ptr) {
+			return; 
 		}
 
-		if (!existInfo(eventType)) {
-			return;
-		}
+		if (!existInfo(eventType)) { return; }
 
 		auto info = timerMap[eventType];
 
@@ -84,7 +85,7 @@ namespace DBBD {
 
 		auto info = timerMap[eventType];
 		info.timer->async_wait(std::bind(&TimerObject::methodEvent, shared_from_this(),
-			std::placeholders::_1, info.type));
+			std::placeholders::_1, std::weak_ptr<TimerObject>(shared_from_this()), info.type));
 	}
 
 	void TimerObject::removeTimerEvent(const size_t& eventType) {

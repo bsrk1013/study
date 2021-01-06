@@ -28,8 +28,7 @@ namespace DBBD {
 		startAccept();
 
 		for (size_t i = 0; i < 8; i++) {
-			auto thread = threads.create_thread(boost::bind(&io_context::run, &(*context)));
-			threadList.push_back(thread);
+			threads.create_thread(boost::bind(&io_context::run, &(*context)));
 		}
 
 		std::cout << name << " Server Started..." << std::endl;
