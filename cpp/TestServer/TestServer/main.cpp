@@ -66,12 +66,12 @@ int main() {
 			}
 			else if (a == "a") {
 				if (!number) {
-					number = new int(10);
+					number = new int[10000]{0};
 				}
 			} 
 			else if (a == "d") {
 				if (number) {
-					delete number;
+					delete[] number;
 					number = nullptr;
 				}
 			}

@@ -39,23 +39,31 @@ namespace DBBD {
 
 	void TimerObject::methodEvent(const boost::system::error_code& error,
 		std::weak_ptr<TimerObject> weakPtr, const size_t& eventType) {
-		if (error) { return; }
-
 		auto ptr = weakPtr.lock();
 		if (!ptr) {
+			std::cout << "methodEvent, object release, eventType: " << eventType << std::endl;;
+			return;
+		}
+
+		if (error) { 
+			std::cout << "methodEvent, error, eventType: " << eventType << ", error: " << error << std::endl;;
 			return; 
 		}
 
-		if (!existInfo(eventType)) { return; }
+		if (!existInfo(eventType)) { 
+			std::cout << "methodEvent, info is null, eventType: " << eventType << std::endl;;
+			return; 
+		}
 
+		std::cout << "methodEvent, eventType: " << eventType << std::endl;;
 		auto info = timerMap[eventType];
 
-		info.method();
-		if (info.isRepeat) {
-			addTimerEvent(info.type, info.method, info.waitMs, info.isRepeat);
+		info->method();
+		if (info->isRepeat) {
+			addTimerEvent(info->type, info->method, info->waitMs, info->isRepeat);
 		}
 		else {
-			removeTimerEvent(info.type);
+			removeTimerEvent(info->type);
 		}
 	}
 
@@ -70,22 +78,23 @@ namespace DBBD {
 		if (!existInfo(eventType)) {
 			auto timer = std::make_shared<boost::asio::deadline_timer>(*context, waitTime);
 			
-			TimerInfo newInfo;
-			newInfo.type = eventType;
-			newInfo.timer = timer;
-			newInfo.method = target;
-			newInfo.waitMs = waitMs;
-			newInfo.isRepeat = isRepeat;
+			std::shared_ptr<TimerInfo> newInfo = std::make_shared<TimerInfo>();
+			//TimerInfo newInfo;
+			newInfo->type = eventType;
+			newInfo->timer = timer;
+			newInfo->method = target;
+			newInfo->waitMs = waitMs;
+			newInfo->isRepeat = isRepeat;
 			timerMap[eventType] = newInfo;
 		}
 		else {
 			auto existInfo = timerMap[eventType];
-			existInfo.timer->expires_from_now(waitTime);
+			existInfo->timer->expires_from_now(waitTime);
 		}
 
 		auto info = timerMap[eventType];
-		info.timer->async_wait(std::bind(&TimerObject::methodEvent, shared_from_this(),
-			std::placeholders::_1, std::weak_ptr<TimerObject>(shared_from_this()), info.type));
+		info->timer->async_wait(std::bind(&TimerObject::methodEvent, this,
+			std::placeholders::_1, std::weak_ptr<TimerObject>(shared_from_this()), info->type));
 	}
 
 	void TimerObject::removeTimerEvent(const size_t& eventType) {
@@ -94,8 +103,7 @@ namespace DBBD {
 			return;
 		}
 
-		it->second.timer->cancel();
-
+		std::cout << "removeTimerEvent, eventType: " << eventType << std::endl;
 		timerMap.erase(eventType);
 	}
 

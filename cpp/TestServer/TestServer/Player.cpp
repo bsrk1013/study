@@ -41,14 +41,16 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 
 void Player::registTimerEvent() {
 	addTimerEvent(1, TIMER_BINDING(&Player::update), 1000, true);
-	addTimerEvent(2, TIMER_BINDING(&Player::pingCheck), 1000, true);
+	//addTimerEvent(2, TIMER_BINDING(&Player::pingCheck), 1000, true);
 }
 
 void Player::update() {
+	std::cout << "Player::update" << std::endl;
 	size_t sessionId = this->session->getSessionId();
 }
 
 void Player::pingCheck() {
+	std::cout << "Player::pingCheck" << std::endl;
 	PingCheckReq req;
 	send((DBBD::Cell*)&req);
 }

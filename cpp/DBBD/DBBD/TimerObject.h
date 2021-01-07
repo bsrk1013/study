@@ -11,6 +11,12 @@ namespace DBBD {
 		TimerInfo() {
 			memset(this, 0, sizeof(TimerInfo));
 		}
+		~TimerInfo() {
+			if (timer) {
+				std::cout << "timer reset" << std::endl;
+				timer.reset();
+			}
+		}
 		size_t type;
 		TimerSP timer;
 		TimerParam method;
@@ -45,6 +51,6 @@ namespace DBBD {
 	private:
 		bool isDisposed = false;
 		IoContextSP context;
-		std::map<size_t, TimerInfo> timerMap;
+		std::map<size_t, std::shared_ptr<TimerInfo>> timerMap;
 	};
 }
