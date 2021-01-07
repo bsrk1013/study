@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include <mutex>
 #include "Define.h"
 
@@ -23,6 +24,8 @@ namespace DBBD {
 		size_t waitMs;
 		bool isRepeat;
 	};
+
+	using TimerInfoSP = std::shared_ptr<TimerInfo>;
 
 	class TimerObject : public std::enable_shared_from_this<TimerObject>
 	{
@@ -50,7 +53,9 @@ namespace DBBD {
 
 	private:
 		bool isDisposed = false;
+		boost::mutex lockObject;
+		//std::mutex lockObject;
 		IoContextSP context;
-		std::map<size_t, std::shared_ptr<TimerInfo>> timerMap;
+		std::map<size_t, TimerInfoSP> timerMap;
 	};
 }

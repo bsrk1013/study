@@ -64,15 +64,16 @@ int main() {
 				printing.join();
 				break;
 			}
-			else if (a == "a") {
-				if (!number) {
-					number = new int[10000]{0};
-				}
-			} 
 			else if (a == "d") {
 				if (number) {
 					delete[] number;
 					number = nullptr;
+				}
+			}
+			else {
+				int num = atoi(a.c_str());
+				if (!number) {
+					number = new int[num]{ 0 };
 				}
 			}
 		}

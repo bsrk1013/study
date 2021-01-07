@@ -17,9 +17,8 @@ namespace DBBD {
 	TcpServer::TcpServer(std::string name, std::string address, short port)
 		: name(name) {
 
-		context = std::make_shared<io_context>(5);
+		context = NEW_CONTEXT_SP(8);
 		auto tempGuard = make_work_guard(*context);
-		//guard = new executor_work_guard<io_context::executor_type>(context.get());
 
 		acceptor = std::make_unique<ip::tcp::acceptor>(*context,
 			ip::tcp::endpoint(ip::address_v4::from_string(address), port));
@@ -47,14 +46,10 @@ namespace DBBD {
 
 		if (acceptor && acceptor->is_open()) {
 			acceptor->cancel();
-			//acceptor->close();
-			//acceptor.reset();
 		}
 
 		if (context) {
 			context->stop();
-			//context.reset();
-			//context->restart();
 		}
 
 		threads.join_all();
@@ -69,15 +64,12 @@ namespace DBBD {
 
 		std::cout << "start accept..." << std::endl;
 		lockObject.lock();
-		SocketSP socket = std::make_shared<ip::tcp::socket>(*context);
-		//auto session = TcpSession::create(this, context);
+		SocketSP socket = NEW_SOCKET_SP(*context);
 		lockObject.unlock();
 		if (socket) {
 			acceptor->async_accept(*socket,
 				boost::bind(&TcpServer::handleAccept, this, socket, placeholders::error));
 		}
-		/*acceptor->async_accept(*session->getSocket(),
-			boost::bind(&TcpServer::handleAccept, this, session, placeholders::error));*/
 	}
 
 	void TcpServer::handleAccept(SocketSP socket, const error_code& error) {

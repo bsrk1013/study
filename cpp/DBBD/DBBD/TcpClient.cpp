@@ -9,16 +9,13 @@ namespace DBBD {
 		context = std::make_unique<io_context>();
 
 		// 家南 积己
-		socket = std::make_shared<ip::tcp::socket>(*context);
+		socket = NEW_SOCKET_SP(*context);
 
 		ip::tcp::endpoint endpoint(ip::address_v4::from_string(address), 8100);
 		socket->async_connect(endpoint,
 			boost::bind(&TcpClient::handleConnect, this, placeholders::error));
 
 		threads.create_thread(boost::bind(&io_context::run, &(*context)));
-		/*mainThread = new std::thread([&]() {
-			context->run();
-			});*/
 	}
 
 	TcpClient::~TcpClient() {
@@ -35,10 +32,6 @@ namespace DBBD {
 		}
 
 		threads.join_all();
-		/*if (mainThread) {
-			mainThread->join();
-			delete mainThread;
-		}*/
 	}
 
 	void TcpClient::send(Cell* data) {
