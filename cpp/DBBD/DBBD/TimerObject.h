@@ -5,6 +5,7 @@
 #include <boost/thread.hpp>
 #include <mutex>
 #include "Define.h"
+#include "BaseObject.h"
 
 //#include "boost/asio.hpp"
 namespace DBBD {
@@ -27,15 +28,17 @@ namespace DBBD {
 
 	using TimerInfoSP = std::shared_ptr<TimerInfo>;
 
-	class TimerObject : public std::enable_shared_from_this<TimerObject>
+	class TimerObject
+		: public BaseObject// : public std::enable_shared_from_this<TimerObject>
 	{
 	public:
-		TimerObject(IoContextSP context);
+		TimerObject();
 		virtual ~TimerObject();
 
 	public:
-		void start();
-		void stop();
+		virtual void init(IoContextSP context);
+		virtual void dispose();
+		virtual void reset();
 
 	protected:
 		virtual void registTimerEvent() = 0;
@@ -45,17 +48,14 @@ namespace DBBD {
 
 	private:
 		void methodEvent(const boost::system::error_code& error,
-			std::weak_ptr<TimerObject> weakPtr, const size_t& eventType);
-		void dispose();
+			std::weak_ptr<BaseObject> weakPtr, const size_t& eventType);
 
 	private:
 		bool existInfo(size_t eventType);
 
 	private:
-		bool isDisposed = false;
 		boost::mutex lockObject;
 		//std::mutex lockObject;
-		IoContextSP context;
 		std::map<size_t, TimerInfoSP> timerMap;
 	};
 }

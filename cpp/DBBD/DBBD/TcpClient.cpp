@@ -25,10 +25,12 @@ namespace DBBD {
 	void TcpClient::close() {
 		if (socket) {
 			socket->close();
+			socket.reset();
 		}
 
 		if (context) {
 			context->stop();
+			context.reset();
 		}
 
 		threads.join_all();

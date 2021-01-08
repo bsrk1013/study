@@ -45,9 +45,9 @@ namespace DBBD {
 	}
 
 	void TcpSession::read() {
-		//lockObject.lock();
+		lockObject.lock();
 		receiveBuffer.adjust();
-		//lockObject.unlock();
+		lockObject.unlock();
 		if (socket) {
 			socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 				boost::bind(&TcpSession::handleRead, shared_from_this(),
@@ -95,9 +95,9 @@ namespace DBBD {
 	}
 
 	void TcpSession::write(Cell* data) {
-		//lockObject.lock();
+		lockObject.lock();
 		Serialize::write(sendBuffer, data);
-		//lockObject.unlock();
+		lockObject.unlock();
 
 		if (socket) {
 			async_write(*socket,
@@ -125,7 +125,7 @@ namespace DBBD {
 		if (!isConnect()) {
 			return;
 		}
-
+		
 		if (server != nullptr) {
 			server->sessionDisconnected(sessionId);
 			server = nullptr;
@@ -134,6 +134,10 @@ namespace DBBD {
 		if (socket && socket->is_open()) {
 			socket->close();
 			socket.reset();
+		}
+
+		if (context) {
+			context.reset();
 		}
 	}
 }

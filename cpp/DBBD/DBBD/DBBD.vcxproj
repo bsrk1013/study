@@ -145,21 +145,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BaseObject.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Deserialize.h" />
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="ObjectPoolManager.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Request.h" />
     <ClInclude Include="Response.h" />
     <ClInclude Include="Serialize.h" />
+    <ClInclude Include="Singleton.h" />
     <ClInclude Include="TcpClient.h" />
     <ClInclude Include="TcpServer.h" />
     <ClInclude Include="TcpSession.h" />
     <ClInclude Include="TimerObject.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BaseObject.cpp" />
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Deserialize.cpp" />
     <ClCompile Include="Random.cpp" />

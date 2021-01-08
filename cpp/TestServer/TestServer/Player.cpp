@@ -3,14 +3,33 @@
 #include "DBBD/Common.hpp"
 #include "BaseProtocol.hpp"
 
-Player::Player(DBBD::TcpSession::pointer session)
-	: TimerObject(session->getContext()), session(session) {
-	bindReadInternal(this->session->readInternal);
+Player::Player(){
 }
 
 Player::~Player() {
-	isDisposed = true;
-	//removeTimerEvent(1);
+	dispose();
+}
+
+void Player::init(DBBD::TcpSession::pointer session) {
+	this->session = session;
+	bindReadInternal(this->session->readInternal);
+	init(session->getContext());
+}
+
+void Player::init(DBBD::IoContextSP context) {
+	TimerObject::init(context);
+}
+
+void Player::dispose() {
+	if (isDisposed) { return; }
+	TimerObject::dispose();
+	session.reset();
+}
+
+void Player::reset() {
+	if (!isDisposed) { return; }
+	TimerObject::reset();
+	session.reset();
 }
 
 void Player::send(DBBD::Cell* data) {
@@ -23,9 +42,7 @@ void Player::bindReadInternal(DBBD::ReadInternalParam& dest) {
 
 bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 {
-	if (isDisposed) {
-		return false;
-	}
+	if (isDisposed) { return false; }
 
 	/////////////////////////////////////////////////////////////////////// readInternal에서 구현해야함
 	switch (header.typeId) {

@@ -3,6 +3,7 @@
 #include <iostream>
 #include "SessionServer.h"
 #include <Psapi.h>
+#include <mutex>
 #if _DEBUG
 #include <vld.h>
 #endif

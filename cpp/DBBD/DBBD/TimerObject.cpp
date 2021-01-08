@@ -1,27 +1,21 @@
 #include "TimerObject.h"
 
 namespace DBBD {
-	TimerObject::TimerObject(IoContextSP context)
-		: context(context)
-	{
+	TimerObject::TimerObject(){
 	}
 	
 	TimerObject::~TimerObject() {
 		dispose();
 	}
 
-	void TimerObject::start() {
-		registTimerEvent();
-	}
-
-	void TimerObject::stop() {
-		dispose();
+	void TimerObject::init(IoContextSP context) {
+		BaseObject::init(context);
+		//registTimerEvent();
 	}
 
 	void TimerObject::dispose() {
-		if (isDisposed) {
-			return;
-		}
+		if (isDisposed) { return; }
+		BaseObject::dispose();
 
 		std::vector<int> keys;
 		for (auto pair : timerMap) {
@@ -33,12 +27,15 @@ namespace DBBD {
 		}
 
 		timerMap.clear();
+	}
 
-		isDisposed = true;
+	void TimerObject::reset() {
+		if (!isDisposed) { return; }
+		BaseObject::reset();
 	}
 
 	void TimerObject::methodEvent(const boost::system::error_code& error,
-		std::weak_ptr<TimerObject> weakPtr, const size_t& eventType) {
+		std::weak_ptr<BaseObject> weakPtr, const size_t& eventType) {
 		auto ptr = weakPtr.lock();
 		if (!ptr) {
 			std::cout << "methodEvent, object release, eventType: " << eventType << std::endl;;
@@ -97,7 +94,7 @@ namespace DBBD {
 
 		auto info = timerMap[eventType];
 		info->timer->async_wait(std::bind(&TimerObject::methodEvent, this,
-			std::placeholders::_1, std::weak_ptr<TimerObject>(shared_from_this()), info->type));
+			std::placeholders::_1, std::weak_ptr<BaseObject>(shared_from_this()), info->type));
 		lockObject.unlock();
 	}
 

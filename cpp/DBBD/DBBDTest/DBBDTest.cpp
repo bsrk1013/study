@@ -555,6 +555,13 @@ namespace DBBDTest
 
 			std::shared_ptr<Foo2> foo = std::shared_ptr<Foo2>(new Foo2());
 			Assert::AreEqual(foo->getX(), 10);
+
+			std::shared_ptr<Foo2> fooSP1 = std::make_shared<Foo2>();
+			std::shared_ptr<Foo2> fooSP2(fooSP1);
+
+			Assert::AreEqual((int)fooSP2.use_count(), 2);
+			fooSP2.reset();
+			Assert::AreEqual((int)fooSP1.use_count(), 1);
 		}
 
 		TEST_METHOD(FunctionTest) {

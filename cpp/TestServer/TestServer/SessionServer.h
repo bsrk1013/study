@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include "DBBD/TcpServer.h"
+#include "DBBD/ObjectPoolManager.h"
 
 using namespace boost::asio;
 
@@ -20,5 +21,6 @@ protected:
 	virtual void disconnectInternal(size_t sessionId) override;
 
 private:
+	DBBD::ObjectSPPoolManager<Player> playerSPPool;
 	std::map<size_t, std::shared_ptr<Player>> playerMap;
 };

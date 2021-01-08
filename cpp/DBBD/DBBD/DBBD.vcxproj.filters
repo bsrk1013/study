@@ -31,6 +31,18 @@
     <Filter Include="소스 파일\Util">
       <UniqueIdentifier>{2bf19520-bd93-4abd-88bf-ee20928262b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Common">
+      <UniqueIdentifier>{0666d487-5fdd-4fab-8b88-80681d17eec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Common">
+      <UniqueIdentifier>{80c51dc7-45d5-4ee5-a18f-0f9d7f753458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Object">
+      <UniqueIdentifier>{ef654816-300b-4686-bfbf-a179086290c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Object">
+      <UniqueIdentifier>{f3a34dea-7b70-4b84-ab4c-3103c30ec3e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSession.h">
@@ -60,17 +72,26 @@
     <ClInclude Include="Random.h">
       <Filter>헤더 파일\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Common.hpp">
-      <Filter>헤더 파일\Util</Filter>
-    </ClInclude>
     <ClInclude Include="Define.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="TimerObject.h">
-      <Filter>헤더 파일\Tcp</Filter>
-    </ClInclude>
     <ClInclude Include="Response.h">
       <Filter>헤더 파일\Tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.hpp">
+      <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>헤더 파일\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerObject.h">
+      <Filter>헤더 파일\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseObject.h">
+      <Filter>헤더 파일\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectPoolManager.h">
+      <Filter>헤더 파일\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -96,7 +117,10 @@
       <Filter>소스 파일\Util</Filter>
     </ClCompile>
     <ClCompile Include="TimerObject.cpp">
-      <Filter>소스 파일\Tcp</Filter>
+      <Filter>소스 파일\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseObject.cpp">
+      <Filter>소스 파일\Object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

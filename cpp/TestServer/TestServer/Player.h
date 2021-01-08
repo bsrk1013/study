@@ -8,10 +8,16 @@ class Player :
 	DBBD::ITcpSession
 {
 public:
-	Player(DBBD::TcpSession::pointer session);
+	Player();
 	virtual ~Player();
 
 public:
+	void init(DBBD::TcpSession::pointer session);
+	// TimerObject을(를) 통해 상속됨
+	virtual void init(DBBD::IoContextSP context);
+	virtual void dispose();
+	virtual void reset();
+
 	// ITcpSession을(를) 통해 상속됨
 	virtual void send(DBBD::Cell*) override;
 
@@ -27,7 +33,6 @@ private:
 	void pingCheck();
 
 private:
-	bool isDisposed = false;
 	DBBD::TcpSession::pointer session;
 	size_t count = 0;
 };
