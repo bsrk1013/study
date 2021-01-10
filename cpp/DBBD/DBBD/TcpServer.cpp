@@ -17,7 +17,7 @@ namespace DBBD {
 	TcpServer::TcpServer(std::string name, std::string address, short port)
 		: name(name) {
 
-		context = NEW_CONTEXT_SP(8);
+		context = NEW_CONTEXT_SP();
 		auto tempGuard = make_work_guard(*context);
 
 		acceptor = std::make_unique<ip::tcp::acceptor>(*context,
@@ -26,7 +26,7 @@ namespace DBBD {
 
 		startAccept();
 
-		for (size_t i = 0; i < 8; i++) {
+		for (size_t i = 0; i < std::thread::hardware_concurrency(); i++) {
 			threads.create_thread(boost::bind(&io_context::run, &(*context)));
 		}
 
@@ -62,10 +62,8 @@ namespace DBBD {
 			return;
 		}
 
-		std::cout << "start accept..." << std::endl;
-		lockObject.lock();
+		std::cout << "[" << std::this_thread::get_id() << "]start accept..." << std::endl;
 		SocketSP socket = NEW_SOCKET_SP(*context);
-		lockObject.unlock();
 		if (socket) {
 			acceptor->async_accept(*socket,
 				boost::bind(&TcpServer::handleAccept, this, socket, placeholders::error));
@@ -76,11 +74,9 @@ namespace DBBD {
 		if (!error) {
 			size_t sessionId = increaseAndGetSessionId();
 
-			lockObject.lock();
 			auto session = TcpSession::create(this, context, socket);
 			session->setSessionId(sessionId);
 			acceptInternal(session);
-			lockObject.unlock();
 
 			session->start();
 
@@ -92,9 +88,7 @@ namespace DBBD {
 	}
 
 	void TcpServer::sessionDisconnected(size_t sessionId) {
-		lockObject.lock();
 		disconnectInternal(sessionId);
-		lockObject.unlock();
 	}
 
 	size_t TcpServer::increaseAndGetSessionId() {

@@ -14,10 +14,18 @@ SessionServer::SessionServer(std::string name, std::string address, short port)
 SessionServer::~SessionServer() {}
 
 void SessionServer::acceptInternal(DBBD::TcpSession::pointer session) {
+	auto iter = playerMap.find(session->getSessionId());
+	if (iter != playerMap.end()) {
+		std::cout << "invalid session id, sessionId: " << session->getSessionId() << std::endl;
+		return;
+	}
+
 	//auto player = playerSPPool.pop();
 	auto player = std::make_shared<Player>();
 	player->init(session);
-	playerMap[session->getSessionId()] = player;
+	playerMap.insert(std::pair<size_t, std::shared_ptr<Player>>(session->getSessionId(), player));
+	//playerMap[session->getSessionId()] = player;
+	std::cout << "acceptInternal, mapCount: " << playerMap.size() << std::endl;
 }
 
 void SessionServer::disconnectInternal(size_t sessionId) {
@@ -30,5 +38,7 @@ void SessionServer::disconnectInternal(size_t sessionId) {
 	auto player = iter->second;
 	playerMap.erase(sessionId);
 	player->dispose();
+
+	std::cout << "disconnectInternal, mapCount: " << playerMap.size() << std::endl;
 	/*playerSPPool.push(player);*/
 }

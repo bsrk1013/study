@@ -7,13 +7,13 @@
 #include <map>
 
 namespace ProtocolType {
-	enum Value {
+	enum class Value {
 		PingCheckReq = 1001,
 		PingCheckResp = 1002,
 	};
 	std::map<Value, std::string> stringMap = {
-		{ PingCheckReq, "PingCheckReq" },
-		{ PingCheckResp, "PingCheckResp" },
+		{ Value::PingCheckReq, "PingCheckReq" },
+		{ Value::PingCheckResp, "PingCheckResp" },
 	};
 	std::string Get(Value value) {
 		auto iter = ProtocolType::stringMap.find(value);

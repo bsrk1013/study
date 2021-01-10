@@ -10,7 +10,7 @@ namespace DBBD {
 
 	void TimerObject::init(IoContextSP context) {
 		BaseObject::init(context);
-		//registTimerEvent();
+		registTimerEvent();
 	}
 
 	void TimerObject::dispose() {
@@ -52,10 +52,7 @@ namespace DBBD {
 			return; 
 		}
 
-		std::cout << "methodEvent, eventType: " << eventType << std::endl;;
-		lockObject.lock();
 		auto info = timerMap[eventType];
-		lockObject.unlock();
 
 		info->method();
 		if (info->isRepeat) {
@@ -75,7 +72,6 @@ namespace DBBD {
 		auto waitTime = boost::posix_time::milliseconds(waitMs);
 		
 		if (!existInfo(eventType)) {
-			lockObject.lock();
 			auto timer = NEW_TIMER_SP(*context, waitTime);
 			
 			TimerInfoSP newInfo = std::make_shared<TimerInfo>();
@@ -87,7 +83,6 @@ namespace DBBD {
 			timerMap[eventType] = newInfo;
 		}
 		else {
-			lockObject.lock();
 			auto existInfo = timerMap[eventType];
 			existInfo->timer->expires_from_now(waitTime);
 		}
@@ -95,20 +90,16 @@ namespace DBBD {
 		auto info = timerMap[eventType];
 		info->timer->async_wait(std::bind(&TimerObject::methodEvent, this,
 			std::placeholders::_1, std::weak_ptr<BaseObject>(shared_from_this()), info->type));
-		lockObject.unlock();
 	}
 
 	void TimerObject::removeTimerEvent(const size_t& eventType) {
-		lockObject.lock();
 		auto it = timerMap.find(eventType);
 		if (it == timerMap.end()) {
-			lockObject.unlock();
 			return;
 		}
 
 		std::cout << "removeTimerEvent, eventType: " << eventType << std::endl;
 		timerMap.erase(eventType);
-		lockObject.unlock();
 	}
 
 	bool TimerObject::existInfo(size_t eventType) {
@@ -116,9 +107,7 @@ namespace DBBD {
 			return false;
 		}
 
-		lockObject.lock();
 		auto it = timerMap.find(eventType);
-		lockObject.unlock();
 		return it != timerMap.end();
 	}
 }

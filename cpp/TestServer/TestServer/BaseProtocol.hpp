@@ -7,7 +7,7 @@
 class PingCheckReq : public DBBD::Request {
 public:
 	PingCheckReq() {
-		typeId = ProtocolType::PingCheckReq;
+		typeId = (size_t)ProtocolType::Value::PingCheckReq;
 	}	virtual ~PingCheckReq() {}
 
 public:

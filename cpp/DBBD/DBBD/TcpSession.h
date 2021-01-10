@@ -61,6 +61,5 @@ namespace DBBD {
 		Buffer sendBuffer;
 		Buffer receiveBuffer;
 		size_t sessionId;
-		std::mutex lockObject;
 	};
 }

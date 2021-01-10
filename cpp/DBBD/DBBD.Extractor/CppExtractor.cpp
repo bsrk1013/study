@@ -38,7 +38,7 @@ void CppExtractor::writeConst(std::ofstream& ofs, std::string fileName) {
 	auto namespaceName = fileName.substr(0, pos);
 	ofs << "#include <map>" << std::endl << std::endl;
 	ofs << "namespace " << namespaceName << " {" << std::endl;
-	ofs << "\tenum Value {" << std::endl;
+	ofs << "\tenum class Value {" << std::endl;
 	for (auto info : headerInfoList) {
 		ofs << "\t\t" << info.name << " = " << info.value << "," << std::endl;
 	}
@@ -46,7 +46,7 @@ void CppExtractor::writeConst(std::ofstream& ofs, std::string fileName) {
 
 	ofs << "\tstd::map<Value, std::string> stringMap = {" << std::endl;
 	for (auto info : headerInfoList) {
-		ofs << "\t\t{ " << info.name << ", \"" << info.name << "\" }," << std::endl;
+		ofs << "\t\t{ Value::" << info.name << ", \"" << info.name << "\" }," << std::endl;
 	}
 	ofs << "\t};" << std::endl;
 

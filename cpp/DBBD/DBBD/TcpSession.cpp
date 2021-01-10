@@ -45,9 +45,7 @@ namespace DBBD {
 	}
 
 	void TcpSession::read() {
-		lockObject.lock();
 		receiveBuffer.adjust();
-		lockObject.unlock();
 		if (socket) {
 			socket->async_read_some(buffer(receiveBuffer.getBuffer(), 8192),
 				boost::bind(&TcpSession::handleRead, shared_from_this(),
@@ -56,12 +54,10 @@ namespace DBBD {
 	}
 
 	void TcpSession::handleRead(const error_code& error, size_t bytesTransferred) {
-		lockObject.lock();
 		if (error) {
 			std::cerr << "session disconnected..." << " sessionId: " << sessionId
 				<< ", error: " << error << std::endl;
 			dieconnect();
-			lockObject.unlock();
 			return;
 		}
 
@@ -89,15 +85,11 @@ namespace DBBD {
 			}
 		}
 
-		lockObject.unlock();
-
 		read();
 	}
 
 	void TcpSession::write(Cell* data) {
-		lockObject.lock();
 		Serialize::write(sendBuffer, data);
-		lockObject.unlock();
 
 		if (socket) {
 			async_write(*socket,
@@ -108,17 +100,14 @@ namespace DBBD {
 	}
 
 	void TcpSession::handleWrite(const error_code& error, size_t bytesTransferred) {
-		lockObject.lock();
 		if (error) {
 			std::cerr << "session disconnected..." << " sessionId: " << sessionId
 				<< ", error: " << error << std::endl;
 			dieconnect();
-			lockObject.unlock();
 			return;
 		}
 
 		sendBuffer.clearBuffer();
-		lockObject.unlock();
 	}
 
 	void TcpSession::dieconnect() {

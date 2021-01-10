@@ -30,7 +30,7 @@ namespace DBBD {
 
 		if (context) {
 			context->stop();
-			context.reset();
+			//context.reset();
 		}
 
 		threads.join_all();

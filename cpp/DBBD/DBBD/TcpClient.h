@@ -33,7 +33,6 @@ namespace DBBD {
 
 	private:
 		boost::thread_group threads;
-		//std::thread* mainThread = nullptr;
 		std::unique_ptr<io_context> context;
 		std::shared_ptr<ip::tcp::socket> socket;
 		TcpSession::pointer session;

@@ -2,12 +2,9 @@
 #include <iostream>
 #include <map>
 #include <boost/asio.hpp>
-#include <boost/thread.hpp>
-#include <mutex>
 #include "Define.h"
 #include "BaseObject.h"
 
-//#include "boost/asio.hpp"
 namespace DBBD {
 	struct TimerInfo {
 		TimerInfo() {
@@ -54,8 +51,6 @@ namespace DBBD {
 		bool existInfo(size_t eventType);
 
 	private:
-		boost::mutex lockObject;
-		//std::mutex lockObject;
 		std::map<size_t, TimerInfoSP> timerMap;
 	};
 }

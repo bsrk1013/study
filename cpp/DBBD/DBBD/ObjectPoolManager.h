@@ -11,7 +11,6 @@ namespace DBBD {
 		ObjectPoolManager(size_t initSize) {
 			for (size_t i = 0; i < initSize; i++) {
 				T object = new T;
-				//ObjectSP object = std::make_shared<T>();
 				objectQueue.push(object);
 			}
 		}
@@ -22,13 +21,11 @@ namespace DBBD {
 				objectQueue.pop();
 				object->dispose();
 				delete object;
-				//object.reset();
 			}
 		}
 
 	public:
 		T pop() {
-			lockObject.lock();
 			if (objectQueue.empty()) {
 				T object = new T;
 				objectQueue.push(object);
@@ -36,14 +33,11 @@ namespace DBBD {
 
 			T object = objectQueue.front();
 			objectQueue.pop();
-			lockObject.unlock();
 			return object;
 		}
 
 		void push(T object) {
-			lockObject.lock();
 			objectQueue.push(object);
-			lockObject.unlock();
 		}
 
 	private:
@@ -52,7 +46,6 @@ namespace DBBD {
 
 	private:
 		std::queue<T> objectQueue;
-		std::mutex lockObject;
 	};
 
 	template<typename T>
@@ -80,7 +73,6 @@ namespace DBBD {
 
 	public:
 		std::shared_ptr<T> pop() {
-			lockObject.lock();
 			if (objectQueue.empty()) {
 				std::shared_ptr<T> object = std::make_shared<T>();
 				objectQueue.push(object);
@@ -89,19 +81,15 @@ namespace DBBD {
 			std::shared_ptr<T> object = objectQueue.front();
 			objectQueue.pop();
 			usedObjectCount++;
-			lockObject.unlock();
 			return object;
 		}
 
 		void push(std::shared_ptr<T> object) {
-			lockObject.lock();
 			if (usedObjectCount >= maxObjectPoolCount) {
 				usedObjectCount--;
-				lockObject.unlock();
 				return;
 			}
 			objectQueue.push(object);
-			lockObject.unlock();
 		}
 
 	private:
@@ -110,7 +98,6 @@ namespace DBBD {
 		
 	private:
 		std::queue<std::shared_ptr<T>> objectQueue;
-		std::mutex lockObject;
 		size_t usedObjectCount;
 		size_t maxObjectPoolCount;
 	};
