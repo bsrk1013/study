@@ -621,41 +621,85 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(ServerTest) {
-			class GameServer : public TcpServer {
+#pragma region GameServer
+			class PlayerSession
+				: public TimerObject, ITcpSession {
+			public:
+				PlayerSession() {}
+				virtual ~PlayerSession() {}
+
+			public:
+				void init(TcpSession::pointer session) {
+					this->session = session;
+					bindReadInternal(session->readInternal);
+				}
+
+				virtual void init(IoContextSP context) {
+					if (!isDisposed) { return; }
+					TimerObject::init(context);
+				}
+
+				virtual void dispose() {
+					if (isDisposed) { return; }
+					TimerObject::dispose();
+				}
+
+				virtual void reset() {
+					if (!isDisposed) { return; }
+					TimerObject::reset();
+				}
+
+			protected:
+				virtual void registTimerEvent() {}
+				virtual void bindReadInternal(ReadInternalParam& dest) {
+					dest = READ_INTERNAL_BINDING(&PlayerSession::readInternal);
+				}
+
+				virtual bool readInternal(const Header& header, Buffer& buffer) {
+					switch (header.typeId) {
+					default:
+					}
+				}
+
+			private:
+				TcpSession::pointer session;
+			};
+
+			class GameServer 
+				: public TcpServer {
 			public:
 				GameServer(std::string name, std::string address, int port)
-				: TcpServer(name, address, port)
-				{}
-				virtual ~GameServer() {}
-			};
-
-			class CommunityServer : public TcpServer {
-			public:
-				CommunityServer(std::string name, std::string address, int port)
 					: TcpServer(name, address, port)
 				{}
-				virtual ~CommunityServer() {}
+				virtual ~GameServer() {}
+
+			protected:
+				virtual void acceptInternal(TcpSession::pointer session) {
+
+				}
+
+				virtual void disconnectInternal(size_t sessionId) {
+
+				}
+
+			private:
+				std::map<size_t, PlayerSession> playerMap;
 			};
+#pragma endregion
 
-			// 게임 서버와의 통신을 위한 클라이언트(클라이언트용)
-			class PlayerClient : public TcpClient {
-
-			};
-
-			// 게임 서버와의 통신을 위한 세션(커뮤니티 서버용)
-			class GameSession : public TcpSession {
-
-			};
-
-			// 커뮤니티 서버와의 통신을 위한 클라이언트(게임 서버용)
-			class GameClient : public TcpClient {
-
-			};
-
-			// 플레이어 클라이언트와의 통신을 위한 세션(게임 서버용)
-			class PlayerSession : public TcpSession {
+#pragma region Player
+			class PlayerClient 
+				: public TcpClient {
+			public:
+				PlayerClient(std::string name, std::string address, int port)
+					: TcpClient(address, port)
+				{}
+				virtual ~PlayerClient() {}
+				
+			private:
 
 			};
+#pragma endregion
 		}
 	};
 }

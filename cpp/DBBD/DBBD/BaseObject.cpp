@@ -10,7 +10,7 @@ namespace DBBD {
 	}
 
 	void BaseObject::init(IoContextSP context) {
-		if (isDisposed) { return; }
+		if (!isDisposed) { return; }
 		this->context = context;
 	}
 

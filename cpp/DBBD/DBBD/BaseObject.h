@@ -20,7 +20,7 @@ namespace DBBD {
 		virtual void reset();
 
 	protected:
-		bool isDisposed = false;
+		bool isDisposed = true;
 		IoContextSP context;
 	};
 }

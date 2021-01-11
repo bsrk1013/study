@@ -9,6 +9,7 @@ namespace DBBD {
 	}
 
 	void TimerObject::init(IoContextSP context) {
+		if (!isDisposed) { return; }
 		BaseObject::init(context);
 		registTimerEvent();
 	}
