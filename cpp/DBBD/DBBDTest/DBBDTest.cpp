@@ -621,261 +621,41 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(ServerTest) {
-			enum Protocol {
-				PingReq = 1,
-				PingResp = 2,
+			class GameServer : public TcpServer {
+			public:
+				GameServer(std::string name, std::string address, int port)
+				: TcpServer(name, address, port)
+				{}
+				virtual ~GameServer() {}
 			};
 
-			class PingCheckReq : Request {
+			class CommunityServer : public TcpServer {
 			public:
-				PingCheckReq() {
-					typeId = Protocol::PingReq;
-				}
-
-			public:
-				virtual void serialize(Buffer& buffer) {
-					Request::writeHeader(buffer, getLength());
-				}
-
-				virtual void deserialize(Buffer& buffer) {
-					Request::readHeader(buffer);
-				}
-
-				virtual size_t getLength() {
-					return Request::getLength();
-				}
+				CommunityServer(std::string name, std::string address, int port)
+					: TcpServer(name, address, port)
+				{}
+				virtual ~CommunityServer() {}
 			};
 
-			class PingCheckResp : Response {
-			public:
-				PingCheckResp() {
-					typeId = Protocol::PingResp;
-				}
+			// 게임 서버와의 통신을 위한 클라이언트(클라이언트용)
+			class PlayerClient : public TcpClient {
 
-			public:
-				virtual void serialize(Buffer& buffer) {
-					Response::writeHeader(buffer, getLength());
-				}
-
-				virtual void deserialize(Buffer& buffer) {
-					Response::readHeader(buffer);
-				}
-
-				virtual size_t getLength() {
-					return Response::getLength();
-				}
 			};
 
-			class TestServerSession : public ITcpSession, TimerObject {
-			public:
-				TestServerSession(TcpSession::pointer session) :
-				session(session), TimerObject(session->getContext()){
-					bindReadInternal(this->session->readInternal);
-				}
-				~TestServerSession() {
-					TimerObject::~TimerObject();
-				}
+			// 게임 서버와의 통신을 위한 세션(커뮤니티 서버용)
+			class GameSession : public TcpSession {
 
-			public:
-				virtual void send(DBBD::Cell* data) {
-					session->write(data);
-				}
-
-			protected:
-				virtual void registTimerEvent() override {
-					addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500, true);
-				}
-
-				virtual void bindReadInternal(ReadInternalParam& dest) {
-					dest = READ_INTERNAL_BINDING(&TestServerSession::readInternal);
-				}
-
-				virtual bool readInternal(const DBBD::Header& header, DBBD::Buffer& buffer) {
-					switch (header.typeId) {
-					case Protocol::PingResp: {
-						PingCheckResp pingResp;
-						Deserialize::read(buffer, (Cell*)&pingResp);
-						pingFlag = true;
-						invalidPingCount = 0;
-						pingCount++;
-						break;
-					}
-					}
-
-					return true;
-				}
-
-			private:
-				void pingCheck() {
-					if (!pingFlag) {
-						invalidPingCount++;
-					}
-
-					if (invalidPingCount > 2) {
-						session->stop();
-						return;
-					}
-
-					PingCheckReq ping;
-					session->write((Cell*)&ping);
-
-					pingFlag = false;
-				}
-
-			public:
-				bool isConnect() { return session->isConnect(); }
-				size_t getPingCount() { return pingCount; }
-
-			private:
-				TcpSession::pointer session;
-				bool pingFlag = true;
-				size_t invalidPingCount = 0;
-				size_t pingCount = 0;
-			};
-			
-			class TestClientSession : public ITcpSession, TimerObject {
-			public:
-				TestClientSession(TcpSession::pointer session)
-					: session(session), TimerObject(session->getContext()) {
-					bindReadInternal(this->session->readInternal);
-				}
-				~TestClientSession() {}
-
-			public:
-				virtual void send(DBBD::Cell* data) {
-					session->write(data);
-				}
-
-			protected:
-				virtual void registTimerEvent() override {
-					//addTimerEvent(1, TIMER_BINDING(&TestServerSession::pingCheck), 500, true);
-				}
-
-				virtual void bindReadInternal(ReadInternalParam& dest) {
-					dest = READ_INTERNAL_BINDING(&TestClientSession::readInternal);
-				}
-
-				virtual bool readInternal(const Header& header, Buffer& buffer) {
-					switch (header.typeId) {
-					case Protocol::PingReq: {
-						PingCheckReq pingReq;
-						Deserialize::read(buffer, (Cell*)&pingReq);
-
-						pingCount++;
-
-						PingCheckResp pingResp;
-						session->write((Cell*)&pingResp);
-						break;
-					}
-					}
-
-					return true;
-				}
-
-			public:
-				bool isConnect() { return session->isConnect(); }
-				size_t getPingCount() { return pingCount; }
-
-			private:
-				TcpSession::pointer session;
-				size_t pingCount = 0;
 			};
 
-			class TestServer : public TcpServer {
-			public:
-				TestServer(std::string name, std::string address, int port)
-				:TcpServer(name, address, port){}
-				virtual ~TestServer(){}
+			// 커뮤니티 서버와의 통신을 위한 클라이언트(게임 서버용)
+			class GameClient : public TcpClient {
 
-			public:
-				TestServerSession* getSession() { return testClientSession; }
-
-			protected:
-				virtual void acceptInternal(TcpSession::pointer session) {
-					testClientSession = new TestServerSession(session);
-				}
-
-				virtual void disconnectInternal(size_t sessionId) {
-					delete testClientSession;
-				}
-
-			public:
-				TestServerSession* testClientSession = nullptr;
 			};
 
-			class ChatServer : public TcpServer {
-			public:
-				ChatServer(std::string name, std::string address, int port)
-				:TcpServer(name, address, port) {}
-				virtual ~ChatServer() {}
+			// 플레이어 클라이언트와의 통신을 위한 세션(게임 서버용)
+			class PlayerSession : public TcpSession {
 
-			public:
 			};
-
-			class TestClient : public TcpClient {
-			public:
-				TestClient(std::string name, std::string address, int port)
-					: TcpClient(address, port){}
-				virtual ~TestClient() {}
-
-			public:
-				TestClientSession* getSession() { return testSession; }
-
-			protected:
-				virtual void connectInternal(TcpSession::pointer session) {
-					testSession = new TestClientSession(session);
-				}
-
-			private:
-				TestClientSession* testSession = nullptr;
-			};
-
-
-			auto start = std::chrono::system_clock::now();
-
-			TestServer* server;
-			TestClient* client;
-
-			std::string address = "127.0.0.1";
-			int port = 8100;
-
-			std::thread serverThread([&]() {
-				server = new TestServer("TestServer", address, port);
-				});
-			std::thread clientThread([&]() {
-				std::this_thread::sleep_for(std::chrono::milliseconds(500));
-				client = new TestClient("TestClient", address, port);
-				});
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-			while (true) {
-				auto session = server->getSession();
-				if (!session) { continue; }
-				if (!session->isConnect()) { break; }
-				size_t pingCount = session->getPingCount();
-				// 1초에 2번 증가
-				if (pingCount > 20) {
-					break;
-				}
-			}
-
-			auto end = std::chrono::system_clock::now();
-
-			std::chrono::duration<double> elapsed = end - start;
-
-			auto serverSession = server->getSession();
-			auto clientSession = client->getSession();
-
-			auto elapsedSecond = elapsed.count();
-			Assert::IsTrue(elapsedSecond >= 11);
-			size_t serverPingCount = serverSession->getPingCount();
-			size_t clientPingCount = clientSession->getPingCount();
-			Assert::AreEqual(serverPingCount, clientPingCount);
-			//server->stop();
-
-			serverThread.join();
-			clientThread.join();
 		}
 	};
 }

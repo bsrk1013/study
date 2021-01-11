@@ -345,64 +345,6 @@ void baram5() {
     std::cout << "answer5 : " << endl;
 }
 
-class ChattingReq : DBBD::Request {
-public:
-    ChattingReq() { typeId = 1; }
-    virtual ~ChattingReq() {}
-
-    // Request을(를) 통해 상속됨
-    virtual void serialize(DBBD::Buffer& buffer)
-    {
-        writeHeader(buffer, getLength());
-        DBBD::Serialize::write(buffer, msg);
-    }
-    virtual void deserialize(DBBD::Buffer& buffer)
-    {
-        readHeader(buffer);
-        DBBD::Deserialize::read(buffer, msg);
-    }
-
-    virtual size_t getLength() {
-        return Request::getLength() + DBBD::GetPacketLength(msg);
-    }
-
-public:
-    std::string getMsg() { return msg; }
-    void setMsg(const std::string& value) { msg = value; }
-
-private:
-    std::string msg;
-};
-
-class FooReq : DBBD::Request {
-public:
-    FooReq() { typeId = 2; }
-    virtual ~FooReq() {}
-
-    // Request을(를) 통해 상속됨
-    virtual void serialize(DBBD::Buffer& buffer)
-    {
-        writeHeader(buffer, getLength());
-        DBBD::Serialize::write(buffer, msgSize);
-    }
-    virtual void deserialize(DBBD::Buffer& buffer)
-    {
-        readHeader(buffer);
-        DBBD::Deserialize::read(buffer, msgSize);
-    }
-
-    virtual size_t getLength() {
-        return Request::getLength() + DBBD::GetPacketLength(msgSize);
-    }
-
-public:
-    size_t getMsgSize() { return msgSize; }
-    void setMsgSize(const size_t& value) { msgSize = value; }
-
-private:
-	size_t msgSize;
-};
-
 int main() {
 	/*baram1();
 	baram2();
@@ -433,26 +375,6 @@ int main() {
                     client->close();
                 }
 				break;
-			}
-
-			int rand = DBBD::Random::instance().next(0, 100);
-			if (rand <= 50) {
-				ChattingReq chatReq;
-				chatReq.setMsg(a);
-
-				for (auto client : clientList) {
-					client->send((DBBD::Cell*)&chatReq);
-				}
-			}
-			else {
-				FooReq fooReq;
-				fooReq.setMsgSize(a.size());
-				/*ChattingReq chatReq;
-				chatReq.setMsg(a);*/
-
-				for (auto client : clientList) {
-					client->send((DBBD::Cell*)&fooReq);
-				}
 			}
 		}
 	}

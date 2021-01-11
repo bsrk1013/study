@@ -181,6 +181,12 @@ void BaseExtractor::parseContents(std::ofstream& ofs, XMLElement* root, std::str
 						info2.name = name;
 					}
 
+					find = elemChild->FindAttribute("base");
+					if (find) {
+						std::string base = find->Value();
+						info2.base = base;
+					}
+
 					find = elemChild->FindAttribute("type");
 					if (find) {
 						std::string type = find->Value();

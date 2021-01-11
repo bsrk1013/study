@@ -3,9 +3,9 @@
 		<!-- 유저 정보 -->
 		<cell name="UserInfo" base="Cell">
 			<!-- 닉네임 -->
-			<property name="Nickname" type="string" />
+			<property name="Nickname" type="string" base="default" />
 			<!-- 레벨 -->
-			<property name="Level" type="int64" />
+			<property name="Level" type="int64" base="default" />
 		</cell>
 	</cells>
 	<protocols>

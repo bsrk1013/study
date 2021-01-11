@@ -7,12 +7,12 @@
 #include <map>
 #include "tinyxml2.h"
 
-enum ExtractorType {
+enum class ExtractorType {
 	Cpp = 0,
 	Csharp = 1,
 };
 
-enum XmlElementType {
+enum class XmlElementType {
 	None = 0,
 	Comment,
 	Cell,

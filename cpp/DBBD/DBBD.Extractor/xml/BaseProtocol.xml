@@ -1,6 +1,15 @@
 <root>
+	<cells>
+	</cells>
 	<protocols>
+		<protocol name="ServerConnectReq" type="ServerConnectReq" base="Request">
+			<property name="SessionId" type="int64" base="default"/>
+		</protocol>
+		<protocol name="ServerConnectResp" type="ServerConnectResp" base="Response" />
+
+		<!-- 핑 요청 -->
 		<protocol name="PingCheckReq" type="PingCheckReq" base="Request" />
+		<!-- 핑 응답 -->
 		<protocol name="PingCheckResp" type="PingCheckResp" base="Response" />
 	</protocols>
 </root>

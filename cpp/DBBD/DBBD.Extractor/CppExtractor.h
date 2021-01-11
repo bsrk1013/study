@@ -16,6 +16,6 @@ protected:
 	virtual void writeProtocolContents(std::ofstream& ofs, std::string base) override;
 
 private:
-	std::string getDeSerialize(std::string type, std::string name, bool isSerialize);
+	std::string getDeSerialize(std::string base, std::string type, std::string name, bool isSerialize);
 	std::string getLength(std::string type, std::string name);
 };

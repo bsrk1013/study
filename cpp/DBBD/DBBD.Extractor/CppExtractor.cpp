@@ -121,13 +121,13 @@ void CppExtractor::writeCellContents(std::ofstream& ofs) {
 	ofs << "public:" << std::endl;
 	ofs << "\tvirtual void serialize(DBBD::Buffer& buffer) {" << std::endl;
 	for (auto info : realContents) {
-		ofs << "\t\t" << getDeSerialize(info.type, info.name, true) << std::endl;
+		ofs << "\t\t" << getDeSerialize(info.base, info.type, info.name, true) << std::endl;
 	}
 	ofs << "\t}" << std::endl;;
 
 	ofs << "\tvirtual void deserialize(DBBD::Buffer& buffer) {" << std::endl;
 	for (auto info : realContents) {
-		ofs << "\t\t" << getDeSerialize(info.type, info.name, false) << std::endl;
+		ofs << "\t\t" << getDeSerialize(info.base, info.type, info.name, false) << std::endl;
 	}
 	ofs << "\t}" << std::endl;;
 
@@ -187,14 +187,14 @@ void CppExtractor::writeProtocolContents(std::ofstream& ofs, std::string base) {
 	ofs << "\tvirtual void serialize(DBBD::Buffer& buffer) {" << std::endl;
 	ofs << "\t\tDBBD::" << base << "::writeHeader(buffer, getLength());" << std::endl;
 	for (auto info : realContents) {
-		ofs << "\t\t" << getDeSerialize(info.type, info.name, true) << std::endl;
+		ofs << "\t\t" << getDeSerialize(info.base, info.type, info.name, true) << std::endl;
 	}
 	ofs << "\t}" << std::endl;;
 
 	ofs << "\tvirtual void deserialize(DBBD::Buffer& buffer) {" << std::endl;
 	ofs << "\t\tDBBD::" << base << "::readHeader(buffer);" << std::endl;
 	for (auto info : realContents) {
-		ofs << "\t\t" << getDeSerialize(info.type, info.name, false) << std::endl;
+		ofs << "\t\t" << getDeSerialize(info.base, info.type, info.name, false) << std::endl;
 	}
 	ofs << "\t}" << std::endl;;
 
@@ -243,15 +243,22 @@ void CppExtractor::writeProtocolContents(std::ofstream& ofs, std::string base) {
 	}
 }
 
-std::string CppExtractor::getDeSerialize(std::string type, std::string name, bool isSerialize) {
-	std::string base = isSerialize ? "DBBD::Serialize::write" : "DBBD::Deserialize::read";
+std::string CppExtractor::getDeSerialize(std::string base, std::string type, std::string name, bool isSerialize) {
+	std::string baseProcess = isSerialize ? "DBBD::Serialize::write" : "DBBD::Deserialize::read";
 	switch (HashCode(type.c_str())) {
 	case HashCode("string"):
 	case HashCode("int64"):
-		return base + "(buffer, " + name + ");";
+		return baseProcess + "(buffer, " + name + ");";
 		//return ofs << "\t\t" << base << "(buffer, " << name << ");" << std::endl;
 	default:
-		return base + "(buffer, dynamic_cast<DBBD::Cell*>(&" + name + ");";
+		if (strcmp(base.c_str(), "cell") == 0
+			|| strcmp(base.c_str(), "Cell") == 0) {
+			return baseProcess + "(buffer, dynamic_cast<DBBD::Cell*>(&" + name + ");";
+		}
+		else {
+			std::string msg = "illegal type and base, type: " + type + ", base: " + base;
+			new std::exception(msg.c_str());
+		}
 	}
 }
 
