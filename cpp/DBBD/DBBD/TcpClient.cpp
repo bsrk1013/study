@@ -23,6 +23,8 @@ namespace DBBD {
 	}
 
 	void TcpClient::close() {
+		closeInternal();
+
 		if (socket) {
 			socket->close();
 			socket.reset();

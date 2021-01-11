@@ -27,6 +27,7 @@ namespace DBBD {
 
 	protected:
 		virtual void connectInternal(TcpSession::pointer session) = 0;
+		virtual void closeInternal() = 0;
 
 	private:
 		void handleConnect(const boost::system::error_code& error);
