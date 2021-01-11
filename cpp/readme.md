@@ -9,7 +9,7 @@
    - boost_1_74_0.zip 압축 해제
    - boost_1_74_0 폴더에서 booststrap.bat 실행
    - 명령 프롬포트에서 boost_1_74_0 폴더 진입 아래 명령어 실행  
-     ~ b2 release debug threading=multi --build-type=complete --toolset=msvc address-model=64 stage
+     - b2 release debug threading=multi --build-type=complete --toolset=msvc address-model=64 stage
 
 2. 프로젝트 링크 설정
    - 추가 포함 디렉터리
