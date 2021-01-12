@@ -660,9 +660,6 @@ namespace DBBDTest
 				}
 
 				virtual bool readInternal(const Header& header, Buffer& buffer) {
-					switch (header.typeId) {
-					default:
-					}
 				}
 
 			private:
@@ -732,9 +729,6 @@ namespace DBBDTest
 				}
 
 				virtual bool readInternal(const Header& header, Buffer& buffer) {
-					switch (header.typeId) {
-					default:
-					}
 				}
 
 			private:
@@ -805,9 +799,6 @@ namespace DBBDTest
 				}
 
 				virtual bool readInternal(const Header& header, Buffer& buffer) {
-					switch (header.typeId) {
-					default:
-					}
 				}
 
 			private:
@@ -835,6 +826,10 @@ namespace DBBDTest
 				PlayerClientSession gameSession;
 			};
 #pragma endregion
+
+			CommunityServer server("Community", "127.0.0.1", 8100);
+
+			while (true) {}
 		}
 	};
 }
