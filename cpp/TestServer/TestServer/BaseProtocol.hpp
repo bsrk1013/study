@@ -26,7 +26,7 @@ public:
 class PingCheckResp : public DBBD::Response {
 public:
 	PingCheckResp() {
-		typeId = ProtocolType::PingCheckResp;
+		typeId = (size_t)ProtocolType::Value::PingCheckResp;
 	}	virtual ~PingCheckResp() {}
 
 public:

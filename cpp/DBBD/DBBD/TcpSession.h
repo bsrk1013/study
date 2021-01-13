@@ -10,21 +10,13 @@ using namespace boost::asio;
 using namespace boost::system;
 
 namespace DBBD {
-	class ITcpSession {
-	public:
-		virtual void send(DBBD::Cell*) = 0;
-	protected:
-		virtual void bindReadInternal(DBBD::ReadInternalParam&) = 0;
-		virtual bool readInternal(const DBBD::Header&, DBBD::Buffer&) = 0;
-	};
-
 	class Cell;
 	class TcpServer;
 	class TcpSession
 		: public std::enable_shared_from_this<TcpSession>
 	{
 	public:
-		typedef std::shared_ptr<TcpSession> pointer;
+		using pointer = std::shared_ptr<TcpSession>;
 		static pointer create(TcpServer* server_context, IoContextSP context, SocketSP socket);
 		static pointer create(SocketSP socket);
 
@@ -61,5 +53,14 @@ namespace DBBD {
 		Buffer sendBuffer;
 		Buffer receiveBuffer;
 		size_t sessionId;
+	};
+
+	class ITcpSession {
+	public:
+		virtual void init(DBBD::TcpSession::pointer session) = 0;
+		virtual void send(DBBD::Cell*) = 0;
+	protected:
+		virtual void bindReadInternal(DBBD::ReadInternalParam&) = 0;
+		virtual bool readInternal(const DBBD::Header&, DBBD::Buffer&) = 0;
 	};
 }

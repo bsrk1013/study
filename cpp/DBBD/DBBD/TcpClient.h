@@ -26,7 +26,7 @@ namespace DBBD {
 		TcpSession::pointer getSession() { return session; }
 
 	protected:
-		virtual void connectInternal(TcpSession::pointer session) = 0;
+		virtual void connectInternal(DBBD::TcpSession::pointer session) = 0;
 		virtual void closeInternal() = 0;
 
 	private:

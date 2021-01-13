@@ -1,6 +1,5 @@
 #include <iostream>
 #include "Player.h"
-#include "DBBD/Common.hpp"
 #include "BaseProtocol.hpp"
 
 Player::Player(){
@@ -45,8 +44,8 @@ bool Player::readInternal(const DBBD::Header& header, DBBD::Buffer& buffer)
 	if (isDisposed) { return false; }
 
 	/////////////////////////////////////////////////////////////////////// readInternal에서 구현해야함
-	switch (header.typeId) {
-	case ProtocolType::PingCheckResp: {
+	switch ((ProtocolType::Value)header.typeId) {
+	case ProtocolType::Value::PingCheckResp: {
 		PingCheckResp resp;
 		DBBD::Deserialize::read(buffer, (DBBD::Cell*)&resp);
 		break;
