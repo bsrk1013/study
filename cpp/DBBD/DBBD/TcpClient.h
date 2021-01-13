@@ -33,6 +33,7 @@ namespace DBBD {
 		void handleConnect(const boost::system::error_code& error);
 
 	private:
+		bool isDisposed = false;
 		boost::thread_group threads;
 		std::unique_ptr<io_context> context;
 		std::shared_ptr<ip::tcp::socket> socket;

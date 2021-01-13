@@ -23,6 +23,9 @@ namespace DBBD {
 	}
 
 	void TcpClient::close() {
+		if (isDisposed) { return; }
+		isDisposed = true;
+
 		closeInternal();
 
 		if (socket) {

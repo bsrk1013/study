@@ -30,12 +30,27 @@
     <ClCompile Include="PlayerClientSession.cpp">
       <Filter>소스 파일\Base</Filter>
     </ClCompile>
+    <ClCompile Include="CommunityClient.cpp">
+      <Filter>소스 파일\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="CommunityClientSession.cpp">
+      <Filter>소스 파일\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SessionServer.h">
       <Filter>헤더 파일\Base</Filter>
     </ClInclude>
     <ClInclude Include="PlayerClientSession.h">
+      <Filter>헤더 파일\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CommunityClient.h">
+      <Filter>헤더 파일\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="CommunityClientSession.h">
       <Filter>헤더 파일\Base</Filter>
     </ClInclude>
   </ItemGroup>

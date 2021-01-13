@@ -143,12 +143,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CommunityClient.cpp" />
+    <ClCompile Include="CommunityClientSession.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayerClientSession.cpp" />
     <ClCompile Include="SessionServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommunityClient.h" />
+    <ClInclude Include="CommunityClientSession.h" />
     <ClInclude Include="PlayerClientSession.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SessionServer.h" />
   </ItemGroup>
   <ItemGroup>

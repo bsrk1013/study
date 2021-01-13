@@ -42,3 +42,7 @@ void SessionServer::disconnectInternal(size_t sessionId) {
 	std::cout << "disconnectInternal, mapCount: " << playerMap.size() << std::endl;
 	/*playerSPPool.push(player);*/
 }
+
+void SessionServer::closeInternal() {
+
+}

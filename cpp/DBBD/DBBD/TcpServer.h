@@ -31,6 +31,7 @@ namespace DBBD {
 	protected:
 		virtual void acceptInternal(DBBD::TcpSession::pointer session) = 0;
 		virtual void disconnectInternal(size_t sessionId) = 0;
+		virtual void closeInternal() = 0;
 
 	private:
 		void startAccept();

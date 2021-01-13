@@ -42,6 +42,8 @@ namespace DBBD {
 			return;
 		}
 
+		closeInternal();
+
 		isDispose = true;
 
 		if (acceptor && acceptor->is_open()) {

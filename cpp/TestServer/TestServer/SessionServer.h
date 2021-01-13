@@ -19,6 +19,7 @@ public:
 protected:
 	virtual void acceptInternal(DBBD::TcpSession::pointer session) override;
 	virtual void disconnectInternal(size_t sessionId) override;
+	virtual void closeInternal() override;
 
 private:
 	DBBD::ObjectSPPoolManager<Player> playerSPPool;

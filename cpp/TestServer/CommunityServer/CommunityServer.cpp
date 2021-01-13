@@ -30,3 +30,7 @@ void CommunityServer::disconnectInternal(size_t sessionId)
 
 	sessionMap.erase(sessionId);
 }
+
+void CommunityServer::closeInternal() {
+
+}

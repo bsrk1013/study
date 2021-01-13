@@ -11,6 +11,7 @@ public:
 protected:
 	// TcpClient을(를) 통해 상속됨
 	virtual void connectInternal(DBBD::TcpSession::pointer session) override;
+	virtual void closeInternal() override;
 
 private:
 	std::shared_ptr<PlayerSession> playerSession;

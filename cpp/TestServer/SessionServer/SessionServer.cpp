@@ -4,7 +4,9 @@
 
 SessionServer::SessionServer(std::string name, std::string address, int port)
 	: DBBD::TcpServer(name, address, port)
-{}
+{
+	communityClient = std::make_shared<CommunityClient>("127.0.0.1", 8100, this);
+}
 
 SessionServer::~SessionServer() {}
 
@@ -31,4 +33,10 @@ void SessionServer::disconnectInternal(size_t sessionId)
 	}
 
 	sessionMap.erase(sessionId);
+}
+
+void SessionServer::closeInternal() 
+{
+	communityClient->close();
+	//communityClient.reset();
 }
