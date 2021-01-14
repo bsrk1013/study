@@ -19,8 +19,8 @@ namespace DBBD
 		virtual void stopInternal() = 0;
 
 		virtual void accept() = 0;
-		virtual void handleAccept(SocketSP, const boost::system::error_code&) = 0;
-		virtual void acceptInternal(SocketSP, size_t) = 0;
+		virtual void handleAccept(DBBD::SocketSP, const boost::system::error_code&) = 0;
+		virtual void acceptInternal(DBBD::SocketSP, size_t) = 0;
 
 	protected:
 		size_t increaseAndGetSessionId() { return ++sessionIdCounter; }

@@ -38,6 +38,8 @@ void DBBD::TcpServerBase::start()
 
 		threadList.push_back(thread);
 	}
+
+	std::cout << name << " Server Started..." << std::endl;
 }
 
 void DBBD::TcpServerBase::stop()

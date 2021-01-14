@@ -21,6 +21,8 @@ void DBBD::TcpSessionBase::start()
 
 void DBBD::TcpSessionBase::stop()
 {
+	if (isDisposed) { return; }
+
 	if (context) {
 		context.reset();
 	}
@@ -39,6 +41,8 @@ void DBBD::TcpSessionBase::stop()
 		delete writeBuffer;
 		writeBuffer = nullptr;
 	}
+
+	isDisposed = true;
 }
 
 void DBBD::TcpSessionBase::read()
@@ -71,7 +75,7 @@ void DBBD::TcpSessionBase::handleRead(const boost::system::error_code& error, si
 			break;
 		}
 
-		//readInternal();
+		readInternal();
 	}
 
 	read();
@@ -79,7 +83,7 @@ void DBBD::TcpSessionBase::handleRead(const boost::system::error_code& error, si
 
 void DBBD::TcpSessionBase::write()
 {
-	//writeInternal();
+	writeInternal();
 
 	if (socket && socket->is_open()) {
 		boost::asio::async_write(*socket,

@@ -143,23 +143,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CommunityClient.cpp" />
-    <ClCompile Include="CommunityClientSession.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayerClientSession.cpp" />
     <ClCompile Include="SessionServer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CommunityClient.h" />
-    <ClInclude Include="CommunityClientSession.h" />
-    <ClInclude Include="PlayerClientSession.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="SessionServer.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\DBBD\DBBD\DBBD.vcxproj">
       <Project>{b3075808-ef91-4576-9c72-d262e5707a3f}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PlayerClientSession.h" />
+    <ClInclude Include="SessionServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

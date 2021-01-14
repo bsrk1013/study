@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="BaseObject.h" />
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="ClientBase.h" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Deserialize.h" />

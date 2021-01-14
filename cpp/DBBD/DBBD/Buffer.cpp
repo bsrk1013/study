@@ -10,6 +10,8 @@ namespace DBBD {
 	}
 
 	Buffer::Buffer(const char* bufferBlock) {
+		bufferCapacity = strlen(bufferBlock);
+		memcpy(buffer, bufferBlock, bufferCapacity);
 	}
 
 	Buffer::~Buffer() {

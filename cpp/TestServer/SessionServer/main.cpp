@@ -3,7 +3,8 @@
 #include "SessionServer.h"
 
 int main() {
-	SessionServer server("Session", "127.0.0.1", 8102);
+	SessionServer server("Session", "127.0.0.1", 8101, 1);
+	server.start();
 
 	while (true) {
 		std::string a;

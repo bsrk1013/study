@@ -15,8 +15,8 @@ namespace DBBD {
 	protected:
 		virtual void stopInternal() = 0;
 
-		virtual void handleAccept(SocketSP, const boost::system::error_code&) override;
-		virtual void acceptInternal(SocketSP, size_t) = 0;
+		virtual void handleAccept(DBBD::SocketSP, const boost::system::error_code&) override;
+		virtual void acceptInternal(DBBD::SocketSP, size_t) = 0;
 
 	private:
 		virtual void accept() override;
