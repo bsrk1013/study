@@ -12,6 +12,6 @@ namespace DBBD
 	protected:
 		bool isDisposed = false;
 		std::thread* thread = nullptr;
-
+		//std::shared_ptr
 	};
 }

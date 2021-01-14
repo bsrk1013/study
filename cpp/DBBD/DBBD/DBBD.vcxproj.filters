@@ -114,6 +114,9 @@
     <ClInclude Include="ClientBase.h">
       <Filter>헤더 파일\Network</Filter>
     </ClInclude>
+    <ClInclude Include="TcpClientSession.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TcpSession.cpp">
@@ -147,6 +150,9 @@
       <Filter>소스 파일\Network</Filter>
     </ClCompile>
     <ClCompile Include="TcpSessionBase.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpClientSession.cpp">
       <Filter>소스 파일\Network</Filter>
     </ClCompile>
   </ItemGroup>
