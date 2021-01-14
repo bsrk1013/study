@@ -16,6 +16,7 @@
 #include <boost/timer.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include <queue>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -620,216 +621,25 @@ namespace DBBDTest
 			}
 		}
 
-		TEST_METHOD(ServerTest) {
-#pragma region GameServer
-			class PlayerServerSession
-				: public TimerObject, ITcpSession {
+		TEST_METHOD(ScopeTest) {
+			class ScopeTestFoo {
 			public:
-				PlayerServerSession() {}
-				virtual ~PlayerServerSession() {}
-
-			public:
-				void init(TcpSession::pointer session) {
-					this->session = session;
-					bindReadInternal(session->readInternal);
+				ScopeTestFoo(int a) {
+					this->a = a;
 				}
 
-				virtual void init(IoContextSP context) {
-					if (!isDisposed) { return; }
-					TimerObject::init(context);
-				}
-
-				virtual void send(Cell* data) {
-					session->write(data);
-				}
-
-				virtual void dispose() {
-					if (isDisposed) { return; }
-					TimerObject::dispose();
-				}
-
-				virtual void reset() {
-					if (!isDisposed) { return; }
-					TimerObject::reset();
-				}
-
-			protected:
-				virtual void registTimerEvent() {}
-				virtual void bindReadInternal(ReadInternalParam& dest) {
-					dest = READ_INTERNAL_BINDING(&PlayerServerSession::readInternal);
-				}
-
-				virtual bool readInternal(const Header& header, Buffer& buffer) {
-				}
-
-			private:
-				TcpSession::pointer session;
+				int a;
 			};
 
-			class GameServer 
-				: public TcpServer {
-			public:
-				GameServer(std::string name, std::string address, int port)
-					: TcpServer(name, address, port)
-				{}
-				virtual ~GameServer() {}
+			std::queue<ScopeTestFoo*> fooQueue;
+			{
+				ScopeTestFoo scopeTestFoo(10);
+				fooQueue.push(&scopeTestFoo);
+			}
 
-			protected:
-				virtual void acceptInternal(TcpSession::pointer session) {
-					PlayerServerSession player;
-					player.init(session);
-					playerMap[session->getSessionId()] = player;
-				}
+			auto scopeTestFoo = fooQueue.front();
 
-				virtual void disconnectInternal(size_t sessionId) {
-					playerMap.erase(sessionId);
-				}
-
-			private:
-				std::map<size_t, PlayerServerSession> playerMap;
-			};
-#pragma endregion
-
-#pragma region Community
-			class GameServerSession
-				: public TimerObject, ITcpSession {
-			public:
-				GameServerSession() {}
-				virtual ~GameServerSession() {}
-
-			public:
-				void init(TcpSession::pointer session) {
-					this->session = session;
-					bindReadInternal(session->readInternal);
-				}
-
-				virtual void init(IoContextSP context) {
-					if (!isDisposed) { return; }
-					TimerObject::init(context);
-				}
-
-				virtual void send(Cell* data) {
-					session->write(data);
-				}
-
-				virtual void dispose() {
-					if (isDisposed) { return; }
-					TimerObject::dispose();
-				}
-
-				virtual void reset() {
-					if (!isDisposed) { return; }
-					TimerObject::reset();
-				}
-
-			protected:
-				virtual void registTimerEvent() {}
-				virtual void bindReadInternal(ReadInternalParam& dest) {
-					dest = READ_INTERNAL_BINDING(&GameServerSession::readInternal);
-				}
-
-				virtual bool readInternal(const Header& header, Buffer& buffer) {
-				}
-
-			private:
-				TcpSession::pointer session;
-			};
-
-			class CommunityServer
-				: public TcpServer {
-			public:
-				CommunityServer(std::string name, std::string address, int port)
-					: TcpServer(name, address, port)
-				{}
-				virtual ~CommunityServer() {}
-
-			protected:
-				virtual void acceptInternal(TcpSession::pointer session) {
-					/*PlayerServerSession player;
-					player.init(session);
-					playerMap[session->getSessionId()] = player;*/
-				}
-
-				virtual void disconnectInternal(size_t sessionId) {
-					//playerMap.erase(sessionId);
-				}
-
-			private:
-				std::map<size_t, TcpSession::pointer> sessionMap;
-				//std::map<size_t, PlayerServerSession> playerMap;
-			};
-#pragma endregion
-
-#pragma region Player
-			class PlayerClientSession
-				: public TimerObject, ITcpSession {
-			public:
-				PlayerClientSession() {}
-				virtual ~PlayerClientSession() {}
-
-			public:
-				void init(TcpSession::pointer session) {
-					this->session = session;
-					bindReadInternal(session->readInternal);
-				}
-
-				virtual void init(IoContextSP context) {
-					if (!isDisposed) { return; }
-					TimerObject::init(context);
-				}
-
-				virtual void send(Cell* data) {
-					session->write(data);
-				}
-
-				virtual void dispose() {
-					if (isDisposed) { return; }
-					TimerObject::dispose();
-				}
-
-				virtual void reset() {
-					if (!isDisposed) { return; }
-					TimerObject::reset();
-				}
-
-			protected:
-				virtual void registTimerEvent() {}
-				virtual void bindReadInternal(ReadInternalParam& dest) {
-					dest = READ_INTERNAL_BINDING(&PlayerClientSession::readInternal);
-				}
-
-				virtual bool readInternal(const Header& header, Buffer& buffer) {
-				}
-
-			private:
-				TcpSession::pointer session;
-			};
-
-			class PlayerClient 
-				: public TcpClient {
-			public:
-				PlayerClient(std::string name, std::string address, int port)
-					: TcpClient(address, port)
-				{}
-				virtual ~PlayerClient() {}
-				
-			protected:
-				virtual void connectInternal(TcpSession::pointer session) {
-					gameSession.init(session);
-				}
-
-				virtual void closeInternal() {
-					gameSession.dispose();
-				}
-
-			private:
-				PlayerClientSession gameSession;
-			};
-#pragma endregion
-
-			CommunityServer server("Community", "127.0.0.1", 8100);
-
-			while (true) {}
+			Assert::AreEqual(scopeTestFoo->a, 10);
 		}
 	};
 }

@@ -12,6 +12,8 @@ namespace DBBD {
 	// shared_ptr
 	using IoContextSP = std::shared_ptr<boost::asio::io_context>;
 #define NEW_CONTEXT_SP(concurrency_hint) std::make_shared<boost::asio::io_context>(concurrency_hint)
+	using TcpAcceptorSP = std::shared_ptr<boost::asio::ip::tcp::acceptor>;
+#define NEW_TCP_ACCEPTOR_SP(context, address, port) std::make_shared<boost::asio::ip::tcp::acceptor>(context, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4::from_string(address), port))
 	using SocketSP = std::shared_ptr<boost::asio::ip::tcp::socket>;
 #define NEW_SOCKET_SP(context) std::make_shared<boost::asio::ip::tcp::socket>(context)
 	using TimerSP = std::shared_ptr<boost::asio::deadline_timer>;

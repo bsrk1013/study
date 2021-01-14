@@ -43,6 +43,12 @@
     <Filter Include="헤더 파일\Object">
       <UniqueIdentifier>{f3a34dea-7b70-4b84-ab4c-3103c30ec3e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Network">
+      <UniqueIdentifier>{804a0da6-6b5e-4490-8485-1e741ab36b48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Network">
+      <UniqueIdentifier>{85c35396-7f2d-4982-a448-38ef46d74e03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSession.h">
@@ -93,6 +99,18 @@
     <ClInclude Include="ObjectPoolManager.h">
       <Filter>헤더 파일\Common</Filter>
     </ClInclude>
+    <ClInclude Include="SessionBase.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerBase.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpServerBase.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpSessionBase.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TcpSession.cpp">
@@ -121,6 +139,12 @@
     </ClCompile>
     <ClCompile Include="BaseObject.cpp">
       <Filter>소스 파일\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpServerBase.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpSessionBase.cpp">
+      <Filter>소스 파일\Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

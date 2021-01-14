@@ -156,10 +156,14 @@
     <ClInclude Include="Request.h" />
     <ClInclude Include="Response.h" />
     <ClInclude Include="Serialize.h" />
+    <ClInclude Include="ServerBase.h" />
+    <ClInclude Include="SessionBase.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="TcpClient.h" />
     <ClInclude Include="TcpServer.h" />
+    <ClInclude Include="TcpServerBase.h" />
     <ClInclude Include="TcpSession.h" />
+    <ClInclude Include="TcpSessionBase.h" />
     <ClInclude Include="TimerObject.h" />
   </ItemGroup>
   <ItemGroup>
@@ -170,7 +174,9 @@
     <ClCompile Include="Serialize.cpp" />
     <ClCompile Include="TcpClient.cpp" />
     <ClCompile Include="TcpServer.cpp" />
+    <ClCompile Include="TcpServerBase.cpp" />
     <ClCompile Include="TcpSession.cpp" />
+    <ClCompile Include="TcpSessionBase.cpp" />
     <ClCompile Include="TimerObject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

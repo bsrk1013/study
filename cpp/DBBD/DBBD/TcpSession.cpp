@@ -107,7 +107,8 @@ namespace DBBD {
 			return;
 		}
 
-		sendBuffer.clearBuffer();
+		sendBuffer.setBufferOffset(sendBuffer.getBufferOffset() + bytesTransferred);
+		sendBuffer.adjust();
 	}
 
 	void TcpSession::dieconnect() {
