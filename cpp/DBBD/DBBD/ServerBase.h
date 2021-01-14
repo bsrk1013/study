@@ -2,7 +2,6 @@
 #include <boost/asio.hpp>
 #include <thread>
 #include <vector>
-#include <queue>
 #include "Define.h"
 
 namespace DBBD

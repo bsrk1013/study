@@ -24,7 +24,7 @@ namespace DBBD
 		virtual void writeInternal() = 0;
 
 	protected:
-		Buffer readBuffer;
-		Buffer writeBuffer;
+		Buffer* readBuffer;
+		Buffer* writeBuffer;
 	};
 }

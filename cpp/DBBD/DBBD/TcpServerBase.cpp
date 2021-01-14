@@ -64,7 +64,7 @@ void DBBD::TcpServerBase::stop()
 
 void DBBD::TcpServerBase::accept()
 {
-	SocketSP socket = NEW_SOCKET_SP(&context);
+	SocketSP socket = NEW_SOCKET_SP(*context);
 	if (socket) {
 		acceptor->async_accept(*socket,
 			boost::bind(&TcpServerBase::handleAccept, this, socket, boost::asio::placeholders::error));

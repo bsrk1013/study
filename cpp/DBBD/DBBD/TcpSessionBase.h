@@ -5,7 +5,7 @@ namespace DBBD {
 	class TcpSessionBase : public SessionBase
 	{
 	public:
-		TcpSessionBase(IoContextSP, SocketSP);
+		TcpSessionBase(IoContextSP , SocketSP, size_t);
 		virtual ~TcpSessionBase();
 
 	public:

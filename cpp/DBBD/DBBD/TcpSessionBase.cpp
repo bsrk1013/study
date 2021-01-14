@@ -1,10 +1,12 @@
 #include <boost/bind.hpp>
 #include "TcpSessionBase.h"
 
-DBBD::TcpSessionBase::TcpSessionBase(IoContextSP context, SocketSP socket)
+DBBD::TcpSessionBase::TcpSessionBase(IoContextSP context, SocketSP socket, size_t bufferSize)
 {
 	this->context = context;
 	this->socket = socket;
+	this->readBuffer = new Buffer(bufferSize);
+	this->writeBuffer = new Buffer(bufferSize);
 }
 
 DBBD::TcpSessionBase::~TcpSessionBase()
@@ -27,13 +29,23 @@ void DBBD::TcpSessionBase::stop()
 		socket->close();
 		socket.reset();
 	}
+
+	if (readBuffer != nullptr) {
+		delete readBuffer;
+		readBuffer = nullptr;
+	}
+
+	if (writeBuffer != nullptr) {
+		delete writeBuffer;
+		writeBuffer = nullptr;
+	}
 }
 
 void DBBD::TcpSessionBase::read()
 {
-	readBuffer.adjust();
+	readBuffer->adjust();
 	if (socket && socket->is_open()) {
-		socket->async_read_some(boost::asio::buffer(readBuffer.getBuffer(), 8192),
+		socket->async_read_some(boost::asio::buffer(readBuffer->getBuffer(), 8192),
 			boost::bind(&TcpSessionBase::handleRead, this,
 				boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 	}
@@ -46,16 +58,16 @@ void DBBD::TcpSessionBase::handleRead(const boost::system::error_code& error, si
 		return;
 	}
 
-	readBuffer.increaseLastPos(bytesTransferred);
+	readBuffer->increaseLastPos(bytesTransferred);
 	while (true) {
-		if (readBuffer.getBufferLastPos() < HeaderSize) {
+		if (readBuffer->getBufferLastPos() < HeaderSize) {
 			break;
 		}
 
-		auto headerBlock = readBuffer.viewByteBlock(HeaderSize);
+		auto headerBlock = readBuffer->viewByteBlock(HeaderSize);
 		Header header(headerBlock);
 
-		if (readBuffer.getBufferLastPos() < header.length) {
+		if (readBuffer->getBufferLastPos() < header.length) {
 			break;
 		}
 
@@ -71,7 +83,7 @@ void DBBD::TcpSessionBase::write()
 
 	if (socket && socket->is_open()) {
 		boost::asio::async_write(*socket,
-			boost::asio::buffer(writeBuffer.getBuffer(), writeBuffer.getBufferLastPos()),
+			boost::asio::buffer(writeBuffer->getBuffer(), writeBuffer->getBufferLastPos()),
 			boost::bind(&TcpSessionBase::handleWrite, this,
 				boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 	}
@@ -84,5 +96,6 @@ void DBBD::TcpSessionBase::handleWrite(const boost::system::error_code& error, s
 		return;
 	}
 	
-	writeBuffer.clearBuffer();
+	writeBuffer->setBufferOffset(writeBuffer->getBufferOffset() + bytesTransferred);
+	writeBuffer->adjust();
 }
