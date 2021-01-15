@@ -25,5 +25,10 @@ void SessionServer::acceptInternal(DBBD::SocketSP socket, size_t sessionId)
 
 void SessionServer::disconnectInternal(size_t sessionId)
 {
+	auto iter = sessionMap.find(sessionId);
+	if (iter == sessionMap.end()) {
+		return;
+	}
+
 	sessionMap.erase(sessionId);
 }

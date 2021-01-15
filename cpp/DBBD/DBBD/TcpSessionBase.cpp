@@ -22,15 +22,12 @@ void DBBD::TcpSessionBase::start()
 
 void DBBD::TcpSessionBase::stop()
 {
-	if (bindStopInternal) {
-		bindStopInternal(sessionId);
-	}
-
 	if (isDisposed) { return; }
+	isDisposed = true;
 
-	if (context) {
+	/*if (context) {
 		context.reset();
-	}
+	}*/
 
 	if (socket) {
 		socket->close();
@@ -47,7 +44,9 @@ void DBBD::TcpSessionBase::stop()
 		writeBuffer = nullptr;
 	}
 
-	isDisposed = true;
+	if (bindStopInternal) {
+		bindStopInternal(sessionId);
+	}
 }
 
 void DBBD::TcpSessionBase::send(DBBD::Cell* data)
