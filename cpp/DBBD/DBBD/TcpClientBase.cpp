@@ -10,6 +10,7 @@ DBBD::TcpClientBase::TcpClientBase(const std::string& address, const short& port
 
 DBBD::TcpClientBase::~TcpClientBase()
 {
+	stop();
 }
 
 void DBBD::TcpClientBase::start()
@@ -22,14 +23,16 @@ void DBBD::TcpClientBase::start()
 
 void DBBD::TcpClientBase::stop()
 {
-	if (socket && !socket->is_open()) {
+	if (isDisposed) { return; }
+
+	stopInternal();
+
+	if (socket && socket->is_open()) {
 		socket->close();
-		socket.reset();
 	}
 
 	if (context) {
 		context->stop();
-		context.reset();
 	}
 
 	if (thread) {
@@ -37,6 +40,8 @@ void DBBD::TcpClientBase::stop()
 		delete thread;
 		thread = nullptr;
 	}
+
+	isDisposed = true;
 }
 
 void DBBD::TcpClientBase::send(DBBD::Cell* data)

@@ -20,6 +20,7 @@ void SessionServer::acceptInternal(DBBD::SocketSP socket, size_t sessionId)
 	session->bindingStopInternal(boost::bind(
 		&SessionServer::disconnectInternal, this, boost::placeholders::_1));
 	sessionMap[sessionId] = session;
+	session->start();
 }
 
 void SessionServer::disconnectInternal(size_t sessionId)
