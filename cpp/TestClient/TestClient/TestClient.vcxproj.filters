@@ -21,21 +21,15 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="DBClient.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerSession.cpp">
+    <ClCompile Include="PlayerClient.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DBClient.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="BaseProtocol.hpp">
       <Filter>헤더 파일\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerSession.h">
+    <ClInclude Include="PlayerClient.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

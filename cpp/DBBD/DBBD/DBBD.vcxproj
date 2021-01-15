@@ -161,6 +161,7 @@
     <ClInclude Include="SessionBase.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="TcpClient.h" />
+    <ClInclude Include="TcpClientBase.h" />
     <ClInclude Include="TcpClientSession.h" />
     <ClInclude Include="TcpServer.h" />
     <ClInclude Include="TcpServerBase.h" />
@@ -175,6 +176,7 @@
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="Serialize.cpp" />
     <ClCompile Include="TcpClient.cpp" />
+    <ClCompile Include="TcpClientBase.cpp" />
     <ClCompile Include="TcpClientSession.cpp" />
     <ClCompile Include="TcpServer.cpp" />
     <ClCompile Include="TcpServerBase.cpp" />

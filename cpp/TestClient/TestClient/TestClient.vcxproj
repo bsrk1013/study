@@ -143,9 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DBClient.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PlayerSession.cpp" />
+    <ClCompile Include="PlayerClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DBBD\DBBD\DBBD.vcxproj">
@@ -154,8 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseProtocol.hpp" />
-    <ClInclude Include="DBClient.h" />
-    <ClInclude Include="PlayerSession.h" />
+    <ClInclude Include="PlayerClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

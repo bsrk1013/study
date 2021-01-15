@@ -21,6 +21,7 @@ namespace DBBD
 		virtual void accept() = 0;
 		virtual void handleAccept(DBBD::SocketSP, const boost::system::error_code&) = 0;
 		virtual void acceptInternal(DBBD::SocketSP, size_t) = 0;
+		virtual void disconnectInternal(size_t) = 0;
 
 	protected:
 		size_t increaseAndGetSessionId() { return ++sessionIdCounter; }
@@ -29,7 +30,7 @@ namespace DBBD
 		bool isDisposed = false;
 		std::string name;
 		std::string address;
-		int port;
+		short port;
 		size_t threadCount;
 		IoContextSP context;
 		std::vector<std::thread*> threadList;

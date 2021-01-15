@@ -5,7 +5,9 @@
 
 namespace DBBD {
 // MACRO
+	using TimerParam = std::function<void()>;
 #define TIMER_BINDING(method) std::bind(method, this)
+	using ReadInternalParam = std::function<bool(const Header&, Buffer&)>;
 #define READ_INTERNAL_BINDING(method) std::bind(method, this, std::placeholders::_1, std::placeholders::_2)
 
 // typedef
@@ -18,8 +20,4 @@ namespace DBBD {
 #define NEW_SOCKET_SP(context) std::make_shared<boost::asio::ip::tcp::socket>(context)
 	using TimerSP = std::shared_ptr<boost::asio::deadline_timer>;
 #define NEW_TIMER_SP(context, waitTime) std::make_shared<boost::asio::deadline_timer>(context, waitTime)
-
-	// std::function
-	using TimerParam = std::function<void()>;
-	using ReadInternalParam = std::function<bool(const Header&, Buffer&)>;
 }

@@ -18,13 +18,11 @@ namespace DBBD {
 		if (buffer != nullptr) {
 			delete[] buffer;
 			buffer = nullptr;
-			std::cout << "~Buffer, buffer" << std::endl;
 		}
 
 		if (block != nullptr) {
 			delete[] block;
 			block = nullptr;
-			std::cout << "~Buffer, block" << std::endl;
 		}
 	}
 

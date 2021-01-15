@@ -5,7 +5,10 @@ namespace DBBD {
 	class TcpServerBase : public ServerBase
 	{
 	public:
-		TcpServerBase(std::string name, std::string address, int port, size_t threadCount);
+		TcpServerBase(const std::string& name,
+			const std::string& address,
+			const short& port,
+			const size_t& threadCount);
 		virtual ~TcpServerBase();
 
 	public:
@@ -17,6 +20,7 @@ namespace DBBD {
 
 		virtual void handleAccept(DBBD::SocketSP, const boost::system::error_code&) override;
 		virtual void acceptInternal(DBBD::SocketSP, size_t) = 0;
+		virtual void disconnectInternal(size_t) = 0;
 
 	private:
 		virtual void accept() override;

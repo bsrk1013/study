@@ -2,7 +2,10 @@
 #include <boost/bind.hpp>
 #include "TcpServerBase.h"
 
-DBBD::TcpServerBase::TcpServerBase(std::string name, std::string address, int port, size_t threadCount)
+DBBD::TcpServerBase::TcpServerBase(const std::string& name,
+	const std::string& address,
+	const short& port,
+	const size_t& threadCount)
 {
 	this->name = name;
 	this->address = address;

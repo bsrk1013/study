@@ -1,5 +1,6 @@
 #include <boost/bind.hpp>
 #include "TcpSessionBase.h"
+#include "Serialize.h"
 
 DBBD::TcpSessionBase::TcpSessionBase(IoContextSP context, SocketSP socket, size_t bufferSize)
 {
@@ -21,6 +22,10 @@ void DBBD::TcpSessionBase::start()
 
 void DBBD::TcpSessionBase::stop()
 {
+	if (bindStopInternal) {
+		bindStopInternal(sessionId);
+	}
+
 	if (isDisposed) { return; }
 
 	if (context) {
@@ -43,6 +48,17 @@ void DBBD::TcpSessionBase::stop()
 	}
 
 	isDisposed = true;
+}
+
+void DBBD::TcpSessionBase::send(DBBD::Cell* data)
+{
+	Serialize::write(*writeBuffer, data);
+	write();
+}
+
+void DBBD::TcpSessionBase::bindingStopInternal(std::function<void(const size_t&)> method)
+{
+	bindStopInternal = method;
 }
 
 void DBBD::TcpSessionBase::read()
@@ -75,7 +91,7 @@ void DBBD::TcpSessionBase::handleRead(const boost::system::error_code& error, si
 			break;
 		}
 
-		readInternal();
+		readInternal(header);
 	}
 
 	read();

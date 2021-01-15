@@ -13,6 +13,13 @@ namespace DBBD
 	public:
 		virtual void start() = 0;
 		virtual void stop() = 0;
+		virtual void bindingStopInternal(std::function<void(const size_t&)>) = 0;
+
+		virtual void send(DBBD::Cell* data) = 0;
+
+	public:
+		inline size_t getSessionId() { return sessionId; }
+		inline void setSessionId(const size_t& value) { sessionId = value; }
 
 	protected:
 		virtual void read() = 0;
@@ -25,7 +32,9 @@ namespace DBBD
 
 	protected:
 		bool isDisposed = false;
+		size_t sessionId;
 		Buffer* readBuffer;
 		Buffer* writeBuffer;
+		std::function<void(const size_t&)> bindStopInternal;
 	};
 }

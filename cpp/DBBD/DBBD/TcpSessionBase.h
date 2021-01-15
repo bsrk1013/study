@@ -11,8 +11,10 @@ namespace DBBD {
 	public:
 		virtual void start() override;
 		virtual void stop() override;
+		virtual void send(DBBD::Cell* data) override;
+		virtual void bindingStopInternal(std::function<void(const size_t&)>) override;
 
-	protected:
+	private:
 		// SessionBase을(를) 통해 상속됨
 		virtual void read() override;
 		virtual void handleRead(const boost::system::error_code&, size_t) override;

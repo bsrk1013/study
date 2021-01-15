@@ -28,7 +28,7 @@
       <Filter>소스 파일\Base</Filter>
     </ClCompile>
     <ClCompile Include="PlayerClientSession.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -36,7 +36,7 @@
       <Filter>헤더 파일\Base</Filter>
     </ClInclude>
     <ClInclude Include="PlayerClientSession.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
