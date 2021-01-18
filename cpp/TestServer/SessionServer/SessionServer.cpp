@@ -21,6 +21,8 @@ void SessionServer::acceptInternal(DBBD::SocketSP socket, size_t sessionId)
 		&SessionServer::disconnectInternal, this, boost::placeholders::_1));
 	sessionMap[sessionId] = session;
 	session->start();
+
+	std::cout << "acceptInternal, sessionId: " << sessionId << std::endl;
 }
 
 void SessionServer::disconnectInternal(size_t sessionId)
@@ -31,4 +33,6 @@ void SessionServer::disconnectInternal(size_t sessionId)
 	}
 
 	sessionMap.erase(sessionId);
+
+	std::cout << "disconnectInternal, sessionId: " << sessionId << std::endl;
 }

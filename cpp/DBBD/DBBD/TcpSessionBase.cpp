@@ -25,13 +25,8 @@ void DBBD::TcpSessionBase::stop()
 	if (isDisposed) { return; }
 	isDisposed = true;
 
-	/*if (context) {
-		context.reset();
-	}*/
-
-	if (socket) {
+	if (socket && socket->is_open()) {
 		socket->close();
-		socket.reset();
 	}
 
 	if (readBuffer != nullptr) {

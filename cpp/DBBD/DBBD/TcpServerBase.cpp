@@ -35,7 +35,7 @@ void DBBD::TcpServerBase::start()
 
 	for (size_t i = 0; i < threadCount; i++)
 	{
-		std::thread* thread = new std::thread([&]() {
+		auto thread = NEW_THREAD_SP([&]() {
 			context->run();
 			});
 
@@ -61,7 +61,7 @@ void DBBD::TcpServerBase::stop()
 
 	for (auto thread : threadList) {
 		thread->join();
-		delete thread;
+		thread.reset();
 	}
 
 	isDisposed = true;

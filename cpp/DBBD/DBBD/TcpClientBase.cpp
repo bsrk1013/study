@@ -27,6 +27,8 @@ void DBBD::TcpClientBase::stop()
 
 	stopInternal();
 
+	session->stop();
+
 	if (socket && socket->is_open()) {
 		socket->close();
 	}
@@ -37,8 +39,7 @@ void DBBD::TcpClientBase::stop()
 
 	if (thread) {
 		thread->join();
-		delete thread;
-		thread = nullptr;
+		thread.reset();
 	}
 
 	isDisposed = true;
@@ -55,7 +56,7 @@ void DBBD::TcpClientBase::connect()
 	socket->async_connect(endpoint,
 		boost::bind(&TcpClientBase::handleConnect, this, boost::asio::placeholders::error));
 
-	thread = new std::thread([&]() {
+	thread = NEW_THREAD_SP([&]() {
 		context->run();
 		});
 }

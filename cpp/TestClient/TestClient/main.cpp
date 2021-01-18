@@ -355,13 +355,13 @@ int main() {
 	program2();
 	program3();*/
 
-    std::vector<PlayerClient*> clientList;
+    std::vector<std::shared_ptr<PlayerClient>> clientList;
 	//std::vector<DBBD::TcpClient*> clientList;
 	std::vector<std::thread*> threadList(100);
 
 	try {
-		for (size_t i = 0; i < 1; i++) {
-            PlayerClient* client = new PlayerClient("127.0.0.1", 8101);
+		for (size_t i = 0; i < 10; i++) {
+            auto client = std::make_shared<PlayerClient>("127.0.0.1", 8101);
             client->start();
             clientList.push_back(client);
 		}

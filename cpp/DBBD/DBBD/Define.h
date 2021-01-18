@@ -12,6 +12,8 @@ namespace DBBD {
 
 // typedef
 	// shared_ptr
+	using ThreadSP = std::shared_ptr<std::thread>;
+#define NEW_THREAD_SP(method) std::make_shared<std::thread>(method)
 	using IoContextSP = std::shared_ptr<boost::asio::io_context>;
 #define NEW_CONTEXT_SP(concurrency_hint) std::make_shared<boost::asio::io_context>(concurrency_hint)
 	using TcpAcceptorSP = std::shared_ptr<boost::asio::ip::tcp::acceptor>;

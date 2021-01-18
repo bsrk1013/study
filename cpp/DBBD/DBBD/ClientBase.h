@@ -28,7 +28,7 @@ namespace DBBD
 		std::string address;
 		int port;
 		bool isDisposed = false;
-		std::thread* thread = nullptr;
+		ThreadSP thread;
 		IoContextSP context;
 		SocketSP socket;
 	};

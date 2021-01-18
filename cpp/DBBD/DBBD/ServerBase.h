@@ -33,7 +33,7 @@ namespace DBBD
 		short port;
 		size_t threadCount;
 		IoContextSP context;
-		std::vector<std::thread*> threadList;
+		std::vector<ThreadSP> threadList;
 
 	private:
 		std::atomic<size_t> sessionIdCounter = 0;
