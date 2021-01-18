@@ -163,7 +163,7 @@ void CppExtractor::writeCellContents(std::ofstream& ofs) {
 	}
 	ofs << std::endl;
 
-	ofs << "private:" << std::endl;
+	ofs << "protected:" << std::endl;
 	for (auto info : contentsInfoList) {
 		switch (info.fileType) {
 		case XmlElementType::Comment:
@@ -230,7 +230,7 @@ void CppExtractor::writeProtocolContents(std::ofstream& ofs, std::string base) {
 	}
 	ofs << std::endl;
 
-	ofs << "private:" << std::endl;
+	ofs << "protected:" << std::endl;
 	for (auto info : contentsInfoList) {
 		switch (info.fileType) {
 		case XmlElementType::Comment:

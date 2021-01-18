@@ -12,8 +12,20 @@ namespace DBBD {
 		}
 	}
 
+	void Serialize::write(Buffer& buffer, const unsigned char& value) {
+		write<unsigned char>(buffer, value);
+	}
+
 	void Serialize::write(Buffer& buffer, const short& value) {
 		write<short>(buffer, value);
+	}
+
+	void Serialize::write(Buffer& buffer, const int& value) {
+		write<int>(buffer, value);
+	}
+
+	void Serialize::write(Buffer& buffer, const long& value) {
+		write<long>(buffer, value);
 	}
 
 	void Serialize::write(Buffer& buffer, const size_t& value) {

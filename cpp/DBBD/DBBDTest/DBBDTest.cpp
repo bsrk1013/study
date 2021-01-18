@@ -17,6 +17,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <queue>
+#include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -640,6 +641,139 @@ namespace DBBDTest
 			auto scopeTestFoo = fooQueue.front();
 
 			Assert::AreEqual(scopeTestFoo->a, 10);
+		}
+
+		TEST_METHOD(DataTest) {
+			enum ItemType {
+				Consumed = 0,
+				Equip,
+			};
+
+			class ItemBase {
+			public:
+				BYTE type;
+				std::string name;
+				long uid;
+			};
+
+			class ConsumedItem : public ItemBase {
+			public:
+				int count;
+			};
+
+			class EquipItem : public ItemBase {
+			public:
+				int enchant;
+			};
+
+			std::vector<ItemBase*> itemList;
+
+			EquipItem sword;
+			sword.type = ItemType::Equip;
+			sword.name = "ÀÏº»µµ";
+			sword.uid = 1001;
+			sword.enchant = 1;
+			itemList.push_back(&sword);
+
+			ConsumedItem healingPotion;
+			healingPotion.type = ItemType::Consumed;
+			healingPotion.name = "»¡°­Æ÷¼Ç";
+			healingPotion.uid = 1000;
+			healingPotion.count = 100;
+			itemList.push_back(&healingPotion);
+
+			for (auto item : itemList) {
+				switch (item->type) {
+				case ItemType::Consumed:{
+					auto consumed = (ConsumedItem*)item;
+					Assert::IsTrue(strcmp(consumed->name.c_str(), "»¡°­Æ÷¼Ç") == 0);
+					Assert::IsTrue(consumed->uid == 1000);
+					Assert::IsTrue(consumed->count == 100);
+					break;
+				}
+				case ItemType::Equip: {
+					auto equip = (EquipItem*)item;
+					Assert::IsTrue(strcmp(equip->name.c_str(), "ÀÏº»µµ") == 0);
+					Assert::IsTrue(equip->uid == 1001);
+					Assert::IsTrue(equip->enchant == 1);
+					break;
+				}
+				}
+			}
+		}
+
+		TEST_METHOD(InheritTest) {
+			enum ItemType {
+				Consumed = 0,
+				Equip,
+			};
+
+			class ItemBase : public Cell {
+			public:
+				virtual ~ItemBase() {}
+
+			public:
+				virtual void serialize(Buffer& buffer) {
+					Serialize::write(buffer, type);
+					Serialize::write(buffer, name);
+					Serialize::write(buffer, uid);
+				}
+
+				virtual void deserialize(Buffer& buffer) {
+					Deserialize::read(buffer, type);
+					Deserialize::read(buffer, name);
+					Deserialize::read(buffer, uid);
+				}
+
+				virtual size_t getLength() {
+					return sizeof(BYTE) + sizeof(size_t) + name.size() + sizeof(long);
+				}
+
+			public:
+				BYTE type;
+				std::string name;
+				long uid;
+			};
+
+			class EquipItem : public ItemBase {
+			public:
+				virtual ~EquipItem() {}
+
+			public:
+				virtual void serialize(Buffer& buffer) {
+					ItemBase::serialize(buffer);
+					Serialize::write(buffer, enchant);
+				}
+
+				virtual void deserialize(Buffer& buffer) {
+					ItemBase::deserialize(buffer);
+					Deserialize::read(buffer, enchant);
+				}
+
+				virtual size_t getLength() {
+					return ItemBase::getLength() + sizeof(int);
+				}
+
+			public:
+				int enchant;
+			};
+
+			EquipItem sword;
+			sword.type = ItemType::Equip;
+			sword.name = "¾Ç¸¶¿ÕÀÇ ÇÑ¼Õ°Ë";
+			sword.uid = 100101;
+			sword.enchant = 7;
+
+			ItemBase* item = &sword;
+
+			Buffer buffer(8192);
+			item->serialize(buffer);
+
+			ItemBase* respItem;
+			//respItem->deserialize(buffer);
+			/*EquipItem respSword;
+			respSword.deserialize(buffer);*/
+
 		}
 	};
 }

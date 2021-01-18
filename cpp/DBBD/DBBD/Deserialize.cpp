@@ -10,8 +10,20 @@ namespace DBBD {
 		memcpy(&value, dataBuffer, sizeof(T));
 	}
 
-	void Deserialize::read(Buffer& buffer, short& value){
+	void Deserialize::read(Buffer& buffer, unsigned char& value) {
+		read<unsigned char>(buffer, value);
+	}
+
+	void Deserialize::read(Buffer& buffer, short& value) {
 		read<short>(buffer, value);
+	}
+
+	void Deserialize::read(Buffer& buffer, int& value) {
+		read<int>(buffer, value);
+	}
+
+	void Deserialize::read(Buffer& buffer, long& value) {
+		read<long>(buffer, value);
 	}
 
 	void Deserialize::read(Buffer& buffer, size_t& value) {
