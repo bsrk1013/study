@@ -14,6 +14,7 @@ namespace DBBD {
 		size_t type;
 		TimerParam method;
 		size_t waitMs;
+		std::chrono::system_clock::time_point reservedTime;
 		bool isRepeat;
 		std::weak_ptr<TimerObject> baseObject;
 	};
@@ -27,14 +28,13 @@ namespace DBBD {
 	{
 	public:
 		virtual ~TimerObject();
+		//void methodEvent(std::weak_ptr<BaseObject> weakPtr, const size_t& eventType);
+		void methodEvent(const size_t& eventType);
 
 	protected:
 		void addTimerEvent(const size_t& eventType, const TimerParam& method,
 			const size_t& waitMs, const bool& isRepeat);
 		void removeTimerEvent(const size_t& eventType);
-
-	private:
-		void methodEvent(std::weak_ptr<BaseObject> weakPtr, const size_t& eventType);
 
 	private:
 		bool existInfo(size_t eventType);

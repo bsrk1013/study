@@ -9,11 +9,13 @@ void DBBD::TimerManager::init(size_t threadCount)
 		threadIdTable[thread->get_id()] = i;
 		threadList.push_back(thread);
 	}
+
+	isInit = true;
 }
 
 void DBBD::TimerManager::addTimer(TimerInfoWP infoPtr) {
 	if (!isInit) {
-		new std::exception("TimerManager is not inited...");
+		throw std::exception("TimerManager is not inited...");
 	}
 
 	{
@@ -57,13 +59,13 @@ void DBBD::TimerManager::update()
 			}
 
 
-			auto reserved = now + std::chrono::milliseconds(info->waitMs);
-			if (now < reserved) {
+			if (now < info->reservedTime) {
 				it++;
 				continue;
 			}
 
-			info->method();
+			info->baseObject.lock()->methodEvent(info->type);
+			//info->method();
 
 			it = deque->erase(it);
 			// FIXME 로직 구현

@@ -23,9 +23,9 @@ DBBD::TcpServerBase::~TcpServerBase()
 
 void DBBD::TcpServerBase::start()
 {
-	if (address == "") { new std::exception(std::string("invalid address, address: " + address).c_str()); }
-	if (port <= 0) { new std::exception(std::string("invalid port, port: " + port).c_str()); }
-	if (threadCount <= 0) { new std::exception(std::string("invalid thread count, threadCount: " + threadCount).c_str()); }
+	if (address == "") { throw std::exception(std::string("invalid address, address: " + address).c_str()); }
+	if (port <= 0) { throw std::exception(std::string("invalid port, port: " + port).c_str()); }
+	if (threadCount <= 0) { throw std::exception(std::string("invalid thread count, threadCount: " + threadCount).c_str()); }
 
 	context = NEW_CONTEXT_SP();
 	acceptor = NEW_TCP_ACCEPTOR_SP(*context, address, port);

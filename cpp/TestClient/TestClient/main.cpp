@@ -3,19 +3,14 @@
 #include <vector>
 #include <stack>
 #include <queue>
+#include <deque>
 #include <set>
 #include <unordered_set>
 #include <map>
 #include <list>
 #include <algorithm>
-#include "DBBD/TcpClient.h"
-#include "DBBD/Request.h"
-#include "DBBD/Common.hpp"
-#include "DBBD/Serialize.h"
-#include "DBBD/Deserialize.h"
-#include "DBBD/Cell.h"
+#include "DBBD/TimerManager.h"
 #include "DBBD/Random.h"
-#include "DBBD/Singleton.h"
 #include "PlayerClient.h"
 //#include <boost/asio.hpp>
 
@@ -458,11 +453,11 @@ int main() {
 	std::vector<std::thread*> threadList(100);
 
 	try {
-		/*for (size_t i = 0; i < 10; i++) {
+		for (size_t i = 0; i < 1; i++) {
 			auto client = std::make_shared<PlayerClient>("127.0.0.1", 8101);
 			client->start();
 			clientList.push_back(client);
-		}*/
+		}
 
 		TimerManager::Instance()->init(8);
 
