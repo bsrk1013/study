@@ -32,7 +32,7 @@ public:
 	long getLevel() { return Level; }
 	void setLevel(long value) { Level = value; }
 
-private:
+protected:
 	// 닉네임
 	std::string Nickname;
 	// 레벨

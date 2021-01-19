@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "../DBBD/TcpServer.h"
-#include "../DBBD/TcpClient.h"
-#include "../DBBD/TcpSession.h"
 #include "../DBBD/Buffer.h"
 #include "../DBBD/Cell.h"
 #include "../DBBD/Serialize.h"
@@ -10,7 +7,6 @@
 #include "../DBBD/Request.h"
 #include "../DBBD/Response.h"
 #include "../DBBD/Random.h"
-#include "../DBBD/TcpSession.h"
 #include "../DBBD/TimerObject.h"
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
@@ -24,6 +20,29 @@ using namespace DBBD;
 
 namespace DBBDTest
 {
+	template <typename T>
+	class ItemReq : public Request {
+	public:
+		virtual ~ItemReq() {}
+
+	public:
+		virtual void serialize(Buffer& buffer) {
+			writeHeader(buffer, getLength());
+			item.serialize(buffer);
+		}
+
+		virtual void deserialize(Buffer& buffer) {
+			readHeader(buffer);
+			item.deserialize(buffer);
+		}
+
+		virtual size_t getLength() {
+			return Request::getLength() + item.getLength();
+		}
+
+		T item;
+	};
+
 	class A {
 	public:
 		virtual ~A() {}
@@ -760,20 +779,20 @@ namespace DBBDTest
 
 			EquipItem sword;
 			sword.type = ItemType::Equip;
-			sword.name = "æ«∏∂ø’¿« «—º’∞À";
+			sword.name = "«—º’∞À";
 			sword.uid = 100101;
 			sword.enchant = 7;
 
-			ItemBase* item = &sword;
+			ItemReq<EquipItem> req;
+			req.item = sword;
 
 			Buffer buffer(8192);
-			item->serialize(buffer);
+			req.serialize(buffer);
 
-			ItemBase* respItem;
-			//respItem->deserialize(buffer);
-			/*EquipItem respSword;
-			respSword.deserialize(buffer);*/
+			ItemReq<EquipItem> tempReq;
+			tempReq.deserialize(buffer);
 
+			Assert::IsTrue(req.item.uid == tempReq.item.uid);
 		}
 	};
 }

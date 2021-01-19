@@ -11,6 +11,10 @@ DBBD::TcpClientSession::~TcpClientSession()
 {
 }
 
+void DBBD::TcpClientSession::startInternal()
+{
+}
+
 void DBBD::TcpClientSession::readInternal(DBBD::Header header)
 {
 	char* block = readBuffer->readByteBlock(header.length);

@@ -12,6 +12,7 @@ namespace DBBD
 
 	protected:
 		// TcpSessionBase을(를) 통해 상속됨
+		virtual void startInternal() override;
 		virtual void readInternal(DBBD::Header) override;
 		virtual void writeInternal() override;
 

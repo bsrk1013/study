@@ -15,217 +15,218 @@
 #include "DBBD/Deserialize.h"
 #include "DBBD/Cell.h"
 #include "DBBD/Random.h"
+#include "DBBD/Singleton.h"
 #include "PlayerClient.h"
 //#include <boost/asio.hpp>
 
 using namespace std;
 
 void program1() {
-    vector<string> names{"soda", "soda", "soda", "soda", "soda" };
-    int answer = 0;
+	vector<string> names{ "soda", "soda", "soda", "soda", "soda" };
+	int answer = 0;
 
-    map<char, int> d;
-    for (auto cookie : names) {
-        char first = cookie.at(0);
-        d[first] += 1;
-    }
+	map<char, int> d;
+	for (auto cookie : names) {
+		char first = cookie.at(0);
+		d[first] += 1;
+	}
 
-    for (auto pair : d) {
-        int result = pair.second % 2;
-        if (result == 0) {
-            int a = pair.second / 2;
+	for (auto pair : d) {
+		int result = pair.second % 2;
+		if (result == 0) {
+			int a = pair.second / 2;
 
-        }
-    }
+		}
+	}
 }
 
 void program2() {
-    vector<int> snowballs{ -5, 5 };
+	vector<int> snowballs{ -5, 5 };
 
-    stack<int> left;
-    queue<int> right;
+	stack<int> left;
+	queue<int> right;
 
-    for (size_t i = 0; i < snowballs.size(); i++) {
-        int snow = snowballs[i];
-        if (snow > 0) {
-            if (right.size() > 0
-                && left.size() > 0) {
-                int rightSnow = right.front();
-                if (rightSnow == snow) {
-                    right.pop();
-                }
-                else if (rightSnow < snow) {
-                    i--;
-                    right.pop();
-                }
-            }
-            else {
-                left.push(snow);
-            }
-        }
-        else {
-            if (left.size() > 0) {
-                int leftSnow = left.top();
-                snow = snow * -1;
-                if (leftSnow == snow) {
-                    left.pop();
-                }
-                else if (leftSnow < snow) {
-                    i--;
-                    left.pop();
-                }
-            }
-            else {
-                right.push(snow * -1);
-            }
-        }
-    }
+	for (size_t i = 0; i < snowballs.size(); i++) {
+		int snow = snowballs[i];
+		if (snow > 0) {
+			if (right.size() > 0
+				&& left.size() > 0) {
+				int rightSnow = right.front();
+				if (rightSnow == snow) {
+					right.pop();
+				}
+				else if (rightSnow < snow) {
+					i--;
+					right.pop();
+				}
+			}
+			else {
+				left.push(snow);
+			}
+		}
+		else {
+			if (left.size() > 0) {
+				int leftSnow = left.top();
+				snow = snow * -1;
+				if (leftSnow == snow) {
+					left.pop();
+				}
+				else if (leftSnow < snow) {
+					i--;
+					left.pop();
+				}
+			}
+			else {
+				right.push(snow * -1);
+			}
+		}
+	}
 
-    vector<int> answer;
-    if (right.size() > 0) {
-        while (right.size() > 0) {
-            int snow = right.front() * -1;
-            right.pop();
-            answer.push_back(snow);
-        }
-    }
+	vector<int> answer;
+	if (right.size() > 0) {
+		while (right.size() > 0) {
+			int snow = right.front() * -1;
+			right.pop();
+			answer.push_back(snow);
+		}
+	}
 
-    if (left.size() > 0) {
-        vector<int> result;
-        while (left.size() > 0) {
-            int snow = left.top();
-            left.pop();
-            result.push_back(snow);
-        }
+	if (left.size() > 0) {
+		vector<int> result;
+		while (left.size() > 0) {
+			int snow = left.top();
+			left.pop();
+			result.push_back(snow);
+		}
 
-        for (auto iter = result.rbegin(); iter != result.rend(); iter++) {
-            answer.push_back(*iter);
-        }
-    }
+		for (auto iter = result.rbegin(); iter != result.rend(); iter++) {
+			answer.push_back(*iter);
+		}
+	}
 }
 
 void program3() {
-    vector<int> A{1, 3, 2, 4, 2, 3, 5};
-    int K = 10;
-    int answer = 0;
+	vector<int> A{ 1, 3, 2, 4, 2, 3, 5 };
+	int K = 10;
+	int answer = 0;
 
-    int count = 0;
-    while (true) {
-        int first = 0;
-        for (auto it = A.begin(); it != A.end();) {
-            int value = *it;
-            if (first == 0 && value != 0) {
-                first = value;
-                it = A.erase(it);
-            }
-            else if(value != 0){
-                if (first + 1 == value) {
-                    first++;
-                    it = A.erase(it);
-                }
-                else {
-                    it++;
-                }
-            }
-            else {
-                it++;
-            }
-        }
-        answer++;
+	int count = 0;
+	while (true) {
+		int first = 0;
+		for (auto it = A.begin(); it != A.end();) {
+			int value = *it;
+			if (first == 0 && value != 0) {
+				first = value;
+				it = A.erase(it);
+			}
+			else if (value != 0) {
+				if (first + 1 == value) {
+					first++;
+					it = A.erase(it);
+				}
+				else {
+					it++;
+				}
+			}
+			else {
+				it++;
+			}
+		}
+		answer++;
 
-        if (A.size() <= 0) {
-            break;
-        }
-    }
+		if (A.size() <= 0) {
+			break;
+		}
+	}
 
-    std::cout << answer << std::endl;
+	std::cout << answer << std::endl;
 }
 
 void baram1() {
-    string s = "avgcshavcghxzvghcavsghczazxcaxxacxzcaz";
+	string s = "avgcshavcghxzvghcavsghczazxcaxxacxzcaz";
 
-    int answer = 0;
+	int answer = 0;
 
-    int index1 = 0;
-    int index2 = 1;
-    while (true) {
-        if (index1 + index2 >= s.length()) {
-            break;
-        }
+	int index1 = 0;
+	int index2 = 1;
+	while (true) {
+		if (index1 + index2 >= s.length()) {
+			break;
+		}
 
-        char a = s[index1];
-        if (a != 'a'
-            && a != 'z') {
-            index1++;
-            continue;
-        }
+		char a = s[index1];
+		if (a != 'a'
+			&& a != 'z') {
+			index1++;
+			continue;
+		}
 
-        bool isZ = a == 'z';
+		bool isZ = a == 'z';
 
-        if (index1 + index2 >= s.length()) {
-            index2 = 1;
-        }
+		if (index1 + index2 >= s.length()) {
+			index2 = 1;
+		}
 
-        char b = s[index1 + index2];
-        if (b != 'a'
-            && b != 'z') {
-            index2++;
-            continue;
-        }
+		char b = s[index1 + index2];
+		if (b != 'a'
+			&& b != 'z') {
+			index2++;
+			continue;
+		}
 
-        index1 = index1 + index2;
-        index2 = 1;
-        if (isZ && b != 'z'
-            || !isZ && b == 'z') {
-            answer++;
-        }
-    }
+		index1 = index1 + index2;
+		index2 = 1;
+		if (isZ && b != 'z'
+			|| !isZ && b == 'z') {
+			answer++;
+		}
+	}
 
-    std::cout << "answer1 : " << answer << endl;
+	std::cout << "answer1 : " << answer << endl;
 }
 
 void baram2() {
-    vector<string> answer;
-    vector<string> card{"ABACDEFG", "NOPQRSTU", "HIJKLKMM"};
-    vector<string> word{"GPQM", "GPMZ", "EFU", "MMNA"};
+	vector<string> answer;
+	vector<string> card{ "ABACDEFG", "NOPQRSTU", "HIJKLKMM" };
+	vector<string> word{ "GPQM", "GPMZ", "EFU", "MMNA" };
 
-    for (auto wordData : word) {
-        bool result = true;
-        vector<string> tempCard(card);
-        int one = 0, two = 0, three = 0;
-        for (size_t i = 0; i < wordData.size(); i++) {
-            char charData = wordData[i];
+	for (auto wordData : word) {
+		bool result = true;
+		vector<string> tempCard(card);
+		int one = 0, two = 0, three = 0;
+		for (size_t i = 0; i < wordData.size(); i++) {
+			char charData = wordData[i];
 
-            //map<int, int> result;
+			//map<int, int> result;
 
-            size_t a = tempCard[0].find(charData);
-            size_t b = tempCard[1].find(charData);
-            size_t c = tempCard[2].find(charData);
+			size_t a = tempCard[0].find(charData);
+			size_t b = tempCard[1].find(charData);
+			size_t c = tempCard[2].find(charData);
 
-            // 만들 수 없음
-            if (a >= tempCard[0].size()
-                && b >= tempCard[1].size()
-                && c >= tempCard[2].size()) {
-                result = false;
-                break;
-            }
-            
-            if (a < tempCard[0].size()) { tempCard[0].erase(a, 1); one++; continue; }
-            if (b < tempCard[1].size()) { tempCard[1].erase(b, 1); two++;  continue; }
-            if (c < tempCard[2].size()) { tempCard[2].erase(c, 1); three++;  continue; }
-        }
+			// 만들 수 없음
+			if (a >= tempCard[0].size()
+				&& b >= tempCard[1].size()
+				&& c >= tempCard[2].size()) {
+				result = false;
+				break;
+			}
 
-        if (result
-            && one > 0
-            && two > 0
-            && three > 0) {
-            answer.push_back(wordData);
-        }
-    }
+			if (a < tempCard[0].size()) { tempCard[0].erase(a, 1); one++; continue; }
+			if (b < tempCard[1].size()) { tempCard[1].erase(b, 1); two++;  continue; }
+			if (c < tempCard[2].size()) { tempCard[2].erase(c, 1); three++;  continue; }
+		}
 
-    if (answer.size() <= 0) {
-        answer.push_back("-1");
-    }
+		if (result
+			&& one > 0
+			&& two > 0
+			&& three > 0) {
+			answer.push_back(wordData);
+		}
+	}
+
+	if (answer.size() <= 0) {
+		answer.push_back("-1");
+	}
 }
 
 void baram3() {
@@ -234,7 +235,7 @@ void baram3() {
 
 	for (auto stat : stats) {
 		bool insert = true;
-		for (auto &team : teams) {
+		for (auto& team : teams) {
 			if (team.top() < stat) {
 				team.push(stat);
 				insert = false;
@@ -249,101 +250,198 @@ void baram3() {
 		}
 	}
 
-    std::cout << "answer3 : " << teams.size() << endl;
+	std::cout << "answer3 : " << teams.size() << endl;
 }
 
 void baram4() {
-    int n = 7;
-    vector<vector<int>> quests{ vector<int>{7, 1}, vector<int>{7, 2}, vector<int>{6, 5}, vector<int>{3, 2} };
+	int n = 7;
+	vector<vector<int>> quests{ vector<int>{7, 1}, vector<int>{7, 2}, vector<int>{6, 5}, vector<int>{3, 2} };
 
-    typedef set<int, greater<int>> questSet;
-    map<int, questSet> questMap;
-    int questArray[5001]{ 0 };
-    vector<int> answer;
-     
-    for (int i = 1; i <= n; i++) {
-        questMap[i];
-        for (auto quest : quests) {
-            if (quest[1] == i) {
-                questMap[i].insert(quest[0]);
-            }
-        }
-    }
+	typedef set<int, greater<int>> questSet;
+	map<int, questSet> questMap;
+	int questArray[5001]{ 0 };
+	vector<int> answer;
 
-    int index = 1;
-    while (true) {
-        if (answer.size() == n) { break; }
-        if (index > n) {
-            index = 1;
-        }
+	for (int i = 1; i <= n; i++) {
+		questMap[i];
+		for (auto quest : quests) {
+			if (quest[1] == i) {
+				questMap[i].insert(quest[0]);
+			}
+		}
+	}
 
-        auto a = questMap[index];
-        if (questArray[index] == 1) { index++; continue; }
-        if (a.size() <= 0) {
-            answer.push_back(index);
-            questArray[index] = 1;
-            index = 1;
-            continue;
-        }
+	int index = 1;
+	while (true) {
+		if (answer.size() == n) { break; }
+		if (index > n) {
+			index = 1;
+		}
 
-        bool possible = true;
-        for (auto b : a) {
-            if (questArray[b] == 0) {
-                possible = false;
-                break;
-            }
-        }
+		auto a = questMap[index];
+		if (questArray[index] == 1) { index++; continue; }
+		if (a.size() <= 0) {
+			answer.push_back(index);
+			questArray[index] = 1;
+			index = 1;
+			continue;
+		}
 
-        if (possible) {
-            questMap[index].clear();
-            answer.push_back(index);
-            questArray[index] = 1;
-            index = 1;
-            continue;
-        }
+		bool possible = true;
+		for (auto b : a) {
+			if (questArray[b] == 0) {
+				possible = false;
+				break;
+			}
+		}
 
-        index++;
-    }
+		if (possible) {
+			questMap[index].clear();
+			answer.push_back(index);
+			questArray[index] = 1;
+			index = 1;
+			continue;
+		}
 
-    std::cout << "answer4 : " << endl;
+		index++;
+	}
+
+	std::cout << "answer4 : " << endl;
 }
 
 void baram5() {
-    int N = 5;
-    vector<vector<int>> relation = { vector<int>{1, 2}, vector<int>{4, 2}, vector<int>{3, 1}, vector<int>{4, 5} };
-    vector<int> answer;
+	int N = 5;
+	vector<vector<int>> relation = { vector<int>{1, 2}, vector<int>{4, 2}, vector<int>{3, 1}, vector<int>{4, 5} };
+	vector<int> answer;
 
-    for (int i = 1; i <= N; i++) {
-        int total = 0;
-        for (auto data : relation) {
-            // 볼 필요 없음(둘 다 다름)
-            if(data[0] != i
-                && data[1] != i) {
-                continue;
-            }
-            
-            int target = data[0] == i ? data[1] : data[0];
-            total++;
+	for (int i = 1; i <= N; i++) {
+		int total = 0;
+		for (auto data : relation) {
+			// 볼 필요 없음(둘 다 다름)
+			if (data[0] != i
+				&& data[1] != i) {
+				continue;
+			}
 
-            for (auto data2 : relation) {
-                // 볼 필요 없음
-                if(data[0] == data2[0]
-                    && data[1] == data2[1]) {
-                    continue;
-                }
+			int target = data[0] == i ? data[1] : data[0];
+			total++;
 
-                if (data2[0] != target
-                    && data2[1] != target) {
-                    continue;
-                }
-                total++;
-            }
-        }
-        answer.push_back(total);
-    }
+			for (auto data2 : relation) {
+				// 볼 필요 없음
+				if (data[0] == data2[0]
+					&& data[1] == data2[1]) {
+					continue;
+				}
 
-    std::cout << "answer5 : " << endl;
+				if (data2[0] != target
+					&& data2[1] != target) {
+					continue;
+				}
+				total++;
+			}
+		}
+		answer.push_back(total);
+	}
+
+	std::cout << "answer5 : " << endl;
 }
+
+
+class TimerObject {
+public:
+	TimerObject(int num, size_t waitMs) {
+		this->num = num;
+		this->waitMs = waitMs;
+		reservedTime = std::chrono::system_clock::now() + std::chrono::milliseconds(waitMs);
+	}
+
+	int num;
+	size_t waitMs;
+	std::chrono::system_clock::time_point reservedTime;
+};
+
+class TimerManager : public DBBD::Singleton<TimerManager> {
+public:
+	/*TimerManager() {}
+	~TimerManager() {}*/
+
+public:
+	void init(size_t threadCount) {
+		this->threadCount = threadCount;
+
+		for (size_t i = 0; i < threadCount; i++) {
+			std::thread* thread = new std::thread([this]() {run(); });
+			threadIdTable[thread->get_id()] = i;
+			threadList.push_back(thread);
+
+			/*std::thread thread([this]() {run(); });
+			threadIdTable[thread.get_id()] = i;
+			threadList.push_back(thread);*/
+		}
+	}
+
+	void add(const TimerObject& info) {
+		{
+			std::lock_guard<std::mutex> lock(lockObject);
+			auto deque = &processMap[processNum++];
+			deque->push_back(info);
+			//processMap[processNum++].push_back(info);
+
+			if (processNum >= threadCount) {
+				processNum = 0;
+			}
+		}
+
+		conditionVariable.notify_one();
+	}
+
+private:
+	void run() {
+		while (true) {
+			auto now = std::chrono::system_clock::now();
+
+			std::unique_lock<std::mutex> lock(lockObject);
+			//conditionVariable.wait(lock, [this]() {return !this->processDeque.empty(); });
+			conditionVariable.wait(lock, [this]() {return this->waitCondition(std::this_thread::get_id()); });
+			//conditionVariable.wait(lock, waitCondition(std::this_thread::get_id()));
+			auto targetIndex = threadIdTable[std::this_thread::get_id()];
+			auto deque = &processMap[targetIndex];
+			lock.unlock();
+
+			auto it = deque->begin();
+			while (it != deque->end()) {
+				if (now < it->reservedTime) {
+					it++;
+					continue; 
+				}
+
+				std::cout << "[" << std::this_thread::get_id() << "](" << it->waitMs << ")number: " << it->num << std::endl;
+				it = deque->erase(it);
+			}
+
+			lock.lock();
+			//processMap[targetIndex] = deque;
+			lock.unlock();
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	}
+
+	bool waitCondition(std::thread::id threadId) {
+		auto targetIndex = threadIdTable[threadId];
+		return !processMap[targetIndex].empty();
+	}
+
+private:
+	size_t threadCount;
+	std::vector<std::thread*> threadList;
+	std::map<std::thread::id, size_t> threadIdTable;
+	std::atomic<int> processNum = 0;
+	std::map<size_t, std::deque<TimerObject>> processMap;
+	//std::deque<TimerObject> processDeque;
+	std::condition_variable conditionVariable;
+	std::mutex lockObject;
+};
 
 int main() {
 	/*baram1();
@@ -355,26 +453,34 @@ int main() {
 	program2();
 	program3();*/
 
-    std::vector<std::shared_ptr<PlayerClient>> clientList;
+	std::vector<std::shared_ptr<PlayerClient>> clientList;
 	//std::vector<DBBD::TcpClient*> clientList;
 	std::vector<std::thread*> threadList(100);
 
 	try {
-		for (size_t i = 0; i < 10; i++) {
-            auto client = std::make_shared<PlayerClient>("127.0.0.1", 8101);
-            client->start();
-            clientList.push_back(client);
-		}
+		/*for (size_t i = 0; i < 10; i++) {
+			auto client = std::make_shared<PlayerClient>("127.0.0.1", 8101);
+			client->start();
+			clientList.push_back(client);
+		}*/
+
+		TimerManager::Instance()->init(8);
 
 		while (true) {
 			std::string a;
 			std::getline(std::cin, a);
 
 			if (a == "exit") {
-                for (auto client : clientList) {
-                    client->stop();
-                }
+				for (auto client : clientList) {
+					client->stop();
+				}
 				break;
+			}
+			else if (a == "a") {
+				for (size_t i = 0; i < 50; i++) {
+					TimerObject info(i, DBBD::Random::instance().next(0, 0));
+					TimerManager::Instance()->add(info);
+				}
 			}
 		}
 	}

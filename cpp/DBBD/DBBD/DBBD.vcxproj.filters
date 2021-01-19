@@ -13,18 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="헤더 파일\Tcp">
-      <UniqueIdentifier>{45f407b2-016c-4b0c-bcd1-b0a80b30af39}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Tcp">
-      <UniqueIdentifier>{e1fcc5b8-c4a7-4a9c-9271-c72bd3257d92}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Data">
-      <UniqueIdentifier>{c7703f90-4d83-43d4-9c1a-84adefba97c7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Data">
-      <UniqueIdentifier>{fb67d630-d9c5-4655-9e1f-c182b3326a17}</UniqueIdentifier>
-    </Filter>
     <Filter Include="헤더 파일\Util">
       <UniqueIdentifier>{ead5b6d7-75ce-407b-bc45-66b0c8b08433}</UniqueIdentifier>
     </Filter>
@@ -52,40 +40,25 @@
     <Filter Include="헤더 파일\Network\Base">
       <UniqueIdentifier>{2a699af7-a536-4952-a2af-d6b5d7061b67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Timer">
+      <UniqueIdentifier>{9674eb18-765d-4816-be33-09d109ebdb21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Timer">
+      <UniqueIdentifier>{47d6f725-93af-497c-997d-f644369ec52b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Network\Tcp">
+      <UniqueIdentifier>{0b094b28-47f3-4b7a-9bf1-397c95fc274c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Network\Tcp">
+      <UniqueIdentifier>{78a1b6b2-dd15-47ed-9e22-2f4c87330340}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TcpSession.h">
-      <Filter>헤더 파일\Tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="TcpServer.h">
-      <Filter>헤더 파일\Tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="TcpClient.h">
-      <Filter>헤더 파일\Tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>헤더 파일\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialize.h">
-      <Filter>헤더 파일\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Deserialize.h">
-      <Filter>헤더 파일\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Cell.h">
-      <Filter>헤더 파일\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Request.h">
-      <Filter>헤더 파일\Tcp</Filter>
-    </ClInclude>
     <ClInclude Include="Random.h">
       <Filter>헤더 파일\Util</Filter>
     </ClInclude>
     <ClInclude Include="Define.h">
       <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Response.h">
-      <Filter>헤더 파일\Tcp</Filter>
     </ClInclude>
     <ClInclude Include="Common.hpp">
       <Filter>헤더 파일\Util</Filter>
@@ -93,23 +66,11 @@
     <ClInclude Include="Singleton.h">
       <Filter>헤더 파일\Common</Filter>
     </ClInclude>
-    <ClInclude Include="TimerObject.h">
-      <Filter>헤더 파일\Object</Filter>
-    </ClInclude>
     <ClInclude Include="BaseObject.h">
       <Filter>헤더 파일\Object</Filter>
     </ClInclude>
     <ClInclude Include="ObjectPoolManager.h">
       <Filter>헤더 파일\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="TcpServerBase.h">
-      <Filter>헤더 파일\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="TcpSessionBase.h">
-      <Filter>헤더 파일\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="TcpClientSession.h">
-      <Filter>헤더 파일\Network</Filter>
     </ClInclude>
     <ClInclude Include="ClientBase.h">
       <Filter>헤더 파일\Network\Base</Filter>
@@ -120,49 +81,76 @@
     <ClInclude Include="SessionBase.h">
       <Filter>헤더 파일\Network\Base</Filter>
     </ClInclude>
+    <ClInclude Include="TimerManager.h">
+      <Filter>헤더 파일\Timer</Filter>
+    </ClInclude>
     <ClInclude Include="TcpClientBase.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Network\Tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpClientSession.h">
+      <Filter>헤더 파일\Network\Tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpServerBase.h">
+      <Filter>헤더 파일\Network\Tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpSessionBase.h">
+      <Filter>헤더 파일\Network\Tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Request.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Response.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerObject.h">
+      <Filter>헤더 파일\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Cell.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Deserialize.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize.h">
+      <Filter>헤더 파일\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TcpSession.cpp">
-      <Filter>소스 파일\Tcp</Filter>
-    </ClCompile>
-    <ClCompile Include="TcpServer.cpp">
-      <Filter>소스 파일\Tcp</Filter>
-    </ClCompile>
-    <ClCompile Include="TcpClient.cpp">
-      <Filter>소스 파일\Tcp</Filter>
-    </ClCompile>
-    <ClCompile Include="Buffer.cpp">
-      <Filter>소스 파일\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Serialize.cpp">
-      <Filter>소스 파일\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Deserialize.cpp">
-      <Filter>소스 파일\Data</Filter>
-    </ClCompile>
     <ClCompile Include="Random.cpp">
       <Filter>소스 파일\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="TimerObject.cpp">
-      <Filter>소스 파일\Object</Filter>
     </ClCompile>
     <ClCompile Include="BaseObject.cpp">
       <Filter>소스 파일\Object</Filter>
     </ClCompile>
-    <ClCompile Include="TcpServerBase.cpp">
-      <Filter>소스 파일\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="TcpSessionBase.cpp">
-      <Filter>소스 파일\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="TcpClientSession.cpp">
-      <Filter>소스 파일\Network</Filter>
+    <ClCompile Include="TimerManager.cpp">
+      <Filter>소스 파일\Timer</Filter>
     </ClCompile>
     <ClCompile Include="TcpClientBase.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Network\Tcp</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpClientSession.cpp">
+      <Filter>소스 파일\Network\Tcp</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpServerBase.cpp">
+      <Filter>소스 파일\Network\Tcp</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpSessionBase.cpp">
+      <Filter>소스 파일\Network\Tcp</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerObject.cpp">
+      <Filter>소스 파일\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffer.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Deserialize.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialize.cpp">
+      <Filter>소스 파일\Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

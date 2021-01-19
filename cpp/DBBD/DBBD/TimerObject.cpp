@@ -1,43 +1,21 @@
 #include "TimerObject.h"
+#include "TimerManager.h"
 
 namespace DBBD {
-	TimerObject::TimerObject(){
-	}
-	
-	TimerObject::~TimerObject() {
-		dispose();
-	}
-
-	void TimerObject::init(IoContextSP context) {
-		if (!isDisposed) { return; }
-		BaseObject::init(context);
-		registTimerEvent();
-	}
-
-	void TimerObject::dispose() {
-		if (isDisposed) { return; }
-		BaseObject::dispose();
-
-		std::vector<int> keys;
-		for (auto pair : timerMap) {
-			keys.push_back(pair.first);
+	TimerObject::~TimerObject()
+	{
+		std::vector<size_t> keys;
+		for (auto info : timerMap) {
+			keys.push_back(info.first);
 		}
 
 		for (auto key : keys) {
 			removeTimerEvent(key);
 		}
-
-		timerMap.clear();
 	}
 
-	void TimerObject::reset() {
-		if (!isDisposed) { return; }
-		BaseObject::reset();
-	}
-
-	void TimerObject::methodEvent(const boost::system::error_code& error,
-		std::weak_ptr<BaseObject> weakPtr, const size_t& eventType) {
-		auto ptr = weakPtr.lock();
+	void TimerObject::methodEvent(std::weak_ptr<BaseObject> weakPtr, const size_t& eventType) {
+		/*auto ptr = weakPtr.lock();
 		if (!ptr) {
 			std::cout << "methodEvent, object release, eventType: " << eventType << std::endl;;
 			return;
@@ -61,54 +39,43 @@ namespace DBBD {
 		}
 		else {
 			removeTimerEvent(info->type);
-		}
+		}*/
 	}
 
 	void TimerObject::addTimerEvent(const size_t& eventType,
-		const TimerParam& target, const size_t& waitMs, const bool& isRepeat) {
-		if (isDisposed) {
-			return;
-		}
+		const TimerParam& method, const size_t& waitMs, const bool& isRepeat) {
 
-		auto waitTime = boost::posix_time::milliseconds(waitMs);
-		
+		auto reservedTime = std::chrono::system_clock::now() + std::chrono::milliseconds(waitMs);
+
+		TimerInfoSP info;
 		if (!existInfo(eventType)) {
-			auto timer = NEW_TIMER_SP(*context, waitTime);
-			
-			TimerInfoSP newInfo = std::make_shared<TimerInfo>();
-			newInfo->type = eventType;
-			newInfo->timer = timer;
-			newInfo->method = target;
-			newInfo->waitMs = waitMs;
-			newInfo->isRepeat = isRepeat;
-			timerMap[eventType] = newInfo;
+			info = NEW_TIMER_INFO_SP();
+			info->type = eventType;
+			info->method = method;
+			info->waitMs = waitMs;
+			info->isRepeat = isRepeat;
+			info->baseObject = std::weak_ptr<TimerObject>(shared_from_this());
+			timerMap[eventType] = info;
 		}
 		else {
-			auto existInfo = timerMap[eventType];
-			existInfo->timer->expires_from_now(waitTime);
+			info = timerMap[eventType];
+			info->waitMs = waitMs;
+			info->isRepeat = isRepeat;
 		}
 
-		auto info = timerMap[eventType];
-		info->timer->async_wait(std::bind(&TimerObject::methodEvent, this,
-			std::placeholders::_1, std::weak_ptr<BaseObject>(shared_from_this()), info->type));
+		TimerManager::Instance()->addTimer(TimerInfoWP(info));
 	}
 
 	void TimerObject::removeTimerEvent(const size_t& eventType) {
-		auto it = timerMap.find(eventType);
-		if (it == timerMap.end()) {
-			return;
-		}
+		if (!existInfo(eventType)) { return; }
 
 		std::cout << "removeTimerEvent, eventType: " << eventType << std::endl;
+		auto info = timerMap[eventType];
+		info.reset();
 		timerMap.erase(eventType);
 	}
 
 	bool TimerObject::existInfo(size_t eventType) {
-		if (isDisposed) {
-			return false;
-		}
-
-		auto it = timerMap.find(eventType);
-		return it != timerMap.end();
+		return timerMap.find(eventType) != timerMap.end();
 	}
 }

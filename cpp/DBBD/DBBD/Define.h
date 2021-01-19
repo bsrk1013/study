@@ -20,6 +20,6 @@ namespace DBBD {
 #define NEW_TCP_ACCEPTOR_SP(context, address, port) std::make_shared<boost::asio::ip::tcp::acceptor>(context, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4::from_string(address), port))
 	using SocketSP = std::shared_ptr<boost::asio::ip::tcp::socket>;
 #define NEW_SOCKET_SP(context) std::make_shared<boost::asio::ip::tcp::socket>(context)
-	using TimerSP = std::shared_ptr<boost::asio::deadline_timer>;
-#define NEW_TIMER_SP(context, waitTime) std::make_shared<boost::asio::deadline_timer>(context, waitTime)
+	/*using TimerSP = std::shared_ptr<boost::asio::deadline_timer>;
+#define NEW_TIMER_SP(context, waitTime) std::make_shared<boost::asio::deadline_timer>(context, waitTime)*/
 }

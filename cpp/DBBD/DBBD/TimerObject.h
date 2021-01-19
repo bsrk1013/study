@@ -6,46 +6,35 @@
 #include "BaseObject.h"
 
 namespace DBBD {
+	class TimerObject;
 	struct TimerInfo {
 		TimerInfo() {
 			memset(this, 0, sizeof(TimerInfo));
 		}
-		~TimerInfo() {
-			if (timer) {
-				std::cout << "timer reset" << std::endl;
-				timer.reset();
-			}
-		}
 		size_t type;
-		TimerSP timer;
 		TimerParam method;
 		size_t waitMs;
 		bool isRepeat;
+		std::weak_ptr<TimerObject> baseObject;
 	};
 
 	using TimerInfoSP = std::shared_ptr<TimerInfo>;
+	using TimerInfoWP = std::weak_ptr<TimerInfo>;
+#define NEW_TIMER_INFO_SP() std::make_shared<TimerInfo>()
 
-	class TimerObject
-		: public BaseObject// : public std::enable_shared_from_this<TimerObject>
+	class TimerObject : public std::enable_shared_from_this<TimerObject>
+		//: public BaseObject// : public std::enable_shared_from_this<TimerObject>
 	{
 	public:
-		TimerObject();
 		virtual ~TimerObject();
 
-	public:
-		virtual void init(IoContextSP context);
-		virtual void dispose();
-		virtual void reset();
-
 	protected:
-		virtual void registTimerEvent() = 0;
-		void addTimerEvent(const size_t& eventType, const TimerParam& target,
+		void addTimerEvent(const size_t& eventType, const TimerParam& method,
 			const size_t& waitMs, const bool& isRepeat);
 		void removeTimerEvent(const size_t& eventType);
 
 	private:
-		void methodEvent(const boost::system::error_code& error,
-			std::weak_ptr<BaseObject> weakPtr, const size_t& eventType);
+		void methodEvent(std::weak_ptr<BaseObject> weakPtr, const size_t& eventType);
 
 	private:
 		bool existInfo(size_t eventType);

@@ -22,6 +22,8 @@ namespace DBBD
 		inline void setSessionId(const size_t& value) { sessionId = value; }
 
 	protected:
+		virtual void startInternal() = 0;
+
 		virtual void read() = 0;
 		virtual void handleRead(const boost::system::error_code&, size_t) = 0;
 		virtual void readInternal(DBBD::Header) = 0;
