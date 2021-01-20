@@ -11,6 +11,18 @@ SessionServer::~SessionServer()
 
 void SessionServer::stopInternal()
 {
+	std::vector<size_t> keys;
+	for (auto pair : sessionMap) {
+		keys.push_back(pair.first);
+	}
+
+	for (auto key : keys) {
+		auto session = sessionMap[key];
+		session->stop();
+		session.reset();
+	}
+
+	sessionMap.clear();
 }
 
 void SessionServer::acceptInternal(DBBD::SocketSP socket, size_t sessionId)

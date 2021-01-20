@@ -23,10 +23,12 @@ namespace DBBD
 		virtual void connect() = 0;
 		virtual void handleConnect(const boost::system::error_code&) = 0;
 		virtual void readInternal(DBBD::Buffer) = 0;
+		virtual void disconnectInternal() = 0;
 
 	protected:
 		std::string address;
 		int port;
+		bool tryReconnect = false;
 		bool isDisposed = false;
 		ThreadSP thread;
 		IoContextSP context;

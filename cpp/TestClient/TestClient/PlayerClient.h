@@ -4,7 +4,7 @@
 class PlayerClient : public DBBD::TcpClientBase
 {
 public:
-	PlayerClient(const std::string& address, const short& port);
+	PlayerClient(const std::string& address, const short& port, const bool& tryReconnect);
 	virtual ~PlayerClient();
 
 private:

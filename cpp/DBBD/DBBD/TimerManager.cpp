@@ -53,18 +53,18 @@ void DBBD::TimerManager::update()
 				continue;
 			}
 
-			if (!info->baseObject.lock()) {
-				it = deque->erase(it);
-				continue;
-			}
-
-
 			if (now < info->reservedTime) {
 				it++;
 				continue;
 			}
 
-			info->baseObject.lock()->methodEvent(info->type);
+			auto timer = info->baseObject.lock();
+			if (!timer) {
+				it = deque->erase(it);
+				continue;
+			}
+
+			timer->methodEvent(info->type);
 			//info->method();
 
 			it = deque->erase(it);

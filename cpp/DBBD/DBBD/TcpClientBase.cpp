@@ -2,10 +2,11 @@
 #include <boost/bind.hpp>
 #include "TcpClientSession.h"
 
-DBBD::TcpClientBase::TcpClientBase(const std::string& address, const short& port)
+DBBD::TcpClientBase::TcpClientBase(const std::string& address, const short& port, const bool& tryReconnect)
 {
 	this->address = address;
 	this->port = port;
+	this->tryReconnect = tryReconnect;
 }
 
 DBBD::TcpClientBase::~TcpClientBase()
@@ -27,7 +28,9 @@ void DBBD::TcpClientBase::stop()
 
 	stopInternal();
 
-	session->stop();
+	if (session) {
+		session->stop();
+	}
 
 	if (socket && socket->is_open()) {
 		socket->close();
@@ -56,19 +59,43 @@ void DBBD::TcpClientBase::connect()
 	socket->async_connect(endpoint,
 		boost::bind(&TcpClientBase::handleConnect, this, boost::asio::placeholders::error));
 
-	thread = NEW_THREAD_SP([&]() {
-		context->run();
-		});
+	if (!thread) {
+		thread = NEW_THREAD_SP([&]() {
+			context->run();
+			});
+	}
 }
 
 void DBBD::TcpClientBase::handleConnect(const boost::system::error_code& error)
 {
 	if (error) {
-		stop();
+		std::cout << address << ":" << port << " connect failed..." << std::endl;
+		if (tryReconnect) {
+			reconnect();
+		}
+		else {
+			stop();
+		}
 		return;
 	}
 
 	session = std::make_shared<TcpClientSession>(context, socket, 8192,
 		boost::bind(&TcpClientBase::readInternal, this, boost::placeholders::_1));
+	session->bindingStopInternal(boost::bind(
+	&TcpClientBase::disconnectInternal, this));
 	session->start();
+}
+
+void DBBD::TcpClientBase::disconnectInternal()
+{
+	if (tryReconnect) {
+		reconnect();
+		return;
+	}
+}
+
+void DBBD::TcpClientBase::reconnect()
+{
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	connect();
 }

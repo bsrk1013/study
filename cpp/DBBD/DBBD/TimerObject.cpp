@@ -28,32 +28,6 @@ namespace DBBD {
 		else {
 			removeTimerEvent(info->type);
 		}
-	//void TimerObject::methodEvent(std::weak_ptr<BaseObject> weakPtr, const size_t& eventType) {
-		/*auto ptr = weakPtr.lock();
-		if (!ptr) {
-			std::cout << "methodEvent, object release, eventType: " << eventType << std::endl;;
-			return;
-		}
-
-		if (error) { 
-			std::cout << "methodEvent, error, eventType: " << eventType << ", error: " << error << std::endl;;
-			return; 
-		}
-
-		if (!existInfo(eventType)) { 
-			std::cout << "methodEvent, info is null, eventType: " << eventType << std::endl;;
-			return; 
-		}
-
-		auto info = timerMap[eventType];
-
-		info->method();
-		if (info->isRepeat) {
-			addTimerEvent(info->type, info->method, info->waitMs, info->isRepeat);
-		}
-		else {
-			removeTimerEvent(info->type);
-		}*/
 	}
 
 	void TimerObject::addTimerEvent(const size_t& eventType,

@@ -2,8 +2,8 @@
 #include "BaseProtocol.hpp"
 //#include "DBBD/Cell.h"
 
-PlayerClient::PlayerClient(const std::string& address, const short& port)
-	: TcpClientBase(address, port)
+PlayerClient::PlayerClient(const std::string& address, const short& port, const bool& tryReconnect)
+	: TcpClientBase(address, port, tryReconnect)
 {
 }
 

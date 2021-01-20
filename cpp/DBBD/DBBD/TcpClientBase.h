@@ -7,7 +7,7 @@ namespace DBBD
 	class TcpClientBase : public ClientBase
 	{
 	public:
-		TcpClientBase(const std::string& address, const short& port);
+		TcpClientBase(const std::string& address, const short& port, const bool& tryReconnect);
 		virtual ~TcpClientBase();
 
 	public:
@@ -23,6 +23,11 @@ namespace DBBD
 	private:
 		virtual void connect() override;
 		virtual void handleConnect(const boost::system::error_code&) override;
+		virtual void disconnectInternal() override;
+
+	private:
+		void reconnect();
+
 
 	private:
 		std::shared_ptr<TcpClientSession> session;

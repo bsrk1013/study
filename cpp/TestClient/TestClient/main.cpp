@@ -341,103 +341,6 @@ void baram5() {
 	std::cout << "answer5 : " << endl;
 }
 
-
-class TimerObject {
-public:
-	TimerObject(int num, size_t waitMs) {
-		this->num = num;
-		this->waitMs = waitMs;
-		reservedTime = std::chrono::system_clock::now() + std::chrono::milliseconds(waitMs);
-	}
-
-	int num;
-	size_t waitMs;
-	std::chrono::system_clock::time_point reservedTime;
-};
-
-class TimerManager : public DBBD::Singleton<TimerManager> {
-public:
-	/*TimerManager() {}
-	~TimerManager() {}*/
-
-public:
-	void init(size_t threadCount) {
-		this->threadCount = threadCount;
-
-		for (size_t i = 0; i < threadCount; i++) {
-			std::thread* thread = new std::thread([this]() {run(); });
-			threadIdTable[thread->get_id()] = i;
-			threadList.push_back(thread);
-
-			/*std::thread thread([this]() {run(); });
-			threadIdTable[thread.get_id()] = i;
-			threadList.push_back(thread);*/
-		}
-	}
-
-	void add(const TimerObject& info) {
-		{
-			std::lock_guard<std::mutex> lock(lockObject);
-			auto deque = &processMap[processNum++];
-			deque->push_back(info);
-			//processMap[processNum++].push_back(info);
-
-			if (processNum >= threadCount) {
-				processNum = 0;
-			}
-		}
-
-		conditionVariable.notify_one();
-	}
-
-private:
-	void run() {
-		while (true) {
-			auto now = std::chrono::system_clock::now();
-
-			std::unique_lock<std::mutex> lock(lockObject);
-			//conditionVariable.wait(lock, [this]() {return !this->processDeque.empty(); });
-			conditionVariable.wait(lock, [this]() {return this->waitCondition(std::this_thread::get_id()); });
-			//conditionVariable.wait(lock, waitCondition(std::this_thread::get_id()));
-			auto targetIndex = threadIdTable[std::this_thread::get_id()];
-			auto deque = &processMap[targetIndex];
-			lock.unlock();
-
-			auto it = deque->begin();
-			while (it != deque->end()) {
-				if (now < it->reservedTime) {
-					it++;
-					continue; 
-				}
-
-				std::cout << "[" << std::this_thread::get_id() << "](" << it->waitMs << ")number: " << it->num << std::endl;
-				it = deque->erase(it);
-			}
-
-			lock.lock();
-			//processMap[targetIndex] = deque;
-			lock.unlock();
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		}
-	}
-
-	bool waitCondition(std::thread::id threadId) {
-		auto targetIndex = threadIdTable[threadId];
-		return !processMap[targetIndex].empty();
-	}
-
-private:
-	size_t threadCount;
-	std::vector<std::thread*> threadList;
-	std::map<std::thread::id, size_t> threadIdTable;
-	std::atomic<int> processNum = 0;
-	std::map<size_t, std::deque<TimerObject>> processMap;
-	//std::deque<TimerObject> processDeque;
-	std::condition_variable conditionVariable;
-	std::mutex lockObject;
-};
-
 int main() {
 	/*baram1();
 	baram2();
@@ -454,12 +357,12 @@ int main() {
 
 	try {
 		for (size_t i = 0; i < 1; i++) {
-			auto client = std::make_shared<PlayerClient>("127.0.0.1", 8101);
+			auto client = std::make_shared<PlayerClient>("127.0.0.1", 8101, true);
 			client->start();
 			clientList.push_back(client);
 		}
 
-		TimerManager::Instance()->init(8);
+		//TimerManager::Instance()->init(8);
 
 		while (true) {
 			std::string a;
@@ -470,12 +373,6 @@ int main() {
 					client->stop();
 				}
 				break;
-			}
-			else if (a == "a") {
-				for (size_t i = 0; i < 50; i++) {
-					TimerObject info(i, DBBD::Random::instance().next(0, 0));
-					TimerManager::Instance()->add(info);
-				}
 			}
 		}
 	}
