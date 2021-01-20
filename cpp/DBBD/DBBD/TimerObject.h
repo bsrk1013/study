@@ -24,11 +24,9 @@ namespace DBBD {
 #define NEW_TIMER_INFO_SP() std::make_shared<TimerInfo>()
 
 	class TimerObject : public std::enable_shared_from_this<TimerObject>
-		//: public BaseObject// : public std::enable_shared_from_this<TimerObject>
 	{
 	public:
 		virtual ~TimerObject();
-		//void methodEvent(std::weak_ptr<BaseObject> weakPtr, const size_t& eventType);
 		void methodEvent(const size_t& eventType);
 
 	protected:
