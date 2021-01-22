@@ -8,7 +8,7 @@
 #include "../DBBD/Response.h"
 #include "../DBBD/Random.h"
 #include "../DBBD/TimerObject.h"
-#include "../DBBD/redisclient.h"
+#include <cpp_redis/core/client.hpp>
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
 #include <boost/bind.hpp>
@@ -797,17 +797,7 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(RedisTest) {
-			/*boost::asio::io_context context;
 
-			boost::asio::ip::address address = boost::asio::ip::address::from_string("127.0.0.1");
-			boost::asio::ip::tcp::endpoint endpoint(address, 6379);
-
-			redisclient::RedisSyncClient redis(context);
-
-			boost::system::error_code errorCode;
-			redis.connect(endpoint, errorCode);
-
-			Assert::IsTrue(!errorCode);*/
 		}
 	};
 }

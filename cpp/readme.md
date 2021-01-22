@@ -19,7 +19,24 @@
 
 # Redis
 
-#### 설치 경로 : cpp/
+1. 프로젝트 빌드 시 Redis 설치 필요
+   1. Redis 설치 전
+      -  Windows 8.1 SDK 다운로드 및 설치
+      -  msvc v140 build tool set 다운로드 및 설치
+   2. 1번을 진행한 이후
+      - cmd에서 cpp폴더로 이동
+      - git clone https://github.com/Cylix/cpp_redis.git
+      - cd cpp_redis
+      - git submodule init && git submodule update
+      - 이후 msvc15폴더에 들어가 솔루션 실행 및 빌드
+      - build 옵션은 Release, x64로 해주자
+
+2. 프로젝트 링크 설정
+   - 추가 포함 디렉터리
+     - \$(SolutionDir)..\cpp_redis\includes
+     - \$(SolutionDir)..\cpp_redis\tacopie\includes
+   - 추가 라이브러리 디렉터리
+     - \$(SolutionDir)..\cpp_redis\msvc15\build 옵션(x64\Release)
 
 
 # VLD

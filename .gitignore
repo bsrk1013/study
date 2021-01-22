@@ -5,6 +5,9 @@
 ### Boost ###
 boost_1_74_0/
 
+### Redis ###
+cpp_redis/
+
 ### VLD ###
 cpp/"Visual Leak Detector"/*
 cpp/"visual leak detector"/*
