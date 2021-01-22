@@ -19,6 +19,8 @@
 
 # Redis
 
+#### GUI Tool 다운로드 경로 : https://www.electronjs.org/apps/p3x-redis-ui
+
 1. 프로젝트 빌드 시 Redis 설치 필요
    1. Redis 설치 전
       -  Windows 8.1 SDK 다운로드 및 설치

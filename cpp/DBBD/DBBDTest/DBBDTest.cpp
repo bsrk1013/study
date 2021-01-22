@@ -9,6 +9,7 @@
 #include "../DBBD/Random.h"
 #include "../DBBD/TimerObject.h"
 #include <cpp_redis/core/client.hpp>
+#include <cpp_redis/network/redis_connection.hpp>
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
 #include <boost/bind.hpp>
@@ -797,7 +798,22 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(RedisTest) {
+			cpp_redis::client client;
+			client.connect("127.0.0.1", 6379, [](const std::string& host, size_t port, cpp_redis::client::connect_state status) {
+				if (status == cpp_redis::client::connect_state::dropped) {
+					Assert::IsTrue(false);
+				}
+				});
 
+			std::vector<std::pair<std::string, std::string>> vec;
+			std::pair<std::string, std::string> key_val("hello", "world");
+
+			vec.push_back(key_val);
+
+			client.hset("study:test", "hello", "world");
+			client.commit();
+
+			client.hget("study:test", "hello");
 		}
 	};
 }
