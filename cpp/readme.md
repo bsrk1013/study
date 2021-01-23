@@ -1,14 +1,16 @@
 # Boost
 
 #### DBBD 코어 프로젝트에 세팅
+
 #### 다운로드 경로 : https://www.boost.org/users/history/version_1_75_0.html
+
 #### 설치 경로 : cpp/
 
 1. 프로젝트 빌드 시 boost 링크 오류 날 시 부스트 설치 필요
 
    - boost_1_74_0.zip 압축 해제
    - boost_1_74_0 폴더에서 booststrap.bat 실행
-   - 명령 프롬포트에서 boost_1_74_0 폴더 진입 아래 명령어 실행  
+   - 명령 프롬포트에서 boost_1_74_0 폴더 진입 아래 명령어 실행
      - b2 release debug threading=multi --build-type=complete --toolset=msvc address-model=64 stage
 
 2. 프로젝트 링크 설정
@@ -22,9 +24,10 @@
 #### GUI Tool 다운로드 경로 : https://www.electronjs.org/apps/p3x-redis-ui
 
 1. 프로젝트 빌드 시 Redis 설치 필요
+
    1. Redis 설치 전
-      -  Windows 8.1 SDK 다운로드 및 설치
-      -  msvc v140 build tool set 다운로드 및 설치
+      - Windows 8.1 SDK 다운로드 및 설치
+      - msvc v140 build tool set 다운로드 및 설치
    2. 1번을 진행한 이후
       - cmd에서 cpp폴더로 이동
       - git clone https://github.com/Cylix/cpp_redis.git
@@ -40,11 +43,12 @@
    - 추가 라이브러리 디렉터리
      - \$(SolutionDir)..\cpp_redis\msvc15\build 옵션(x64\Release)
 
-
 # VLD
 
 #### 하위 프로젝트에 세팅
+
 #### 다운로드 경로 : https://kinddragon.github.io/vld/
+
 #### 설치 경로 : cpp/
 
 1. 프로젝트 빌드 시 vld 링크 오류 날 시 vld 설치 필요
