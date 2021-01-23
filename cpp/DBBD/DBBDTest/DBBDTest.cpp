@@ -799,7 +799,7 @@ namespace DBBDTest
 
 		TEST_METHOD(RedisTest) {
 			cpp_redis::client client;
-			client.connect("127.0.0.1", 6379, [](const std::string& host, size_t port, cpp_redis::client::connect_state status) {
+			client.connect("118.67.134.160", 6379, [](const std::string& host, size_t port, cpp_redis::client::connect_state status) {
 				if (status == cpp_redis::client::connect_state::dropped) {
 					Assert::IsTrue(false);
 				}
@@ -810,10 +810,25 @@ namespace DBBDTest
 
 			vec.push_back(key_val);
 
-			client.hset("study:test", "hello", "world");
-			client.commit();
+			//client.hset("study:test", "hello", "world");
+			//client.commit();
+			//client.hget("study:test", "hello");
 
-			client.hget("study:test", "hello");
+			auto existsResult = client.hexists("study:test", "hello");
+			client.commit();
+			auto existsReply = existsResult.get();
+			if (existsReply.as_integer() == 0) {
+				auto setResult = client.hset("study:test", "hello", "world");
+				client.commit();
+			}
+
+			auto getResult = client.hget("study:test", "hello");
+			client.commit();
+			auto getReply = getResult.get();
+			if (getReply.is_string()) {
+				std::string result = getReply.as_string();
+				Assert::IsTrue(strcmp(result.c_str(), "world") == 0);
+			}
 		}
 	};
 }
