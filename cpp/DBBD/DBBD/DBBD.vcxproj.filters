@@ -52,6 +52,12 @@
     <Filter Include="소스 파일\Network\Tcp">
       <UniqueIdentifier>{78a1b6b2-dd15-47ed-9e22-2f4c87330340}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Redis">
+      <UniqueIdentifier>{118f8317-a028-44a9-a6f5-aa00944116ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Redis">
+      <UniqueIdentifier>{f2fdba85-7247-4328-8b99-c9df84d94025}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Random.h">
@@ -117,6 +123,9 @@
     <ClInclude Include="Serialize.h">
       <Filter>헤더 파일\Network</Filter>
     </ClInclude>
+    <ClInclude Include="RedisManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Random.cpp">
@@ -151,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="Serialize.cpp">
       <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="RedisManager.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
