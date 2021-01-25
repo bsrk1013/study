@@ -798,17 +798,46 @@ namespace DBBDTest
 			Assert::IsTrue(req.item.uid == tempReq.item.uid);
 		}
 
-		TEST_METHOD(RedisTest) {
+		TEST_METHOD(RedisHashTest) {
 			RedisManager::Instance()->init("118.67.134.160", 6379);
 
-			RedisManager::Instance()->hset("study:test", "hello", "world");
-			auto stringGet = RedisManager::Instance()->hget<std::string>("study:test", "hello");
+			RedisManager::Instance()->hset(0, "study:test", "hello", "world");
+			auto stringGet = RedisManager::Instance()->hget<std::string>(0, "study:test", "hello");
 			Assert::IsTrue(strcmp(stringGet.c_str(), "world") == 0);
 
 
-			RedisManager::Instance()->hset("study:test", "doby", 150);
-			auto integerGet = RedisManager::Instance()->hget<int>("study:test", "doby");
+			RedisManager::Instance()->hset(0, "study:test", "doby", 150);
+			auto integerGet = RedisManager::Instance()->hget<int>(0, "study:test", "doby");
 			Assert::IsTrue(integerGet == 150);
+
+			auto arrayGet = RedisManager::Instance()->hgetall<std::string>(0, "study:test");
+			Assert::IsTrue(strcmp(arrayGet["hello"].c_str(), "world") == 0);
+			Assert::IsTrue(strcmp(arrayGet["doby"].c_str(), "150") == 0);
+
+			Assert::IsTrue(RedisManager::Instance()->hexists(0, "study:test", "hello"));
+			Assert::IsTrue(RedisManager::Instance()->hexists(0, "study:test", "doby"));
+
+			auto keys = RedisManager::Instance()->hkeys(0, "study:test");
+
+			RedisManager::Instance()->hdel(0, "study:test", keys);
+			/*RedisManager::Instance()->hdel("study:test", "hello");
+			RedisManager::Instance()->hdel("study:test", "doby");*/
+
+			Assert::IsFalse(RedisManager::Instance()->hexists(0, "study:test", "hello"));
+			Assert::IsFalse(RedisManager::Instance()->hexists(0, "study:test", "doby"));
+
+			RedisManager::Instance()->hset(0, "test", "hello", "world");
+
+			std::this_thread::sleep_for(std::chrono::seconds(10));
+			Assert::IsFalse(RedisManager::Instance()->hexists(0, "test", "hello"));
+		}
+
+		TEST_METHOD(RedisSortedSetTest) {
+			RedisManager::Instance()->init("118.67.134.160", 6379);
+
+			RedisManager::Instance()->zadd(0, "test", "doby", 100);
+			auto dobyScore = RedisManager::Instance()->zscore(0, "test", "doby");
+			Assert::IsTrue(dobyScore == 100);
 		}
 	};
 }
