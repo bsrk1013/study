@@ -22,4 +22,7 @@ namespace DBBD {
 #define NEW_SOCKET_SP(context) std::make_shared<boost::asio::ip::tcp::socket>(context)
 	/*using TimerSP = std::shared_ptr<boost::asio::deadline_timer>;
 #define NEW_TIMER_SP(context, waitTime) std::make_shared<boost::asio::deadline_timer>(context, waitTime)*/
+
+	// short naming
+	using StringVector = std::vector<std::string>;
 }

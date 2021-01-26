@@ -838,6 +838,24 @@ namespace DBBDTest
 			RedisManager::Instance()->zadd(0, "test", "doby", 100);
 			auto dobyScore = RedisManager::Instance()->zscore(0, "test", "doby");
 			Assert::IsTrue(dobyScore == 100);
+
+			auto incr = RedisManager::Instance()->zincrby(0, "test", "doby", 10);
+			dobyScore = RedisManager::Instance()->zscore(0, "test", "doby");
+			Assert::IsTrue(dobyScore == incr && incr == 110);
+
+			auto rank = RedisManager::Instance()->zrank(0, "test", "doby");
+			Assert::IsTrue(rank == 0);
+			rank = RedisManager::Instance()->zrank(0, "test", "douner");
+			Assert::IsTrue(rank == -1);
+
+			auto rangeVec = RedisManager::Instance()->zrange<std::string>(0, "test", 0, -1);
+			Assert::IsTrue(strcmp(rangeVec[0].c_str(), "doby") == 0);
+
+			auto rangeMap = RedisManager::Instance()->zrangeWithscore<std::string>(0, "test", 0, -1);
+			Assert::IsTrue(rangeMap["doby"] == 110);
+
+			auto expireTime = std::chrono::system_clock::now() + std::chrono::hours(24);
+			RedisManager::Instance()->expireat(0, "test", expireTime);
 		}
 	};
 }
