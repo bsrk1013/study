@@ -1,0 +1,4 @@
+Host jonghwan-study-server
+	HostName 118.67.134.160
+	User root
+	IdentityFile "c:\github\study\jonghwan-study.pem"

@@ -17,6 +17,79 @@ namespace DBBD
 		}
 	}
 
+#pragma region KEYS
+	bool RedisManager::del(const short& db, const std::string& key)
+	{
+		return del(db, StringVector{ key });
+	}
+
+	bool RedisManager::del(const short& db, const StringVector & keys)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->del(keys);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+
+		return result.get().as_integer() == keys.size();
+	}
+
+	bool RedisManager::exists(const short& db, const std::string& key)
+	{
+		return exists(db, StringVector{ key });
+	}
+
+	bool RedisManager::exists(const short& db, const StringVector& keys)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->exists(keys);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+
+		return result.get().as_integer() == keys.size();
+	}
+
+	bool RedisManager::rename(const short& db, const std::string& sourceKey, const std::string& destKey)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->rename(sourceKey, destKey);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+		auto error = result.get().as_string();
+		return strcmp(error.c_str(), "OK") == 0;
+	}
+
+	bool RedisManager::expire(const short& db, const std::string& key, const size_t& seconds)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->expire(key, seconds);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+		auto error = result.get().as_string();
+		return strcmp(error.c_str(), "OK") == 0;
+	}
+
+	bool RedisManager::expireat(const short& db, const std::string& key, std::chrono::system_clock::time_point at)
+	{
+		auto duration = at.time_since_epoch() / 10000000;
+		return expireat(db, key, duration.count());
+	}
+
+	bool RedisManager::expireat(const short& db, const std::string& key, const int& timestamp)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->expireat(key, timestamp);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+		auto error = result.get().as_string();
+		return strcmp(error.c_str(), "OK") == 0;
+	}
+#pragma endregion
+
 #pragma region HASH
 	bool RedisManager::hexists(const short& db, const std::string& key, const std::string& field)
 	{
@@ -30,9 +103,7 @@ namespace DBBD
 
 	bool RedisManager::hdel(const short& db, const std::string& key, const std::string& field)
 	{
-		std::vector<std::string> fields;
-		fields.push_back(field);
-		return hdel(db, key, fields);
+		return hdel(db, key, StringVector{ field });
 	}
 
 	bool RedisManager::hdel(const short& db, const std::string& key, const std::vector<std::string>& fields)
@@ -91,7 +162,7 @@ namespace DBBD
 	}
 #pragma endregion
 
-#pragma region SETS
+#pragma region SET
 	bool RedisManager::sadd(const short& db, const std::string& key, const int& member)
 	{
 		return sadd(db, key, std::to_string(member));
@@ -99,9 +170,7 @@ namespace DBBD
 
 	bool RedisManager::sadd(const short& db, const std::string& key, const std::string& member)
 	{
-		StringVector vec;
-		vec.push_back(member);
-		return sadd(db, key, vec);
+		return sadd(db, key, StringVector{ member });
 	}
 
 	bool RedisManager::sadd(const short& db, const std::string& key, const std::vector<int>& members)
@@ -163,6 +232,37 @@ namespace DBBD
 		putConn(redis);
 		return result.get().as_integer() > 0;
 	}
+
+	bool RedisManager::srem(const short& db, const std::string& key, const int& member)
+	{
+		return srem(db, key, std::to_string(member));
+	}
+
+	bool RedisManager::srem(const short& db, const std::string& key, const std::string& member)
+	{
+		return srem(db, key, StringVector{ member });
+	}
+
+	bool RedisManager::srem(const short& db, const std::string& key, const std::vector<int>& members)
+	{
+		StringVector vec;
+		for (auto member : members) {
+			vec.push_back(std::to_string(member));
+		}
+		return srem(db, key, vec);
+	}
+
+	bool RedisManager::srem(const short& db, const std::string& key, const StringVector& members)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->srem(key, members);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+
+		return result.get().is_integer() > 0;
+	}
+
 #pragma endregion
 
 #pragma region SORTED_SET
@@ -196,7 +296,7 @@ namespace DBBD
 		redis->conn->commit();
 		result.wait();
 		putConn(redis);
-		return result.get().as_integer() > 0;
+		return result.get().as_integer() == sets.size();
 	}
 
 	int RedisManager::zscore(const short& db, const std::string& key, const int& member)
@@ -285,27 +385,114 @@ namespace DBBD
 	}
 #pragma endregion
 
-#pragma region EXPIRE
-	void RedisManager::expire(const short& db, const std::string& key, const size_t& seconds)
+#pragma region STRING
+	bool RedisManager::set(const short& db, const std::string& key, const std::string& value)
 	{
 		auto redis = getConn(db);
-		redis->conn->expire(key, seconds);
+		auto result = redis->conn->set(key, value);
 		redis->conn->commit();
+		result.wait();
 		putConn(redis);
+
+		auto error = result.get().as_string();
+		return strcmp(error.c_str(), "OK") == 0;
 	}
 
-	void RedisManager::expireat(const short& db, const std::string& key, std::chrono::system_clock::time_point at)
-	{
-		auto duration = at.time_since_epoch() / 10000000;
-		expireat(db, key, duration.count());
-	}
-
-	void RedisManager::expireat(const short& db, const std::string& key, const int& timestamp)
+	std::string RedisManager::get(const short& db, const std::string& key)
 	{
 		auto redis = getConn(db);
-		redis->conn->expireat(key, timestamp);
+		auto result = redis->conn->get(key);
 		redis->conn->commit();
+		result.wait();
 		putConn(redis);
+
+		return convertElem<std::string>(result.get());
+	}
+
+	std::string RedisManager::getset(const short& db, const std::string& key, const std::string& value)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->getset(key, value);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+
+		return convertElem<std::string>(result.get());
+	}
+
+	bool RedisManager::mset(const short& db, const std::vector<std::pair<std::string, std::string>> keyvalues)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->mset(keyvalues);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+
+		auto error = result.get().as_string();
+		return strcmp(error.c_str(), "OK") == 0;
+	}
+
+	std::map<std::string, std::string> RedisManager::mget(const short& db, StringVector keys)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->mget(keys);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+		
+		std::map<std::string, std::string> map;
+		auto resultArray = result.get().as_array();
+		for (size_t i = 0; i < keys.size(); i++) {
+			std::string value;
+			if (resultArray[i].is_null()) {
+				value = "";
+			}
+			else {
+				value = resultArray[i].as_string();
+			}
+			map[keys[i]] = value;
+		}
+		return map;
+	}
+
+	int RedisManager::incr(const short& db, const std::string& key)
+	{
+		return incrby(db, key, 1);
+	}
+
+	int RedisManager::incrby(const short& db, const std::string& key, const int& incr)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->incrby(key, incr);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+		return result.get().as_integer();
+	}
+
+	int RedisManager::decr(const short& db, const std::string& key)
+	{
+		return decrby(db, key, 1);
+	}
+
+	int RedisManager::decrby(const short& db, const std::string& key, const int& decr)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->decrby(key, decr);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+		return result.get().as_integer();
+	}
+
+	int RedisManager::strlen(const short& db, const std::string& key)
+	{
+		auto redis = getConn(db);
+		auto result = redis->conn->strlen(key);
+		redis->conn->commit();
+		result.wait();
+		putConn(redis);
+		return result.get().as_integer();
 	}
 #pragma endregion
 

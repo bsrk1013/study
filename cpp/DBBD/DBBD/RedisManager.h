@@ -36,6 +36,18 @@ namespace DBBD
 	public:
 		void init(const std::string& address, const short& port, const short& maxConnCount = 8);
 
+#pragma region KEYS
+	public:
+		bool del(const short& db, const std::string& key);
+		bool del(const short& db, const StringVector& keys);
+		bool exists(const short& db, const std::string& key);
+		bool exists(const short& db, const StringVector& keys);
+		bool rename(const short& db, const std::string& sourceKey, const std::string& destKey);
+		bool expire(const short& db, const std::string& key, const size_t& seconds);
+		bool expireat(const short& db, const std::string& key, std::chrono::system_clock::time_point at);
+		bool expireat(const short& db, const std::string& key, const int& timestamp);
+#pragma endregion
+
 #pragma region HASH
 		// template 매개변수로 무조건 std::string, int를 써야함
 	public:
@@ -86,7 +98,7 @@ namespace DBBD
 		}
 #pragma endregion
 
-#pragma region SETS
+#pragma region SET
 	public:
 		bool sadd(const short& db, const std::string& key, const int& member);
 		bool sadd(const short& db, const std::string& key, const std::string& member);
@@ -97,6 +109,10 @@ namespace DBBD
 		bool sismember(const short& db, const std::string& key, const std::string& member);
 		bool smove(const short& db, const std::string& sourceKey, const std::string& destKey, const int& member);
 		bool smove(const short& db, const std::string& sourceKey, const std::string& destKey, const std::string& member);
+		bool srem(const short& db, const std::string& key, const int& member);
+		bool srem(const short& db, const std::string& key, const std::string& member);
+		bool srem(const short& db, const std::string& key, const std::vector<int>& members);
+		bool srem(const short& db, const std::string& key, const StringVector& members);
 		template <typename T>
 		std::vector<T> smembers(const short& db, const std::string& key)
 		{
@@ -107,6 +123,25 @@ namespace DBBD
 			putConn(redis);
 
 			auto resultArray = result.get().as_array();
+			return convertVec<T>(resultArray);
+		}
+		template <typename T>
+		T srandmember(const short& db, const std::string& key)
+		{
+			auto vec = srandmember(db, key, 1);
+			return vec[0];
+		}
+		template <typename T>
+		std::vector<T> srandmember(const short& db, const std::string& key, const int& count)
+		{
+			auto redis = getConn(db);
+			auto result = redis->conn->srandmember(key, count);
+			redis->conn->commit();
+			result.wait();
+			putConn(redis);
+
+			auto resultArray = result.get().as_array();
+
 			return convertVec<T>(resultArray);
 		}
 #pragma endregion
@@ -160,11 +195,18 @@ namespace DBBD
 		std::vector<cpp_redis::reply> innerZragebyscore(const short& db, const std::string& key, const int& min, const int& max, const bool& withscore, const bool& isReverse);
 #pragma endregion
 
-#pragma region EXPIRE
+#pragma region STRING
 	public:
-		void expire(const short& db, const std::string& key, const size_t& seconds);
-		void expireat(const short& db, const std::string& key, std::chrono::system_clock::time_point at);
-		void expireat(const short& db, const std::string& key, const int& timestamp);
+		std::string get(const short& db, const std::string& key);
+		bool set(const short& db, const std::string& key, const std::string& value);
+		std::string getset(const short& db, const std::string& key, const std::string& value);
+		bool mset(const short& db, const std::vector<std::pair<std::string, std::string>> keyvalues);
+		std::map<std::string, std::string> mget(const short& db, StringVector keys);
+		int incr(const short& db, const std::string& key);
+		int incrby(const short& db, const std::string& key, const int& incr);
+		int decr(const short& db, const std::string& key);
+		int decrby(const short& db, const std::string& key, const int& decr);
+		int strlen(const short& db, const std::string& key);
 #pragma endregion
 
 #pragma region BASE
@@ -173,9 +215,15 @@ namespace DBBD
 		T convertElem(cpp_redis::reply reply)
 		{
 			if constexpr (std::is_same<std::string, T>::value) {
+				if (reply.is_null()) {
+					return "";
+				}
 				return reply.as_string();
 			}
 			else if constexpr (std::is_same<int, T>::value) {
+				if (reply.is_null()) {
+					return -1;
+				}
 				auto result = reply.as_string();
 				return std::stoi(result);
 			}

@@ -1,1 +1,2 @@
 *.zip filter=lfs diff=lfs merge=lfs -text
+mysql-installer-web-community-8.0.23.0.msi filter=lfs diff=lfs merge=lfs -text

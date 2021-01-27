@@ -43,6 +43,15 @@
    - 추가 라이브러리 디렉터리
      - \$(SolutionDir)..\cpp_redis\msvc15\build 옵션(x64\Release)
 
+# MySql
+
+#### MySql Connector c++ 다운로드 경로 : https://dev.mysql.com/downloads/connector/cpp/
+
+#### 설치 경로 : cpp/
+
+1. 프로젝트 빌드 시 링크 오류날 시 MySql Connector c++ 설치 필요
+   - 경로는 cpp\ 에 설치한다.
+
 # VLD
 
 #### 하위 프로젝트에 세팅
