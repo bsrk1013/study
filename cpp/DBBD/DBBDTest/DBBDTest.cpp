@@ -871,6 +871,10 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(MysqlTest) {
+			sql::Driver* driver;
+			sql::Connection* conn;
+
+			driver = get_driver_instance();
 			/*sql::Driver* driver;
 			sql::Connection* conn;
 			try {

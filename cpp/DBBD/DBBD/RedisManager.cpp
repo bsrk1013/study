@@ -300,7 +300,6 @@ namespace DBBD
 	{
 		std::string command = isReverse ? "zrevrangebyscore" : "zrangebyscore";
 		std::string strWithscore = withscore ? "withscores" : "";
-		strWithscore.empty();
 		auto reply = execute(command, db, key, min, max, strWithscore);
 		auto replyArray = reply.as_array();
 		return replyArray;
