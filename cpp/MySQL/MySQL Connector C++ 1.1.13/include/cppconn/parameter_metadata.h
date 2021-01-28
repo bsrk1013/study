@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2008, 2018, Oracle and/or its affiliates. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2.0, as
@@ -28,22 +28,57 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
  */
 
-#include "../jdbc/mysql_connection.h"
-#include "../jdbc/mysql_driver.h"
-#include "../jdbc/mysql_error.h"
-#include "../jdbc/cppconn/build_config.h"
-#include "../jdbc/cppconn/config.h"
-#include "../jdbc/cppconn/connection.h"
-#include "../jdbc/cppconn/datatype.h"
-#include "../jdbc/cppconn/driver.h"
-#include "../jdbc/cppconn/exception.h"
-#include "../jdbc/cppconn/metadata.h"
-#include "../jdbc/cppconn/parameter_metadata.h"
-#include "../jdbc/cppconn/prepared_statement.h"
-#include "../jdbc/cppconn/resultset.h"
-#include "../jdbc/cppconn/resultset_metadata.h"
-#include "../jdbc/cppconn/statement.h"
-#include "../jdbc/cppconn/sqlstring.h"
-#include "../jdbc/cppconn/warning.h"
-#include "../jdbc/cppconn/version_info.h"
-#include "../jdbc/cppconn/variant.h"
+
+
+#ifndef _SQL_PARAMETER_METADATA_H_
+#define _SQL_PARAMETER_METADATA_H_
+
+#include <cppconn/sqlstring.h>
+
+
+namespace sql
+{
+
+class ParameterMetaData
+{
+public:
+  enum
+  {
+    parameterModeIn,
+    parameterModeInOut,
+    parameterModeOut,
+    parameterModeUnknown
+  };
+  enum
+  {
+    parameterNoNulls,
+    parameterNullable,
+    parameterNullableUnknown
+  };
+
+  virtual sql::SQLString getParameterClassName(unsigned int param) = 0;
+
+  virtual int getParameterCount() = 0;
+
+  virtual int getParameterMode(unsigned int param) = 0;
+
+  virtual int getParameterType(unsigned int param) = 0;
+
+  virtual sql::SQLString getParameterTypeName(unsigned int param) = 0;
+
+  virtual int getPrecision(unsigned int param) = 0;
+
+  virtual int getScale(unsigned int param) = 0;
+
+  virtual int isNullable(unsigned int param) = 0;
+
+  virtual bool isSigned(unsigned int param) = 0;
+
+protected:
+  virtual ~ParameterMetaData() {}
+};
+
+
+} /* namespace sql */
+
+#endif /* _SQL_PARAMETER_METADATA_H_ */

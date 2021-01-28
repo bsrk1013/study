@@ -9,6 +9,10 @@
 #include "../DBBD/Random.h"
 #include "../DBBD/TimerObject.h"
 #include "../DBBD/RedisManager.h"
+#include <mysql_connection.h>
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/prepared_statement.h>
 #include <cpp_redis/core/client.hpp>
 #include <cpp_redis/network/redis_connection.hpp>
 #include <boost/asio.hpp>
@@ -182,22 +186,22 @@ namespace DBBDTest
 			class BasePlayer {
 			public:
 				BasePlayer() {}
-				BasePlayer(int _nLevel, wchar_t _strNickname[256])
-					:m_nLevel(_nLevel)
+				BasePlayer(int _nLevel, std::string _strNickname)
+					:m_nLevel(_nLevel), m_strNickname(_strNickname)
 				{
-					wcscpy_s(m_strNickname, _strNickname);
+					//wcscpy_s(m_strNickname, _strNickname);
 				}
 
 			public:
 				const int GetLevel() { return m_nLevel; }
-				const wchar_t* GetNickname() { return m_strNickname; }
+				const std::string GetNickname() { return m_strNickname; }
 
 			private:
 				int m_nLevel;
-				wchar_t m_strNickname[256];
+				std::string m_strNickname;
 			};
 
-			BasePlayer player(99, L"Doby2");
+			BasePlayer player(99, "Doby2");
 			memcpy(buffer + nCurWriteBufferPos, (void*)&player, sizeof(BasePlayer));
 			nCurWriteBufferPos += sizeof(BasePlayer);
 
@@ -856,6 +860,26 @@ namespace DBBDTest
 
 			auto expireTime = std::chrono::system_clock::now() + std::chrono::hours(24);
 			RedisManager::Instance()->expireat(0, "test", expireTime);
+		}
+
+		TEST_METHOD(RedisKeyTest) {
+			RedisManager::Instance()->init("118.67.134.160", 6379);
+
+			RedisManager::Instance()->sadd(0, "test1", "hello");
+			RedisManager::Instance()->sadd(0, "test2", "hello");
+			RedisManager::Instance()->del(0, StringVector{"test1", "test2"});
+		}
+
+		TEST_METHOD(MysqlTest) {
+			/*sql::Driver* driver;
+			sql::Connection* conn;
+			try {
+				driver = get_driver_instance();
+				conn = driver->connect("118.67.134.160:3306", "root", "1231013a");
+			}
+			catch (sql::SQLException e) {
+				Assert::IsTrue(false);
+			}*/
 		}
 	};
 }

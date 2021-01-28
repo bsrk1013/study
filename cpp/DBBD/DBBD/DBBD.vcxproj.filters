@@ -52,11 +52,17 @@
     <Filter Include="소스 파일\Network\Tcp">
       <UniqueIdentifier>{78a1b6b2-dd15-47ed-9e22-2f4c87330340}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\Redis">
-      <UniqueIdentifier>{118f8317-a028-44a9-a6f5-aa00944116ff}</UniqueIdentifier>
+    <Filter Include="소스 파일\DB">
+      <UniqueIdentifier>{5504a258-1a29-47a6-871e-232756cf21fa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Redis">
+    <Filter Include="소스 파일\DB\Redis">
       <UniqueIdentifier>{f2fdba85-7247-4328-8b99-c9df84d94025}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\DB">
+      <UniqueIdentifier>{aea4513d-a45f-4930-95c2-c1b84fb44b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\DB\Redis">
+      <UniqueIdentifier>{118f8317-a028-44a9-a6f5-aa00944116ff}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -124,7 +130,7 @@
       <Filter>헤더 파일\Network</Filter>
     </ClInclude>
     <ClInclude Include="RedisManager.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\DB\Redis</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -162,7 +168,7 @@
       <Filter>소스 파일\Network</Filter>
     </ClCompile>
     <ClCompile Include="RedisManager.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\DB\Redis</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

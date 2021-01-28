@@ -41,7 +41,6 @@
 namespace sql
 {
 class ResultSet;
-class Connection;
 
 class DatabaseMetaData
 {

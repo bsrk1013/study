@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2008, 2018, Oracle and/or its affiliates. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2.0, as
@@ -28,72 +28,49 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
  */
 
-#ifndef MYSQLX_COMMON_ERROR_H
-#define MYSQLX_COMMON_ERROR_H
-
-/*
-  TODO: Error handling infrastructure for XDevAPI and X DevAPI for C still
-  needs to be done. Current code is just a temporary hack.
-*/
-
-#include "api.h"
-#include "util.h"
-
-PUSH_SYS_WARNINGS
-#include <string>
-#include <stdexcept>
-#include <ostream>
-#include <memory>
-#include <forward_list>
-#include <string.h>  // for memcpy
-#include <utility>   // std::move etc
-POP_SYS_WARNINGS
 
 
-namespace mysqlx {
-MYSQLX_ABI_BEGIN(2,0)
+#ifndef _SQL_DRIVER_H_
+#define _SQL_DRIVER_H_
 
-namespace common {
+#include "connection.h"
+#include "build_config.h"
 
-/**
-  Base class for connector errors.
-
-  @internal
-  TODO: Derive from std::system_error and introduce proper
-  error codes.
-  @endinternal
-
-  @ingroup devapi
-*/
-
-class Error : public std::runtime_error
+namespace sql
 {
-public:
 
-  Error(const char *msg)
-    : std::runtime_error(msg)
-  {}
+class CPPCONN_PUBLIC_FUNC Driver
+{
+protected:
+  virtual ~Driver() {}
+public:
+  // Attempts to make a database connection to the given URL.
+
+  virtual Connection * connect(const sql::SQLString& hostName, const sql::SQLString& userName, const sql::SQLString& password) = 0;
+
+  virtual Connection * connect(ConnectOptionsMap & options) = 0;
+
+  virtual int getMajorVersion() = 0;
+
+  virtual int getMinorVersion() = 0;
+
+  virtual int getPatchVersion() = 0;
+
+  virtual const sql::SQLString & getName() = 0;
+
+  virtual void threadInit() = 0;
+
+  virtual void threadEnd() = 0;
 };
 
+} /* namespace sql */
 
-inline
-std::ostream& operator<<(std::ostream &out, const Error &e)
+extern "C"
 {
-  out << e.what();
-  return out;
+  CPPCONN_PUBLIC_FUNC sql::Driver * get_driver_instance();
+
+  /* If dynamic loading is disabled in a driver then this function works just like get_driver_instance() */
+  CPPCONN_PUBLIC_FUNC sql::Driver * get_driver_instance_by_name(const char * const clientlib);
 }
 
-
-inline
-void throw_error(const char *msg)
-{
-  throw Error(msg);
-}
-
-}  // common
-
-MYSQLX_ABI_END(2,0)
-}  // mysqlx
-
-
-#endif
+#endif /* _SQL_DRIVER_H_ */

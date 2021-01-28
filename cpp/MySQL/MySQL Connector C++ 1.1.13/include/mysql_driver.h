@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2020, Oracle and/or its affiliates.
+ * Copyright (c) 2008, 2019, Oracle and/or its affiliates. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2.0, as
@@ -33,10 +33,9 @@
 #ifndef _MYSQL_DRIVER_H_
 #define _MYSQL_DRIVER_H_
 
+#include <boost/scoped_ptr.hpp>
 
-#include "cppconn/driver.h"
-
-#include <memory>
+#include <cppconn/driver.h>
 
 extern "C"
 {
@@ -60,7 +59,7 @@ class CPPCONN_PUBLIC_FUNC MySQL_Driver : public sql::Driver
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
-  std::unique_ptr< ::sql::mysql::NativeAPI::NativeDriverWrapper > proxy;
+  boost::scoped_ptr< ::sql::mysql::NativeAPI::NativeDriverWrapper > proxy;
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
@@ -97,23 +96,10 @@ private:
     because the counterpart C function is declared in the cppconn and is always visible.
     If dynamic loading is not enabled then its result is just like of get_driver_instance()
 */
+CPPCONN_PUBLIC_FUNC MySQL_Driver * get_driver_instance_by_name(const char * const clientlib);
 
-CPPCONN_PUBLIC_FUNC MySQL_Driver * _get_driver_instance_by_name(const char * const clientlib);
-
-inline static MySQL_Driver * get_driver_instance_by_name(const char * const clientlib)
-{
-  check_lib();
-  return sql::mysql::_get_driver_instance_by_name(clientlib);
-}
-
-inline static MySQL_Driver * get_driver_instance()
-{
-  return sql::mysql::get_driver_instance_by_name("");
-}
-
-static MySQL_Driver * get_mysql_driver_instance() { return get_driver_instance(); }
-
-
+CPPCONN_PUBLIC_FUNC MySQL_Driver * get_driver_instance();
+static inline MySQL_Driver * get_mysql_driver_instance() { return get_driver_instance(); }
 
 
 } /* namespace mysql */
