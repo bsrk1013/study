@@ -13,7 +13,7 @@
    - 명령 프롬포트에서 boost_1_74_0 폴더 진입 아래 명령어 실행
      - b2 release debug threading=multi --build-type=complete --toolset=msvc address-model=64 stage
 
-2. 프로젝트 링크 설정
+2. 프로젝트 설정
    - 추가 포함 디렉터리
      - \$(SolutionDir)..\boost_1_74_0\
    - 추가 라이브러리 디렉터리
@@ -36,7 +36,7 @@
       - 이후 msvc15폴더에 들어가 솔루션 실행 및 빌드
       - build 옵션은 Release, x64로 해주자
 
-2. 프로젝트 링크 설정
+2. 프로젝트 설정
    - 추가 포함 디렉터리
      - \$(SolutionDir)..\cpp_redis\includes
      - \$(SolutionDir)..\cpp_redis\tacopie\includes
@@ -53,15 +53,19 @@
 #### 설치 경로 : cpp/
 
 1. 프로젝트 빌드 시 링크 오류날 시 MySql Connector c++ 설치 필요
+
    - 경로는 cpp\ 에 설치한다.
-  
-2. 프로젝트 링크 설정
+
+2. 프로젝트 설정
    - 추가 포함 디렉터리
      - \$(SolutionDir)..\MySQL\Connector C++ 8.0\include
    - 추가 라이브러리 디렉터리
      - \$(SolutionDir)..\MySQL\Connector C++ 8.0\lib64(Debug, Release)\vs14
    - 추가 종속성
-      -  mysqlcppconn8.lib
+     - mysqlcppconn8.lib
+   - 전처리기 세팅
+     - \_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+     - \_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
 # VLD
 
@@ -76,7 +80,7 @@
    - vld-2.5.1-setup.exe 설치
      - 설치 시 환경변수는 세팅 필요
 
-2. 프로젝트 링크 설정
+2. 프로젝트 설정
    - 추가 포함 디렉터리
      - \$(SolutionDir)..\Visual Leak Detector\include
    - 추가 라이브러리 디렉터리

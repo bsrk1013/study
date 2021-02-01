@@ -1,6 +1,4 @@
 #pragma once
-#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 #include <iostream>
 #include "DBBD/TimerManager.h"
 #include "DBBD/MysqlManager.h"
