@@ -56,7 +56,12 @@
    - 경로는 cpp\ 에 설치한다.
   
 2. 프로젝트 링크 설정
-   -  
+   - 추가 포함 디렉터리
+     - \$(SolutionDir)..\MySQL\Connector C++ 8.0\include
+   - 추가 라이브러리 디렉터리
+     - \$(SolutionDir)..\MySQL\Connector C++ 8.0\lib64(Debug, Release)\vs14
+   - 추가 종속성
+      -  mysqlcppconn8.lib
 
 # VLD
 
