@@ -15,6 +15,9 @@ namespace DBBD
 				redisSet.insert(redis);
 			}
 		}
+
+		isInit = true;
+		std::cout << "RedisManager init, ip: " << address << ", port: " << port << std::endl;
 	}
 
 #pragma region KEYS
@@ -383,6 +386,10 @@ namespace DBBD
 #pragma region BASE
 	RedisSP RedisManager::getConn(const short& db)
 	{
+		if (!isInit) {
+			throw std::exception("RedisManager is not inited");
+		}
+
 		RedisSP redis;
 		{
 			std::lock_guard<std::mutex> lock(lockObject);

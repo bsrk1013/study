@@ -1,13 +1,20 @@
 #pragma once
+#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 #include <iostream>
 #include "DBBD/TimerManager.h"
+#include "DBBD/MysqlManager.h"
+#include "DBBD/RedisManager.h"
 #include "SessionServer.h"
 
 int main() {
 	SessionServer server("Session", "127.0.0.1", 8101, 1);
 	DBBD::TimerManager::Instance()->init(8);
+	DBBD::RedisManager::Instance()->init("118.67.134.160", 6379);
 
 	server.start();
+
+	auto conn = DBBD::MysqlManager::Instance()->getConn();
 
 	while (true) {
 		std::string a;

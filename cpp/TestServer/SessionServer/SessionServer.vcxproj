@@ -118,12 +118,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\DBBD;$(SolutionDir)..\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\DBBD;$(SolutionDir)..\boost_1_74_0;$(SolutionDir)..\cpp_redis\includes;$(SolutionDir)..\cpp_redis\tacopie\includes;C:\Program Files\MySQL\Connector C++ 8.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\DBBD\x64\Debug;$(SolutionDir)..\boost_1_74_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\DBBD\x64\Debug;$(SolutionDir)..\boost_1_74_0\stage\lib;$(SolutionDir)..\cpp_redis\msvc15\x64\Debug;C:\Program Files\MySQL\Connector C++ 8.0\lib64\vs14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cpp_redis.lib;tacopie.lib;mysqlcppconn8.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,13 +150,13 @@
     <ClCompile Include="SessionServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PlayerClientSession.h" />
+    <ClInclude Include="SessionServer.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\DBBD\DBBD\DBBD.vcxproj">
       <Project>{b3075808-ef91-4576-9c72-d262e5707a3f}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="PlayerClientSession.h" />
-    <ClInclude Include="SessionServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -42,6 +42,9 @@
      - \$(SolutionDir)..\cpp_redis\tacopie\includes
    - 추가 라이브러리 디렉터리
      - \$(SolutionDir)..\cpp_redis\msvc15\build 옵션(x64\Release)
+   - 추가 종속성
+     - cpp_redis.lib
+     - tacopie.lib
 
 # MySql
 

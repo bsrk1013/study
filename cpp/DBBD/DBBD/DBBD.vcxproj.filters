@@ -132,6 +132,9 @@
     <ClInclude Include="RedisManager.h">
       <Filter>헤더 파일\DB\Redis</Filter>
     </ClInclude>
+    <ClInclude Include="MysqlManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Random.cpp">
@@ -169,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="RedisManager.cpp">
       <Filter>소스 파일\DB\Redis</Filter>
+    </ClCompile>
+    <ClCompile Include="MysqlManager.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

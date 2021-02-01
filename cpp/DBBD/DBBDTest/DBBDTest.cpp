@@ -9,12 +9,7 @@
 #include "../DBBD/Random.h"
 #include "../DBBD/TimerObject.h"
 #include "../DBBD/RedisManager.h"
-#include <mysql_connection.h>
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/prepared_statement.h>
-#include <cpp_redis/core/client.hpp>
-#include <cpp_redis/network/redis_connection.hpp>
+#include "../DBBD/MysqlManager.h"
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
 #include <boost/bind.hpp>
@@ -871,19 +866,7 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(MysqlTest) {
-			sql::Driver* driver;
-			sql::Connection* conn;
-
-			driver = get_driver_instance();
-			/*sql::Driver* driver;
-			sql::Connection* conn;
-			try {
-				driver = get_driver_instance();
-				conn = driver->connect("118.67.134.160:3306", "root", "1231013a");
-			}
-			catch (sql::SQLException e) {
-				Assert::IsTrue(false);
-			}*/
+			auto info = MysqlManager::Instance()->getConn();
 		}
 	};
 }

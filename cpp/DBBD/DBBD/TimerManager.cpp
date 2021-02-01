@@ -11,11 +11,12 @@ void DBBD::TimerManager::init(size_t threadCount)
 	}
 
 	isInit = true;
+	std::cout << "TimerManager init, threadCount: " << threadCount << std::endl;
 }
 
 void DBBD::TimerManager::addTimer(TimerInfoWP infoPtr) {
 	if (!isInit) {
-		throw std::exception("TimerManager is not inited...");
+		throw std::exception("TimerManager is not inited");
 	}
 
 	{
