@@ -1,3 +1,2 @@
 *.zip filter=lfs diff=lfs merge=lfs -text
-mysql-connector-c++-8.0.23-winx64.zip filter=lfs diff=lfs merge=lfs -text
-mysql-connector-c++-8.0.23-winx64-debug.zip filter=lfs diff=lfs merge=lfs -text
+mariadb-connector-c-3.1.11-win64.msi filter=lfs diff=lfs merge=lfs -text

@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include "Singleton.h"
-#include "mysqlx/xdevapi.h"
 
 namespace DBBD
 {

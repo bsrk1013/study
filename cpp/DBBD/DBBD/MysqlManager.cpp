@@ -2,17 +2,29 @@
 
 namespace DBBD
 {
+	//using namespace mysqlx;
+
 	std::string MysqlManager::getConn()
 	{
 		try {
-			//std::string uri = "mysqlx://118.67.134.160:33060/Test?user=root&password=1231013a";
-			mysqlx::Session session(
-				mysqlx::SessionOption::HOST, "118.67.134.160",
-				mysqlx::SessionOption::PORT, 33060,
-				mysqlx::SessionOption::USER, "root",
-				mysqlx::SessionOption::PWD, "1231013a");
+			/*sql::Driver* driver*/
+			//Session session("mysqlx://root@118.67.134.160");
+		/*	Client client(
+				SessionOption::USER, "root",
+				SessionOption::PWD, "1231013a",
+				SessionOption::HOST, "118.67.134.160",
+				SessionOption::PORT, 3306,
+				SessionOption::DB, "Test",
+				SessionOption::SSL_MODE, SSLMode::DISABLED,
+				ClientOption::POOLING, true,
+				ClientOption::POOL_MAX_SIZE, 10,
+				ClientOption::POOL_QUEUE_TIMEOUT, 1000,
+				ClientOption::POOL_MAX_IDLE_TIME, 500
+			);*/
 
-			auto db = session.getSchema("Test");
+			//std::string uri = "mysqlx://118.67.134.160:33060/Test?user=root&password=1231013a";
+			//mysqlx::Session session("root:1231013a@118.67.134.160/Test");
+			//auto db = session.getSchema("Test");
 		}
 		catch (std::exception& e) {
 			std::cout << e.what() << std::endl;
