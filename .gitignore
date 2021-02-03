@@ -8,8 +8,8 @@ boost_1_74_0/
 ### Redis ###
 cpp_redis/
 
-### MySQL ###
-MySQL/
+### DB ###
+DB/
 
 ### VLD ###
 cpp/"Visual Leak Detector"/*

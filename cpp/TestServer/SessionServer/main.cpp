@@ -3,6 +3,7 @@
 #include "DBBD/TimerManager.h"
 #include "DBBD/MysqlManager.h"
 #include "DBBD/RedisManager.h"
+#include "DBBD/MariaDBManager.h"
 #include "SessionServer.h"
 
 int main() {
@@ -12,7 +13,8 @@ int main() {
 
 	server.start();
 
-	auto conn = DBBD::MysqlManager::Instance()->getConn();
+	auto mysqlConn = DBBD::MysqlManager::Instance()->getConn();
+	auto mariaConn = DBBD::MariaDBManager::Instance()->getConn();
 
 	while (true) {
 		std::string a;

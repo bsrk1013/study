@@ -64,6 +64,12 @@
     <Filter Include="헤더 파일\DB\Redis">
       <UniqueIdentifier>{118f8317-a028-44a9-a6f5-aa00944116ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\DB\MariaDB">
+      <UniqueIdentifier>{42615211-4842-4d0b-9fa8-543e0fe358d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\DB\MariaDB">
+      <UniqueIdentifier>{37f641ef-d0ee-4924-8c8e-97f38823edd9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Random.h">
@@ -135,6 +141,9 @@
     <ClInclude Include="MysqlManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="MariaDBManager.h">
+      <Filter>헤더 파일\DB\MariaDB</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Random.cpp">
@@ -175,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="MysqlManager.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MariaDBManager.cpp">
+      <Filter>소스 파일\DB\MariaDB</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -119,7 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\boost_1_74_0;$(SolutionDir)..\cpp_redis\includes;$(SolutionDir)..\cpp_redis\tacopie\includes;C:\Program Files\MariaDB\MariaDB Connector C 64-bit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\boost_1_74_0;$(SolutionDir)..\cpp_redis\includes;$(SolutionDir)..\cpp_redis\tacopie\includes;$(SolutionDir)..\DB\Mariadb Connector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -130,7 +130,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\boost_1_74_0\stage\lib;$(SolutionDir)..\cpp_redis\msvc15\x64\Debug;C:\Program Files\MariaDB\MariaDB Connector C 64-bit\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\boost_1_74_0\stage\lib;$(SolutionDir)..\cpp_redis\msvc15\x64\Debug;$(SolutionDir)..\DB\Mariadb Connector\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -166,6 +166,7 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="Deserialize.h" />
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="MariaDBManager.h" />
     <ClInclude Include="MysqlManager.h" />
     <ClInclude Include="ObjectPoolManager.h" />
     <ClInclude Include="Random.h" />
@@ -190,6 +191,7 @@
     </ClCompile>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Deserialize.cpp" />
+    <ClCompile Include="MariaDBManager.cpp" />
     <ClCompile Include="MysqlManager.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="RedisManager.cpp" />
