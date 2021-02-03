@@ -1,4 +1,5 @@
 #include "MysqlManager.h"
+#include <mysql.h>
 
 namespace DBBD
 {
@@ -6,6 +7,18 @@ namespace DBBD
 
 	std::string MysqlManager::getConn()
 	{
+		std::string host = "118.67.134.160";
+		std::string user = "root";
+		std::string psw = "1231013a";
+		std::string db = "Test";
+		int port = 3306;
+
+		MYSQL* mysql = mysql_init(NULL);
+
+		if (!mysql_real_connect(mysql, host.c_str(), user.c_str(), psw.c_str(), db.c_str(), port, NULL, 0)) {
+			return "";
+		}
+
 		try {
 			/*sql::Driver* driver*/
 			//Session session("mysqlx://root@118.67.134.160");
