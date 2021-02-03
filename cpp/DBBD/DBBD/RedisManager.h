@@ -21,12 +21,7 @@ namespace DBBD
 	struct RedisOrder
 	{
 		bool operator()(RedisSP r1, RedisSP r2) const {
-			if (r1->usedTime > r2->usedTime) {
-				return true;
-			}
-			else {
-				return false;
-			}
+			return r1->usedTime > r2->usedTime;
 		}
 	};
 

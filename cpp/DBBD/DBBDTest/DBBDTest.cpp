@@ -9,7 +9,7 @@
 #include "../DBBD/Random.h"
 #include "../DBBD/TimerObject.h"
 #include "../DBBD/RedisManager.h"
-#include "../DBBD/MysqlManager.h"
+#include "../DBBD/MariaDBManager.h"
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
 #include <boost/bind.hpp>
@@ -865,8 +865,9 @@ namespace DBBDTest
 			RedisManager::Instance()->del(0, StringVector{"test1", "test2"});
 		}
 
-		TEST_METHOD(MysqlTest) {
-			auto info = MysqlManager::Instance()->getConn();
+		TEST_METHOD(MariaDBTest) {
+			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a");
+			//auto info = MysqlManager::Instance()->getConn();
 		}
 	};
 }
