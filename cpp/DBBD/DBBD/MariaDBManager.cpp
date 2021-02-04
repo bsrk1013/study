@@ -7,6 +7,7 @@ namespace DBBD
 		const std::string& user, const std::string& psw,
 		const std::string& db, const short& maxConnCount)
 	{
+		this->name = "MariaDBManager";
 		this->address = address;
 		this->port = port;
 		this->user = user;
@@ -15,29 +16,59 @@ namespace DBBD
 		this->maxConnCount = maxConnCount;
 
 		for (size_t i = 0; i < maxConnCount; i++) {
-			auto maria = createMaria();
+			auto maria = createInfo();
+			infoSet.insert(maria);
 		}
 
 		isInit = true;
+		std::cout << name << " init, ip: " << address << ", port: " << port << std::endl;
 	}
 
-	std::string MariaDBManager::getConn()
-	{
-		MYSQL* mysql = mysql_init(NULL);
-		mysql_real_connect(mysql, address.c_str(), user.c_str(), psw.c_str(), db.c_str(), port, NULL, true);
-		return "";
-	}
+	//void MariaDBManager::exeQuery(std::string query)
+	//{
+	//	auto maria = getInfo();
+	//	MYSQL_STMT* stmt = mysql_stmt_init(maria->conn);
 
-	MariaSP MariaDBManager::createMaria()
+
+
+	//	/*int error = mysql_query(maria->conn, query.c_str());
+	//	if (error) {
+	//		std::cout << "MariaDBManager, exeQuery error, message: " << mysql_error(maria->conn) << std::endl;
+	//		return;
+	//	}
+
+	//	auto result = mysql_store_result(maria->conn);
+	//	int fieldCount = mysql_num_fields(result);
+	//	
+	//	MYSQL_ROW row;
+	//	while (row = mysql_fetch_row(result))
+	//	{
+	//		for (int i = 0; i < fieldCount; i++) {
+	//		}
+	//	}
+
+	//	mysql_free_result(result);*/
+
+	//	return;
+	//}
+
+	MariaSP MariaDBManager::createInfo()
 	{
-		std::shared_ptr<MYSQL> conn;
 		MYSQL* mysql = mysql_init(NULL);
 		mysql_real_connect(mysql, address.c_str(), user.c_str(), psw.c_str(), db.c_str(), port, NULL, 0);
-		conn.reset(mysql);
+
+		mysql_set_character_set(mysql, "euckr");
+		mysql_options(mysql, MYSQL_INIT_COMMAND, "SET NAMES euckr");
 
 		MariaSP maria = std::make_shared<MariaConnInfo>();
-		maria->conn = conn;
+		maria->conn = mysql;
 		maria->usedTime = std::chrono::system_clock::now();
 		return maria;
+	}
+
+	void MariaDBManager::closeInfoInternal(MariaSP info)
+	{
+		mysql_close(info->conn);
+		delete info->conn;
 	}
 }

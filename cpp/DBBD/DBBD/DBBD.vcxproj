@@ -163,6 +163,7 @@
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="ClientBase.h" />
     <ClInclude Include="Common.hpp" />
+    <ClInclude Include="DBBaseManager.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Deserialize.h" />
     <ClInclude Include="Cell.h" />

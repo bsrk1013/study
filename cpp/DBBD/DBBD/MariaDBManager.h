@@ -4,6 +4,7 @@
 #include <mutex>
 #include "Define.h"
 #include "Singleton.h"
+#include "DBBaseManager.h"
 #include "mysql.h"
 
 namespace DBBD
@@ -12,38 +13,44 @@ namespace DBBD
 	{
 	public:
 		std::chrono::system_clock::time_point usedTime;
-		std::shared_ptr<MYSQL> conn;
+		MYSQL* conn;
 	};
 
 	using MariaSP = std::shared_ptr<MariaConnInfo>;
+	using ExeParam = std::function<void(MYSQL_RES*)>;
 
-	struct MariaOrder
-	{
-		bool operator()(MariaSP r1, MariaSP r2) const {
-			return r1->usedTime > r2->usedTime;
-		}
-	};
-
-	class MariaDBManager : public Singleton<MariaDBManager>
+	class MariaDBManager : public DBBaseManager<MariaSP>, public Singleton<MariaDBManager>
 	{
 	public:
 		void init(const std::string& address, const int& port,
 			const std::string& user, const std::string& psw, 
 			const std::string& db = "", const short& maxConnCount = 8);
 
-	private:
-		std::string getConn();
-		MariaSP createMaria();
+	public:
+		template <typename ... Args>
+		void exeQuery(std::string query, Args ... args/*, ExeParam callback*/);
+		void exeSP(std::string sp/*, ExeParam callback*/);
 
 	private:
-		bool isInit = false;
+		virtual MariaSP createInfo() override;
+		virtual void closeInfoInternal(MariaSP info) override;
+
+	private:
 		std::string address;
 		int port;
 		std::string user;
 		std::string psw;
 		std::string db;
 		short maxConnCount;
-		std::set<MariaSP, MariaOrder> mariaSet;
-		std::mutex lockObject;
 	};
+
+	template <typename ... Args>
+	void MariaDBManager::exeQuery(std::string query, Args ... args)
+	{
+		std::vector<std::any> argVec = { args... };
+
+		auto maria = getInfo();
+		MYSQL_STMT* stmt = mysql_stmt_init(maria->conn);
+		MYSQL_BIND bind[argVec.size()];
+	}
 }

@@ -15,7 +15,7 @@ int main() {
 	server.start();
 
 	auto mysqlConn = DBBD::MysqlManager::Instance()->getConn();
-	auto mariaConn = DBBD::MariaDBManager::Instance()->getConn();
+	//auto mariaConn = DBBD::MariaDBManager::Instance()->getConn();
 
 	while (true) {
 		std::string a;

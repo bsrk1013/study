@@ -3,6 +3,7 @@
 #include <set>
 #include <mutex>
 #include <type_traits>
+#include "DBBaseManager.h"
 #include "Singleton.h"
 #include "Define.h"
 #include "cpp_redis/core/client.hpp"
@@ -17,15 +18,8 @@ namespace DBBD
 	};
 
 	using RedisSP = std::shared_ptr<RedisConnInfo>;
-
-	struct RedisOrder
-	{
-		bool operator()(RedisSP r1, RedisSP r2) const {
-			return r1->usedTime > r2->usedTime;
-		}
-	};
-
-	class RedisManager : public Singleton<RedisManager>
+	
+	class RedisManager : public DBBaseManager<RedisSP>, public Singleton<RedisManager>
 	{
 	public:
 		void init(const std::string& address, const short& port, const short& maxConnCount = 8);
@@ -176,68 +170,45 @@ namespace DBBD
 
 #pragma region BASE
 	private:
-		RedisSP getConn(const short& db);
-		void putConn(RedisSP);
-		RedisSP createRedis();
-		void refreshRedis();
+		RedisSP getInfo(const short& db);
+		virtual RedisSP createInfo() override;
+		virtual void closeInfoInternal(RedisSP info) override;
 
-		template <typename  Arg1>
-		cpp_redis::reply execute(const std::string& command, const short& db, Arg1 arg1)
+		template <typename ... Args>
+		cpp_redis::reply execute(const std::string& command, const short& db, const Args&... args)
 		{
-			return execute(command, db, arg1, nullptr, nullptr, nullptr);
-		}
-		template <typename  Arg1, typename Arg2>
-		cpp_redis::reply execute(const std::string& command, const short& db, Arg1 arg1, Arg2 arg2)
-		{
-			return execute(command, db, arg1, arg2, nullptr, nullptr);
-		}
-		template <typename  Arg1, typename Arg2, typename Arg3>
-		cpp_redis::reply execute(const std::string& command, const short& db, Arg1 arg1, Arg2 arg2, Arg3 arg3)
-		{
-			return execute(command, db, arg1, arg2, arg3, nullptr);
-		}
-		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		cpp_redis::reply execute(const std::string& command, const short& db, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4)
-		{
-			auto redis = getConn(db);
+			auto redis = getInfo(db);
 
 			StringVector vec;
 			vec.push_back(command);
 
-			auto convert = [&]<typename T>(T arg) {
-				if constexpr (std::is_same<nullptr_t, T>::value) {
-					return;
+			std::vector<std::any> argVec = { args... };
+			for (std::any arg : argVec) {
+				if (auto castInt = arg._Cast<int>()) {
+					vec.push_back(std::to_string(*castInt));
 				}
-
-				if constexpr (std::is_base_of<StringVector, T>::value) {
-					vec.insert(std::end(vec), std::begin(arg), std::end(arg));
+				else if (auto castString = arg._Cast<std::string>()) {
+					vec.push_back(*castString);
 				}
-				else if constexpr (std::is_base_of<std::multimap<std::string, std::string>, T>::value
-					|| std::is_base_of<std::vector<std::pair<std::string, std::string>>, T>::value) {
-					for (auto pair : arg) {
+				else if (auto castMultiMap = arg._Cast<std::multimap<std::string, std::string>>()) {
+					for (auto pair : *castMultiMap) {
 						vec.push_back(pair.first);
 						vec.push_back(pair.second);
 					}
 				}
-				else if constexpr (std::is_same<std::string, T>::value) {
-					if (arg.empty()) { return; }
-					vec.push_back(arg);
+				else if (auto castVec = arg._Cast<std::vector<std::pair<std::string, std::string>>>()) {
+					for (auto pair : *castVec) {
+						vec.push_back(pair.first);
+						vec.push_back(pair.second);
+					}
 				}
-				else if constexpr (std::is_same<int, T>::value) {
-					vec.push_back(std::to_string(arg));
-				}
-			};
-
-			convert(arg1);
-			convert(arg2);
-			convert(arg3);
-			convert(arg4);
+			}
 
 			auto result = redis->conn->send(vec);
 			redis->conn->commit();
 			result.wait();
 			auto reply = result.get();
-			putConn(redis);
+			putInfo(redis);
 			return reply;
 		}
 
@@ -287,12 +258,9 @@ namespace DBBD
 #pragma endregion
 
 	private:
-		bool isInit = false;
 		std::string address;
 		short port;
 		short curCreateConnCount = 0;
 		short maxConnCount;
-		std::set<RedisSP, RedisOrder> redisSet;
-		std::mutex lockObject;
 	};
 }

@@ -585,6 +585,22 @@ namespace DBBDTest
 			Assert::AreEqual((int)fooSP2.use_count(), 2);
 			fooSP2.reset();
 			Assert::AreEqual((int)fooSP1.use_count(), 1);
+
+			std::any anyVal = std::string("aaaaaaaa");
+			auto castInt = anyVal._Cast<int>();
+			auto castString = anyVal._Cast<std::string>();
+			Assert::IsTrue(castInt == nullptr);
+			Assert::IsTrue(strcmp(castString->c_str(), "aaaaaaaa") == 0);
+
+			std::multimap<std::string, std::string> multiMap;
+			multiMap.insert(std::pair<std::string, std::string>("a", "b"));
+			anyVal = multiMap;
+			if (auto castMultiMap = anyVal._Cast<std::multimap<std::string, std::string>>()) {
+				for (auto pair : *castMultiMap) {
+					Assert::IsTrue(strcmp(pair.first.c_str(), "a") == 0);
+					Assert::IsTrue(strcmp(pair.second.c_str(), "b") == 0);
+				}
+			}
 		}
 
 		TEST_METHOD(FunctionTest) {
@@ -866,8 +882,9 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(MariaDBTest) {
-			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a");
-			//auto info = MysqlManager::Instance()->getConn();
+			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a", "Test");
+
+			MariaDBManager::Instance()->exeQuery("select * from TestTable");
 		}
 	};
 }

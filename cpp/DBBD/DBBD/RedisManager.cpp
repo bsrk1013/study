@@ -9,12 +9,19 @@ namespace DBBD
 		this->maxConnCount = maxConnCount;
 
 		for (size_t i = 0; i < maxConnCount; i++) {
+			auto redis = createInfo();
+			{
+				//std::lock_guard<std::mutex> lock(lockObject);
+				infoSet.insert(redis);
+			}
+		}
+		/*for (size_t i = 0; i < maxConnCount; i++) {
 			auto redis = createRedis();
 			{
 				std::lock_guard<std::mutex> lock(lockObject);
 				redisSet.insert(redis);
 			}
-		}
+		}*/
 
 		isInit = true;
 		std::cout << "RedisManager init, ip: " << address << ", port: " << port << std::endl;
@@ -384,42 +391,14 @@ namespace DBBD
 #pragma endregion
 
 #pragma region BASE
-	RedisSP RedisManager::getConn(const short& db)
+	RedisSP RedisManager::getInfo(const short& db)
 	{
-		if (!isInit) {
-			throw std::exception("RedisManager is not inited");
-		}
-
-		RedisSP redis;
-		{
-			std::lock_guard<std::mutex> lock(lockObject);
-			for (auto tempRedis : redisSet) {
-				redis = tempRedis;
-				break;
-			}
-
-			redisSet.erase(redis);
-			redis->usedTime = std::chrono::system_clock::now();
-		}
-
-		if (!redis) {
-			redis = createRedis();
-		}
-
-		refreshRedis();
-
-		redis->conn->select(db);
-
-		return redis;
+		auto info = DBBaseManager::getInfo();
+		info->conn->select(db);
+		return info;
 	}
 
-	void RedisManager::putConn(RedisSP redis)
-	{
-		std::lock_guard<std::mutex> lock(lockObject);
-		redisSet.insert(redis);
-	}
-
-	RedisSP RedisManager::createRedis()
+	RedisSP RedisManager::createInfo()
 	{
 		std::shared_ptr<cpp_redis::client> conn = std::make_shared<cpp_redis::client>();
 		conn->connect(address, port);
@@ -429,22 +408,9 @@ namespace DBBD
 		return redis;
 	}
 
-	void RedisManager::refreshRedis()
+	void RedisManager::closeInfoInternal(RedisSP info)
 	{
-		auto now = std::chrono::system_clock::now();
-		std::lock_guard<std::mutex> lock(lockObject);
-		for (auto iter = redisSet.begin(); iter != redisSet.end();) {
-			auto redis = *iter;
-			auto elapsed = now - redis->usedTime;
-			auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed);
-			if (elapsedSeconds.count() >= 60 * 30) {
-				redis->conn->disconnect();
-				iter = redisSet.erase(iter);
-			}
-			else {
-				iter++;
-			}
-		}
+		info->conn->disconnect(true);
 	}
 #pragma endregion
 }
