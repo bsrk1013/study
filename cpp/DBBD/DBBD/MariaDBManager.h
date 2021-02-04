@@ -52,5 +52,15 @@ namespace DBBD
 		auto maria = getInfo();
 		MYSQL_STMT* stmt = mysql_stmt_init(maria->conn);
 		MYSQL_BIND bind[argVec.size()];
+		memset(&bind, 0, sizeof(MYSQL_BIND));
+
+		auto getType = [](std::any val) MYSQL_{
+
+		};
+
+		for (size_t i = 0; i < argVec.size(); i++) {
+			std::any arg = argVec[i];
+
+		}
 	}
 }
