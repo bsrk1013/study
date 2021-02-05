@@ -904,7 +904,6 @@ namespace DBBDTest
 		TEST_METHOD(MariaDBTest) {
 			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a", "Test");
 
-			//MariaDBManager::Instance()->exeQuery("select * from TestTable");
 			MariaDBManager::Instance()->exeQuery("delete from TestTable where name = ?", std::string ("test"));
 			MariaDBManager::Instance()->exeQuery("insert into TestTable(name) values(?)", std::string("test"));
 			MariaDBManager::Instance()->exeQuery("select * from TestTable where name = ?", std::string("test"));
