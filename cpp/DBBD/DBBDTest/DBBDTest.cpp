@@ -16,6 +16,7 @@
 #include <boost/thread.hpp>
 #include <queue>
 #include <vector>
+#include <cmath>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -601,6 +602,25 @@ namespace DBBDTest
 					Assert::IsTrue(strcmp(pair.second.c_str(), "b") == 0);
 				}
 			}
+
+			int lastClearFloor = 111;
+			float baseFloor = lastClearFloor / 10.0f;
+			int minFloor = std::floor(baseFloor) * 10;
+			int maxFloor = std::ceill(baseFloor) * 10;
+
+			int targetFloor1 = 120;
+			int targetFloor2 = 121;
+			int targetFloor3 = 30;
+
+			Assert::IsTrue(minFloor < targetFloor1&& targetFloor1 <= maxFloor);
+			Assert::IsFalse(minFloor < targetFloor2&& targetFloor2 <= maxFloor);
+			Assert::IsFalse(minFloor < targetFloor3&& targetFloor3 <= maxFloor);
+
+			/*float fSection = lastClearFloor / 10.0f;
+			int nSection = std::ceill(fSection) * 10;
+			Assert::IsTrue(nSection >= targetFloor);
+			targetFloor = 41;
+			Assert::IsFalse(nSection >= targetFloor);*/
 		}
 
 		TEST_METHOD(FunctionTest) {
@@ -884,7 +904,10 @@ namespace DBBDTest
 		TEST_METHOD(MariaDBTest) {
 			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a", "Test");
 
-			MariaDBManager::Instance()->exeQuery("select * from TestTable");
+			//MariaDBManager::Instance()->exeQuery("select * from TestTable");
+			MariaDBManager::Instance()->exeQuery("delete from TestTable where name = ?", std::string ("test"));
+			MariaDBManager::Instance()->exeQuery("insert into TestTable(name) values(?)", std::string("test"));
+			MariaDBManager::Instance()->exeQuery("select * from TestTable where name = ?", std::string("test"));
 		}
 	};
 }

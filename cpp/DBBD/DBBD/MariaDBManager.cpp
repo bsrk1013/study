@@ -24,6 +24,33 @@ namespace DBBD
 		std::cout << name << " init, ip: " << address << ", port: " << port << std::endl;
 	}
 
+	void MariaDBManager::stmtBind(MYSQL_BIND* bind, std::vector<std::any> args)
+	{
+		for (size_t i = 0; i < args.size(); i++) {
+			std::any arg = args[i];
+
+			if (auto castByte = arg._Cast<BYTE>()) {
+				bind[i].buffer_type = MYSQL_TYPE_TINY;
+				bind[i].buffer = castByte;
+			}
+			else if (auto castShort = arg._Cast<short>()) {
+				bind[i].buffer_type = MYSQL_TYPE_SHORT;
+				bind[i].buffer = castShort;
+			}
+			else if (auto castInt = arg._Cast<int>()) {
+				bind[i].buffer_type = MYSQL_TYPE_LONG;
+				bind[i].buffer = castInt;
+			}
+			else if (auto castString = arg._Cast<std::string>()) {
+				bind[i].buffer_type = MYSQL_TYPE_STRING;
+				bind[i].buffer = (char*)castString->c_str();
+				bind[i].buffer_length = castString->size();
+			}
+			else {
+			}
+		}
+	}
+
 	//void MariaDBManager::exeQuery(std::string query)
 	//{
 	//	auto maria = getInfo();
