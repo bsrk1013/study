@@ -24,60 +24,99 @@ namespace DBBD
 		std::cout << name << " init, ip: " << address << ", port: " << port << std::endl;
 	}
 
-	void MariaDBManager::stmtBind(MYSQL_BIND* bind, std::vector<std::any> args)
+	std::map<std::string, std::string> MariaDBManager::execute(std::string query, ExecuteResultParam method)
 	{
-		for (size_t i = 0; i < args.size(); i++) {
-			std::any arg = args[i];
+		std::map<std::string, std::string> result;
 
-			if (auto castByte = arg._Cast<BYTE>()) {
-				bind[i].buffer_type = MYSQL_TYPE_TINY;
-				bind[i].buffer = castByte;
-			}
-			else if (auto castShort = arg._Cast<short>()) {
-				bind[i].buffer_type = MYSQL_TYPE_SHORT;
-				bind[i].buffer = castShort;
-			}
-			else if (auto castInt = arg._Cast<int>()) {
-				bind[i].buffer_type = MYSQL_TYPE_LONG;
-				bind[i].buffer = castInt;
-			}
-			else if (auto castString = arg._Cast<std::string>()) {
-				bind[i].buffer_type = MYSQL_TYPE_STRING;
-				bind[i].buffer = (char*)castString->c_str();
-				bind[i].buffer_length = castString->size();
-			}
-			else {
-			}
+		auto maria = getInfo();
+
+		int error = mysql_query(maria->conn, query.c_str());
+		if (error) {
+			std::string errorString = mysql_error(maria->conn);
+			std::cout << "MariaDBManager, exeQuery error, message: " << errorString << std::endl;
+			//return result;
 		}
+
+		auto queryResult = mysql_store_result(maria->conn);
+		if (queryResult) {
+			int fieldCount = mysql_num_fields(queryResult);
+
+			/*if (method) {
+				method(result, fieldCount);
+			}*/
+
+			std::vector<std::string> fields;
+			while (auto field = mysql_fetch_field(queryResult)) {
+				fields.push_back(field->name);
+			}
+
+			while (auto row = mysql_fetch_row(queryResult)) {
+				for (int i = 0; i < fieldCount; i++) {
+					std::string field = fields[i];
+					std::string value = row[i];
+
+					result[field] = value;
+				}
+			}
+
+			mysql_free_result(queryResult);
+		}
+
+		return result;
 	}
 
-	//void MariaDBManager::exeQuery(std::string query)
-	//{
-	//	auto maria = getInfo();
-	//	MYSQL_STMT* stmt = mysql_stmt_init(maria->conn);
+	std::string MariaDBManager::queryBind(std::string origin, std::vector<std::any> args)
+	{
+		auto queryParts = split(origin, '?');
 
+		if (queryParts.size() != args.size()) {
+			if(args.size() == 1 && queryParts.size() == 2){}
+			else {
+				std::string error = "illegal query bind, query: " + origin + ", argsCount: " + std::to_string(args.size());
+				throw std::exception(error.c_str());
+			}
+		}
 
+		std::string query;
+		for (size_t i = 0; i < queryParts.size(); i++) {
+			query += queryParts[i];
 
-	//	/*int error = mysql_query(maria->conn, query.c_str());
-	//	if (error) {
-	//		std::cout << "MariaDBManager, exeQuery error, message: " << mysql_error(maria->conn) << std::endl;
-	//		return;
-	//	}
+			if (args.size() <= i) { continue; }
 
-	//	auto result = mysql_store_result(maria->conn);
-	//	int fieldCount = mysql_num_fields(result);
-	//	
-	//	MYSQL_ROW row;
-	//	while (row = mysql_fetch_row(result))
-	//	{
-	//		for (int i = 0; i < fieldCount; i++) {
-	//		}
-	//	}
+			query += "'";
+			auto arg = args[i];
+			if (auto castByte = arg._Cast<BYTE>()) {
+				query += std::to_string(*castByte);
+			}
+			else if (auto castShort = arg._Cast<short>()) {
+				query += std::to_string(*castShort);
+			}
+			else if (auto castInt = arg._Cast<int>()) {
+				query += std::to_string(*castInt);
+			}
+			else if (auto castString = arg._Cast<std::string>()) {
+				query += *castString;
+			}
+			else if (auto castChar = arg._Cast<const char*>()) {
+				query += *castChar;
+			}
+			query += "'";
+		}
 
-	//	mysql_free_result(result);*/
+		return query;
+	}
 
-	//	return;
-	//}
+	std::vector<std::string> MariaDBManager::split(std::string input, char delimiter) {
+		std::vector<std::string> answer;
+		std::stringstream ss(input);
+		std::string temp;
+
+		while (getline(ss, temp, delimiter)) {
+			answer.push_back(temp);
+		}
+
+		return answer;
+	}
 
 	MariaSP MariaDBManager::createInfo()
 	{

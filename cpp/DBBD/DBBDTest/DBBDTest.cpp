@@ -902,11 +902,41 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(MariaDBTest) {
+			struct TestInfo {
+				long uid;
+				std::string name;
+			};
+
+			enum GAME_SP {
+				TEST_INSERT_SP,
+				TEST_SELECT_SP,
+			};
+
 			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a", "Test");
 
-			MariaDBManager::Instance()->exeQuery("delete from TestTable where name = ?", std::string ("test"));
-			MariaDBManager::Instance()->exeQuery("insert into TestTable(name) values(?)", std::string("test"));
-			MariaDBManager::Instance()->exeQuery("select * from TestTable where name = ?", std::string("test"));
+			std::string a = "test";
+			auto b = a.c_str();
+			const char* value = "test";
+			MariaDBManager::Instance()->exeQuery("delete from TestTable where name = ?", nullptr, b);
+			MariaDBManager::Instance()->exeSP("TEST_INSERT_SP", nullptr, b);
+			auto result = MariaDBManager::Instance()->exeSP("TEST_SELECT_SP", nullptr, b);
+
+			auto name = result["name"];
+			Assert::IsTrue(strcmp(name.c_str(), "test") == 0);
+		}
+
+		TEST_METHOD(QueryParsingTest) {
+			std::string query = "delete from TestTable where name = ? and uid = ?";
+			std::string value1 = "test";
+			int value2 = 15;
+
+			std::vector<std::any> args;
+			args.push_back(std::any(value1));
+			args.push_back(std::any(value2));
+
+			//auto resultQuery = MariaDBManager::Instance()->queryBind(query, args);
+
+			//Assert::IsTrue(strcmp(resultQuery.c_str(), "delete from TestTable where name = test and uid = 15") == 0);
 		}
 	};
 }

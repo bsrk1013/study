@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <set>
+#include <map>
 #include <mutex>
 #include "Define.h"
 #include "Singleton.h"
@@ -17,7 +18,7 @@ namespace DBBD
 	};
 
 	using MariaSP = std::shared_ptr<MariaConnInfo>;
-	using ExeParam = std::function<void(MYSQL_RES*)>;
+	using ExecuteResultParam = std::function<void(MYSQL_RES*, int)>;
 
 	class MariaDBManager : public DBBaseManager<MariaSP>, public Singleton<MariaDBManager>
 	{
@@ -28,11 +29,14 @@ namespace DBBD
 
 	public:
 		template <typename ... Args>
-		void exeQuery(std::string query, Args ... args/*, ExeParam callback*/);
-		void exeSP(std::string sp/*, ExeParam callback*/);
+		std::map<std::string, std::string> exeQuery(std::string query, ExecuteResultParam method, Args ... args);
+		template <typename ... Args>
+		std::map<std::string, std::string> exeSP(std::string sp, ExecuteResultParam method, Args ... args);;
 
 	private:
-		void stmtBind(MYSQL_BIND* bind, std::vector<std::any> args);
+		std::map<std::string, std::string> execute(std::string query, ExecuteResultParam method);
+		std::string queryBind(std::string origin, std::vector<std::any> args);
+		std::vector<std::string> split(std::string input, char delimiter);
 
 	private:
 		virtual MariaSP createInfo() override;
@@ -48,35 +52,30 @@ namespace DBBD
 	};
 
 	template <typename ... Args>
-	void MariaDBManager::exeQuery(std::string query, Args ... args)
+	std::map<std::string, std::string> MariaDBManager::exeQuery(std::string query, ExecuteResultParam method, Args ... args)
+	{
+		std::vector<std::any> argVec = { args... };
+		auto resultQuery = queryBind(query, argVec);
+
+		return execute(resultQuery, method);
+	}
+
+	template <typename ... Args>
+	std::map<std::string, std::string> MariaDBManager::exeSP(std::string spName, ExecuteResultParam method, Args ... args)
 	{
 		std::vector<std::any> argVec = { args... };
 		int paramCount = argVec.size();
 
-		auto maria = getInfo();
-		MYSQL_STMT* stmt = mysql_stmt_init(maria->conn);
-		MYSQL_BIND* bind = new MYSQL_BIND[paramCount];
-		memset(bind, 0, sizeof(MYSQL_BIND));
+		std::string query = "call " + spName + "(";
+		for (size_t i = 0; i < paramCount; i++) {
+			query += "?";
+			if (i + 1 < paramCount) {
+				query += ", ";
+			}
+		}
+		query += ")";
+		std::string resultQuery = queryBind(query, argVec);
 
-		stmtBind(bind, argVec);
-
-		std::string error;
-		int errorCode = 0;
-		my_bool result;
-		/*if (mysql_stmt_prepare(stmt, query.c_str(), query.size())) {
-			error = mysql_stmt_error(stmt);
-			return;
-		}*/
-
-		result = mysql_stmt_attr_set(stmt, STMT_ATTR_PREBIND_PARAMS, &paramCount);
-		result = mysql_stmt_bind_param(stmt, bind);
-		errorCode = mariadb_stmt_execute_direct(stmt, query.c_str(), -1);
-
-		auto storeResult = mysql_store_result(stmt->mysql);
-
-		error = mysql_stmt_error(stmt);
-
-		mysql_stmt_close(stmt);
-		delete[] bind;
+		return execute(resultQuery, method);
 	}
 }
