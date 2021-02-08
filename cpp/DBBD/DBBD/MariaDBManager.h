@@ -2,10 +2,12 @@
 #include <string>
 #include <set>
 #include <map>
+#include <queue>
 #include <mutex>
 #include "Define.h"
 #include "Singleton.h"
 #include "DBBaseManager.h"
+#include "TimerObject.h"
 #include "mysql.h"
 
 namespace DBBD
@@ -18,7 +20,7 @@ namespace DBBD
 	};
 
 	using MariaSP = std::shared_ptr<MariaConnInfo>;
-	class MariaDBManager : public DBBaseManager<MariaSP>, public Singleton<MariaDBManager>
+	class MariaDBManager : public DBBaseManager<MariaSP>, public Singleton<MariaDBManager>, public TimerObject
 	{
 	public:
 		void init(const std::string& address, const int& port,
@@ -27,14 +29,72 @@ namespace DBBD
 
 	public:
 		template <typename ... Args>
-		std::map<std::string, std::string> exeQuery(std::string query, Args ... args);
+		void enqueQuery(std::string query, Args ... args)
+		{
+			std::vector<std::any> argVec = { args... };
+			auto resultQuery = queryBind(query, argVec);
+
+			{
+				std::scoped_lock<std::mutex> lock(lockObject);
+				queryQueue.push(resultQuery);
+			}
+		}
+
 		template <typename ... Args>
-		std::map<std::string, std::string> exeSP(std::string sp, Args ... args);;
+		void enqueSP(std::string spName, Args ... args)
+		{
+			std::vector<std::any> argVec = { args... };
+			int paramCount = argVec.size();
+
+			std::string query = "call " + spName + "(";
+			for (size_t i = 0; i < paramCount; i++) {
+				query += "?";
+				if (i + 1 < paramCount) {
+					query += ", ";
+				}
+			}
+			query += ")";
+			std::string resultQuery = queryBind(query, argVec);
+
+			{
+				std::scoped_lock<std::mutex> lock(lockObject);
+				queryQueue.push(resultQuery);
+			}
+		}
+
+		template <typename ... Args>
+		std::map<std::string, std::string> exeQuery(std::string query, Args ... args)
+		{
+			std::vector<std::any> argVec = { args... };
+			auto resultQuery = queryBind(query, argVec);
+
+			return execute(resultQuery);
+		}
+
+		template <typename ... Args>
+		std::map<std::string, std::string> exeSP(std::string spName, Args ... args)
+		{
+			std::vector<std::any> argVec = { args... };
+			int paramCount = argVec.size();
+
+			std::string query = "call " + spName + "(";
+			for (size_t i = 0; i < paramCount; i++) {
+				query += "?";
+				if (i + 1 < paramCount) {
+					query += ", ";
+				}
+			}
+			query += ")";
+			std::string resultQuery = queryBind(query, argVec);
+
+			return execute(resultQuery);
+		}
 
 	private:
 		std::map<std::string, std::string> execute(std::string query);
 		std::string queryBind(std::string origin, std::vector<std::any> args);
 		std::vector<std::string> split(std::string input, char delimiter);
+		void update();
 
 	private:
 		virtual MariaSP createInfo() override;
@@ -47,33 +107,7 @@ namespace DBBD
 		std::string psw;
 		std::string db;
 		short maxConnCount;
+		ThreadSP thread;
+		std::queue<std::string> queryQueue;
 	};
-
-	template <typename ... Args>
-	std::map<std::string, std::string> MariaDBManager::exeQuery(std::string query, Args ... args)
-	{
-		std::vector<std::any> argVec = { args... };
-		auto resultQuery = queryBind(query, argVec);
-
-		return execute(resultQuery);
-	}
-
-	template <typename ... Args>
-	std::map<std::string, std::string> MariaDBManager::exeSP(std::string spName, Args ... args)
-	{
-		std::vector<std::any> argVec = { args... };
-		int paramCount = argVec.size();
-
-		std::string query = "call " + spName + "(";
-		for (size_t i = 0; i < paramCount; i++) {
-			query += "?";
-			if (i + 1 < paramCount) {
-				query += ", ";
-			}
-		}
-		query += ")";
-		std::string resultQuery = queryBind(query, argVec);
-
-		return execute(resultQuery);
-	}
 }

@@ -20,6 +20,13 @@ namespace DBBD
 			infoSet.insert(maria);
 		}
 
+		thread = NEW_THREAD_SP([this]() {
+			while (true) {
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				update();
+			}
+			});
+
 		isInit = true;
 		std::cout << name << " init, ip: " << address << ", port: " << port << std::endl;
 	}
@@ -34,7 +41,7 @@ namespace DBBD
 		if (error) {
 			std::string errorString = mysql_error(maria->conn);
 			std::cout << "MariaDBManager, exeQuery error, message: " << errorString << std::endl;
-			//return result;
+			return result;
 		}
 
 		auto queryResult = mysql_store_result(maria->conn);
@@ -114,6 +121,23 @@ namespace DBBD
 		return answer;
 	}
 
+	void MariaDBManager::update() {
+		std::string totalQuery;
+		{
+			std::scoped_lock<std::mutex> lock(lockObject);
+			if (queryQueue.empty()) { return; }
+
+			while (!queryQueue.empty()) {
+				std::string query = queryQueue.front();
+				queryQueue.pop();
+				totalQuery += query += ";";
+			}
+		}
+
+		auto maria = getInfo();
+		execute(totalQuery);
+	}
+
 	MariaSP MariaDBManager::createInfo()
 	{
 		MYSQL* mysql = mysql_init(NULL);
@@ -121,6 +145,8 @@ namespace DBBD
 
 		mysql_set_character_set(mysql, "euckr");
 		mysql_options(mysql, MYSQL_INIT_COMMAND, "SET NAMES euckr");
+		mysql_options(mysql, MARIADB_OPT_MULTI_STATEMENTS, (void*)"");
+		mysql_set_server_option(mysql, MYSQL_OPTION_MULTI_STATEMENTS_ON);
 
 		MariaSP maria = std::make_shared<MariaConnInfo>();
 		maria->conn = mysql;
