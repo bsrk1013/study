@@ -18,8 +18,6 @@ namespace DBBD
 	};
 
 	using MariaSP = std::shared_ptr<MariaConnInfo>;
-	using ExecuteResultParam = std::function<void(MYSQL_RES*, int)>;
-
 	class MariaDBManager : public DBBaseManager<MariaSP>, public Singleton<MariaDBManager>
 	{
 	public:
@@ -29,12 +27,12 @@ namespace DBBD
 
 	public:
 		template <typename ... Args>
-		std::map<std::string, std::string> exeQuery(std::string query, ExecuteResultParam method, Args ... args);
+		std::map<std::string, std::string> exeQuery(std::string query, Args ... args);
 		template <typename ... Args>
-		std::map<std::string, std::string> exeSP(std::string sp, ExecuteResultParam method, Args ... args);;
+		std::map<std::string, std::string> exeSP(std::string sp, Args ... args);;
 
 	private:
-		std::map<std::string, std::string> execute(std::string query, ExecuteResultParam method);
+		std::map<std::string, std::string> execute(std::string query);
 		std::string queryBind(std::string origin, std::vector<std::any> args);
 		std::vector<std::string> split(std::string input, char delimiter);
 
@@ -52,16 +50,16 @@ namespace DBBD
 	};
 
 	template <typename ... Args>
-	std::map<std::string, std::string> MariaDBManager::exeQuery(std::string query, ExecuteResultParam method, Args ... args)
+	std::map<std::string, std::string> MariaDBManager::exeQuery(std::string query, Args ... args)
 	{
 		std::vector<std::any> argVec = { args... };
 		auto resultQuery = queryBind(query, argVec);
 
-		return execute(resultQuery, method);
+		return execute(resultQuery);
 	}
 
 	template <typename ... Args>
-	std::map<std::string, std::string> MariaDBManager::exeSP(std::string spName, ExecuteResultParam method, Args ... args)
+	std::map<std::string, std::string> MariaDBManager::exeSP(std::string spName, Args ... args)
 	{
 		std::vector<std::any> argVec = { args... };
 		int paramCount = argVec.size();
@@ -76,6 +74,6 @@ namespace DBBD
 		query += ")";
 		std::string resultQuery = queryBind(query, argVec);
 
-		return execute(resultQuery, method);
+		return execute(resultQuery);
 	}
 }

@@ -1,26 +1,28 @@
 #include "CppExtractor.h"
 
+using namespace std;
+
 CppExtractor::CppExtractor(std::filesystem::path basePath, std::vector<std::string>& fileList)
 	: BaseExtractor(ExtractorType::Cpp, basePath, fileList) {
 
 }
 
-void CppExtractor::writeHeader(std::ofstream& ofs) {
-	ofs << "#pragma once" << std::endl;
-	ofs << "#include \"DBBD/Cell.h\"" << std::endl;
-	ofs << "#include \"DBBD/Request.h\"" << std::endl;
-	ofs << "#include \"DBBD/Response.h\"" << std::endl;
-	ofs << "#include \"ProtocolType.hpp\"" << std::endl;
-	ofs << std::endl;
+void CppExtractor::writeHeader(ofstream& ofs) {
+	ofs << "#pragma once" << endl;
+	ofs << "#include \"DBBD/Cell.h\"" << endl;
+	ofs << "#include \"DBBD/Request.h\"" << endl;
+	ofs << "#include \"DBBD/Response.h\"" << endl;
+	ofs << "#include \"ProtocolType.hpp\"" << endl;
+	ofs << endl;
 }
 
-void CppExtractor::writeCell(std::ofstream& ofs) {
+void CppExtractor::writeCell(ofstream& ofs) {
 	writeContentsHeader(ofs);
 	writeCellContents(ofs);
-	ofs << "}" << std::endl;
+	ofs << "}" << endl;
 }
 
-void CppExtractor::writeProtocol(std::ofstream& ofs) {
+void CppExtractor::writeProtocol(ofstream& ofs) {
 	writeContentsHeader(ofs);
 
 	for (auto info : headerInfoList) {
@@ -30,57 +32,57 @@ void CppExtractor::writeProtocol(std::ofstream& ofs) {
 		}
 	}
 
-	ofs << "};" << std::endl;
+	ofs << "};" << endl;
 }
 
-void CppExtractor::writeConst(std::ofstream& ofs, std::string fileName) {
+void CppExtractor::writeConst(ofstream& ofs, string fileName) {
 	size_t pos = fileName.find(".");
 	auto namespaceName = fileName.substr(0, pos);
-	ofs << "#include <map>" << std::endl << std::endl;
-	ofs << "namespace " << namespaceName << " {" << std::endl;
-	ofs << "\tenum class Value {" << std::endl;
+	ofs << "#include <map>" << endl << endl;
+	ofs << "namespace " << namespaceName << " {" << endl;
+	ofs << "\tenum class Value {" << endl;
 	for (auto info : headerInfoList) {
-		ofs << "\t\t" << info.name << " = " << info.value << "," << std::endl;
+		ofs << "\t\t" << info.name << " = " << info.value << "," << endl;
 	}
-	ofs << "\t};" << std::endl;
+	ofs << "\t};" << endl;
 
-	ofs << "\tstd::map<Value, std::string> stringMap = {" << std::endl;
+	ofs << "\tstd::map<Value, std::string> stringMap = {" << endl;
 	for (auto info : headerInfoList) {
-		ofs << "\t\t{ Value::" << info.name << ", \"" << info.name << "\" }," << std::endl;
+		ofs << "\t\t{ Value::" << info.name << ", \"" << info.name << "\" }," << endl;
 	}
-	ofs << "\t};" << std::endl;
+	ofs << "\t};" << endl;
 
-	ofs << "\tstd::string Get(Value value) {" << std::endl;
-	ofs << "\t\tauto iter = " << namespaceName << "::stringMap.find(value);" << std::endl;
-	ofs << "\t\tif (iter == " << namespaceName << "::stringMap.end()) {" << std::endl;
-	ofs << "\t\t\treturn \"\";" << std::endl;
-	ofs << "\t\t}" << std::endl;
-	ofs << "\t\treturn iter->second;" << std::endl;
-	ofs << "\t}" << std::endl;
-	ofs << "}" << std::endl;
+	ofs << "\tstd::string Get(Value value) {" << endl;
+	ofs << "\t\tauto iter = " << namespaceName << "::stringMap.find(value);" << endl;
+	ofs << "\t\tif (iter == " << namespaceName << "::stringMap.end()) {" << endl;
+	ofs << "\t\t\treturn \"\";" << endl;
+	ofs << "\t\t}" << endl;
+	ofs << "\t\treturn iter->second;" << endl;
+	ofs << "\t}" << endl;
+	ofs << "}" << endl;
 }
 
-void CppExtractor::writeContentsHeader(std::ofstream& ofs) {
+void CppExtractor::writeContentsHeader(ofstream& ofs) {
 	for (auto info : headerInfoList) {
 		switch (info.fileType) {
 		case XmlElementType::Comment: {
-			ofs << "// " << info.value << std::endl;
+			ofs << "// " << info.value << endl;
 			break;
 		}
 		case XmlElementType::Protocol:
 		case XmlElementType::Cell: {
-			ofs << "class " << info.name << " : public DBBD::" << info.base << " {" << std::endl;
-			ofs << "public:" << std::endl;
+			ofs << "class " << info.name << " : public DBBD::" << info.base << " {" << endl;
+			ofs << "public:" << endl;
 			if (info.fileType == XmlElementType::Cell) {
-				ofs << "\t" << info.name << "() {}" << std::endl;
+				ofs << "\t" << info.name << "() {}" << endl;
 			}
 			else if (info.fileType == XmlElementType::Protocol) {
-				ofs << "\t" << info.name << "() {" << std::endl;
-				ofs << "\t\ttypeId = ProtocolType::" << info.type << ";" << std::endl;
+				ofs << "\t" << info.name << "() {" << endl;
+				ofs << "\t\ttypeId = ProtocolType::" << info.type << ";" << endl;
 				ofs << "\t}";
 			}
 
-			std::vector<FileInfo> realContents;
+			vector<FileInfo> realContents;
 			for (auto contentsInfo : contentsInfoList) {
 				if (contentsInfo.fileType != XmlElementType::Property) { continue; }
 				realContents.push_back(contentsInfo);
@@ -92,62 +94,73 @@ void CppExtractor::writeContentsHeader(std::ofstream& ofs) {
 					auto propertyInfo = realContents[i];
 					ofs << getPropertyType(propertyInfo.type) << " " << propertyInfo.name;
 				}
-				ofs << ")" << std::endl;
+				ofs << ")" << endl;
 				ofs << "\t\t: ";
 				for (size_t i = 0; i < realContents.size(); i++) {
 					if (i > 0) { ofs << ", "; }
 					auto propertyInfo = realContents[i];
 					ofs << propertyInfo.name << "(" << propertyInfo.name << ")";
 				}
-				ofs << std::endl << "\t{}" << std::endl;
+				ofs << endl << "\t{}" << endl;
 			}
 
-			ofs << "\t" << "virtual ~" << info.name << "() {}" << std::endl;
+			ofs << "\t" << "virtual ~" << info.name << "() {}" << endl;
 			break;
 		}
 		}
 	}
 
-	ofs << std::endl;
+	ofs << endl;
 }
 
-void CppExtractor::writeCellContents(std::ofstream& ofs) {
-	std::vector<FileInfo> realContents;
+void CppExtractor::writeCellContents(ofstream& ofs) {
+	vector<FileInfo> realContents;
 	for (auto contentsInfo : contentsInfoList) {
 		if (contentsInfo.fileType != XmlElementType::Property) { continue; }
 		realContents.push_back(contentsInfo);
 	}
 
-	ofs << "public:" << std::endl;
-	ofs << "\tvirtual void serialize(DBBD::Buffer& buffer) {" << std::endl;
-	for (auto info : realContents) {
-		ofs << "\t\t" << getDeSerialize(info.base, info.type, info.name, true) << std::endl;
-	}
-	ofs << "\t}" << std::endl;;
-
-	ofs << "\tvirtual void deserialize(DBBD::Buffer& buffer) {" << std::endl;
-	for (auto info : realContents) {
-		ofs << "\t\t" << getDeSerialize(info.base, info.type, info.name, false) << std::endl;
-	}
-	ofs << "\t}" << std::endl;;
-
-	ofs << "\tvirtual size_t getLength() {" << std::endl;
-	ofs << "\t\treturn ";
-	for (size_t i = 0; i < realContents.size(); i++) {
-		if (i > 0) {
-			ofs << " + ";
+	ofs << "public:" << endl;
+	ofs << "\tvirtual void serialize(DBBD::Buffer& buffer) {" << endl;
+	if (realContents.size() > 0) {
+		ofs << "\t\tDBBD::Serialize::writeArray(buffer, fingerPrinter);" << endl;
+		for (size_t i = 0; i < realContents.size(); i++) {
+			auto info = realContents[i];
+			ofs << "\t\tif(fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, true) << " }" << endl;
 		}
-		auto info = realContents[i];
-		ofs << getLength(info.type, info.name);
 	}
-	ofs << ";" << std::endl;
-	ofs << "\t}" << std::endl << std::endl;
+	ofs << "\t}" << endl;;
+
+	ofs << "\tvirtual void deserialize(DBBD::Buffer& buffer) {" << endl;
+	if (realContents.size() > 0) {
+		ofs << "\t\tDBBD::Deserialize::readArray(buffer, fingerPrinter);" << endl;
+		for (size_t i = 0; i < realContents.size(); i++) {
+			auto info = realContents[i];
+			ofs << "\t\tif(fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, false) << " }" << endl;
+		}
+	}
+	ofs << "\t}" << endl;;
+
+	ofs << "\tvirtual size_t getLength() {" << endl;
+	if (realContents.size() > 0) {
+		ofs << "\t\tsize_t totalLength = sizeof(size_t) + sizeof(fingerPrinter);" << endl;
+		for (size_t i = 0; i < realContents.size(); i++) {
+			auto info = realContents[i];
+			ofs << "\t\tif(fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
+		}
+	}
+	ofs << "\t\treturn totalLength();" << endl;
+	ofs << "\t}" << endl;
 
 	if (realContents.size() <= 0) { return; }
 
-	ofs << "public:" << std::endl;
-	for (auto info : realContents) {
-		std::string newName = "";
+	ofs << endl;
+
+	ofs << "public:" << endl;
+	for (size_t i = 0; i < realContents.size(); i++) {
+		auto info = realContents[i];
+
+		string newName = "";
 		for (size_t i = 0; i < info.name.size(); i++) {
 			char c = info.name[i];
 			if (i == 0) {
@@ -158,66 +171,82 @@ void CppExtractor::writeCellContents(std::ofstream& ofs) {
 			}
 		}
 
-		ofs << "\t" << getPropertyType(info.type) << " get" << newName << "() { return " << info.name << "; }" << std::endl;
-		ofs << "\tvoid set" << newName << "(" << getPropertyType(info.type) << " value) { " << info.name << " = value; }" << std::endl;
+		ofs << "\t" << getPropertyType(info.type) << " get" << newName << "() { return " << info.name << "; }" << endl;
+		ofs << "\tvoid set" << newName << "(" << getPropertyType(info.type) << " value) {" << endl;
+		ofs << "\t\t" << info.name << " = value;" << endl;
+		ofs << "\t\tfingerPrinter[" << i << "] = true;" << endl;
+		ofs << "\t}" << endl;
 	}
-	ofs << std::endl;
+	ofs << endl;
 
-	ofs << "protected:" << std::endl;
+	ofs << "protected:" << endl;
+	ofs << "\tbool fingerPrinter[" << realContents.size() << "] = { false, };" << endl;
 	for (auto info : contentsInfoList) {
 		switch (info.fileType) {
 		case XmlElementType::Comment:
-			ofs << "\t// " << info.value << std::endl;
+			ofs << "\t// " << info.value << endl;
 			break;
 		case XmlElementType::Property:
-			ofs << "\t" << getPropertyType(info.type) << " " << info.name << ";" << std::endl;
+			ofs << "\t" << getPropertyType(info.type) << " " << info.name << ";" << endl;
 			break;
 		}
 	}
 }
 
-void CppExtractor::writeProtocolContents(std::ofstream& ofs, std::string base) {
-	std::vector<FileInfo> realContents;
+void CppExtractor::writeProtocolContents(ofstream& ofs, string base) {
+	vector<FileInfo> realContents;
 	for (auto contentsInfo : contentsInfoList) {
 		if (contentsInfo.fileType != XmlElementType::Property) { continue; }
 		realContents.push_back(contentsInfo);
 	}
 
-	ofs << "public:" << std::endl;
-	ofs << "\tvirtual void serialize(DBBD::Buffer& buffer) {" << std::endl;
-	ofs << "\t\tDBBD::" << base << "::writeHeader(buffer, getLength());" << std::endl;
-	for (auto info : realContents) {
-		ofs << "\t\t" << getDeSerialize(info.base, info.type, info.name, true) << std::endl;
-	}
-	ofs << "\t}" << std::endl;;
-
-	ofs << "\tvirtual void deserialize(DBBD::Buffer& buffer) {" << std::endl;
-	ofs << "\t\tDBBD::" << base << "::readHeader(buffer);" << std::endl;
-	for (auto info : realContents) {
-		ofs << "\t\t" << getDeSerialize(info.base, info.type, info.name, false) << std::endl;
-	}
-	ofs << "\t}" << std::endl;;
-
-	ofs << "\tvirtual size_t getLength() {" << std::endl;
-	ofs << "\t\treturn DBBD::" << base << "::getLength()";
-	for (size_t i = 0; i < realContents.size(); i++) {
-		if (i > 0) {
-			ofs << " + ";
+	ofs << "public:" << endl;
+	ofs << "\tvirtual void serialize(DBBD::Buffer& buffer) {" << endl;
+	ofs << "\t\tDBBD::" << base << "::writeHeader(buffer, getLength());" << endl;
+	if (realContents.size() > 0) {
+		ofs << "\t\tDBBD::Serialize::writeArray(buffer, fingerPrinter);" << endl;
+		for (size_t i = 0; i < realContents.size(); i++) {
+			auto info = realContents[i];
+			ofs << "\t\tif(fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, true) << " }" << endl;
 		}
-		auto info = realContents[i];
-		ofs << getLength(info.type, info.name);
 	}
-	ofs << ";" << std::endl;
-	ofs << "\t}" << std::endl << std::endl;
+	ofs << "\t}" << endl;;
+
+	ofs << "\tvirtual void deserialize(DBBD::Buffer& buffer) {" << endl;
+	ofs << "\t\tDBBD::" << base << "::readHeader(buffer);" << endl;
+	if (realContents.size() > 0) {
+		ofs << "\t\tDBBD::Serialize::readArray(buffer, fingerPrinter);" << endl;
+		for (size_t i = 0; i < realContents.size(); i++) {
+			auto info = realContents[i];
+			ofs << "\t\tif(fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, false) << " }" << endl;
+		}
+	}
+	ofs << "\t}" << endl;;
+
+	ofs << "\tvirtual size_t getLength() {" << endl;
+	ofs << "\t\tsize_t totalLength = DBBD::" << base << "::getLength();" << endl;
+	if (realContents.size() > 0) {
+		ofs << "\t\ttotalLength += sizeof(size_t) + sizeof(fingerPrinter);" << endl;
+		for (size_t i = 0; i < realContents.size(); i++) {
+			auto info = realContents[i];
+			ofs << "\t\tif(fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
+		}
+	}
+	ofs << "\t\treturn totalLength;" << endl;
+	ofs << "\t}" << endl;
 
 	if (realContents.size() <= 0) { return; }
 
-	ofs << "public:" << std::endl;
-	for (auto info : realContents) {
-		std::string newName = "";
-		for (size_t i = 0; i < info.name.size(); i++) {
-			char c = info.name[i];
-			if (i == 0) {
+	ofs << endl;
+
+	ofs << "public:" << endl;
+	for (size_t i = 0; i < realContents.size(); i++) {
+		auto info = realContents[i];
+
+		string newName = "";
+		for (size_t j = 0; j < info.name.size(); j++) {
+			char c = info.name[j];
+			if (j == 0) {
 				newName += toupper(c);
 			}
 			else {
@@ -225,44 +254,47 @@ void CppExtractor::writeProtocolContents(std::ofstream& ofs, std::string base) {
 			}
 		}
 
-		ofs << "\t" << getPropertyType(info.type) << " get" << newName << "() { return " << info.name << "; }" << std::endl;
-		ofs << "\tvoid set" << newName << "(" << getPropertyType(info.type) << " value) { " << info.name << " = value; }" << std::endl;
+		ofs << "\t" << getPropertyType(info.type) << " get" << newName << "() { return " << info.name << "; }" << endl;
+		ofs << "\tvoid set" << newName << "(" << getPropertyType(info.type) << " value) {" << endl;
+		ofs << "\t\t" << info.name << " = value;" << endl;
+		ofs << "\t\t" << "fingerPrinter[" << i << "] = true;" << endl;
+		ofs << "\t}" << endl;
 	}
-	ofs << std::endl;
+	ofs << endl;
 
-	ofs << "protected:" << std::endl;
+	ofs << "protected:" << endl;
+	ofs << "\tbool fingerPrinter[" << realContents.size() << "] = { false, };" << endl;
 	for (auto info : contentsInfoList) {
 		switch (info.fileType) {
 		case XmlElementType::Comment:
-			ofs << "\t// " << info.value << std::endl;
+			ofs << "\t// " << info.value << endl;
 			break;
 		case XmlElementType::Property:
-			ofs << "\t" << getPropertyType(info.type) << " " << info.name << ";" << std::endl;
+			ofs << "\t" << getPropertyType(info.type) << " " << info.name << ";" << endl;
 			break;
 		}
 	}
 }
 
-std::string CppExtractor::getDeSerialize(std::string base, std::string type, std::string name, bool isSerialize) {
-	std::string baseProcess = isSerialize ? "DBBD::Serialize::write" : "DBBD::Deserialize::read";
+string CppExtractor::getDeSerialize(string base, string type, string name, bool isSerialize) {
+	string baseProcess = isSerialize ? "DBBD::Serialize::write" : "DBBD::Deserialize::read";
 	switch (HashCode(type.c_str())) {
 	case HashCode("string"):
 	case HashCode("int64"):
 		return baseProcess + "(buffer, " + name + ");";
-		//return ofs << "\t\t" << base << "(buffer, " << name << ");" << std::endl;
 	default:
 		if (strcmp(base.c_str(), "cell") == 0
 			|| strcmp(base.c_str(), "Cell") == 0) {
 			return baseProcess + "(buffer, dynamic_cast<DBBD::Cell*>(&" + name + ");";
 		}
 		else {
-			std::string msg = "illegal type and base, type: " + type + ", base: " + base;
-			new std::exception(msg.c_str());
+			string msg = "illegal type and base, type: " + type + ", base: " + base;
+			new exception(msg.c_str());
 		}
 	}
 }
 
-std::string CppExtractor::getLength(std::string type, std::string name) {
+string CppExtractor::getLength(string type, string name) {
 	switch (HashCode(type.c_str())) {
 	case HashCode("int64"):
 		return "sizeof(" + getPropertyType(type) + ")";

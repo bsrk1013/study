@@ -24,7 +24,7 @@ namespace DBBD
 		std::cout << name << " init, ip: " << address << ", port: " << port << std::endl;
 	}
 
-	std::map<std::string, std::string> MariaDBManager::execute(std::string query, ExecuteResultParam method)
+	std::map<std::string, std::string> MariaDBManager::execute(std::string query)
 	{
 		std::map<std::string, std::string> result;
 
@@ -40,10 +40,6 @@ namespace DBBD
 		auto queryResult = mysql_store_result(maria->conn);
 		if (queryResult) {
 			int fieldCount = mysql_num_fields(queryResult);
-
-			/*if (method) {
-				method(result, fieldCount);
-			}*/
 
 			std::vector<std::string> fields;
 			while (auto field = mysql_fetch_field(queryResult)) {

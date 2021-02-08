@@ -1,32 +1,36 @@
 #pragma once
 #include <string>
+#include "Buffer.h"
+#include "Cell.h"
 
 namespace DBBD {
-	class Buffer;
-	class Cell;
 	class Deserialize
 	{
 		// Value Read
 	public:
-		static void read(Buffer& buffer, unsigned char& value);
-		static void read(Buffer& buffer, short& value);
-		static void read(Buffer& buffer, int& value);
-		static void read(Buffer& buffer, long& value);
-		static void read(Buffer& buffer, size_t& value);
+		template<typename T>
+		static void read(Buffer& buffer, T& value) {
+			char* dataBuffer = buffer.readByteBlock(sizeof(T));
+			memcpy(&value, dataBuffer, sizeof(T));
+		}
 		static void read(Buffer& buffer, std::string& value);
 		static void read(Buffer& buffer, char* value);
-
 		static void read(Buffer& buffer, Cell* value);
 
 		// Array Read
 	public:
-		template<typename T>
-		static void readArray(Buffer& buffer, T*& values);
+		template<typename T, size_t size>
+		static void readArray(Buffer& buffer, T(&values)[size]) {
+			size_t arraySize;
+			read(buffer, arraySize);
+			//values = new T[arraySize];
+			for (size_t i = 0; i < arraySize; i++) {
+				T value;
+				read(buffer, value);
+				values[i] = value;
+			}
+		}
 		template<typename T1, typename T2>
 		static void readVector(Buffer& buffer, T1& vec);
-
-	private:
-		template<typename T>
-		static void read(Buffer& buffer, T& value);
 	};
 }

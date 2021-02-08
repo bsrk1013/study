@@ -288,25 +288,46 @@ namespace DBBDTest
 			class User : public Cell {
 			public:
 				User() {}
-				User(std::string nickname, short level) :nickname(nickname), level(level) {}
 				virtual ~User() {}
 
 			public:
 				virtual void serialize(Buffer& buffer) {
-					Serialize::write(buffer, nickname);
-					Serialize::write(buffer, level);
+					Serialize::writeArray(buffer, fingerPrinter);
+					if (fingerPrinter[0]) { Serialize::write(buffer, nickname); }
+					if (fingerPrinter[1]) { Serialize::write(buffer, level); }
 				}
 
 				virtual void deserialize(Buffer& buffer) {
-					Deserialize::read(buffer, nickname);
-					Deserialize::read(buffer, level);
+					Deserialize::readArray(buffer, fingerPrinter);
+					if (fingerPrinter[0]) { Deserialize::read(buffer, nickname); }
+					if (fingerPrinter[1]) { Deserialize::read(buffer, level); }
 				}
 
 				virtual size_t getLength() {
-					return sizeof(size_t) + nickname.length() + sizeof(level);
+					size_t totalLength = sizeof(size_t) + sizeof(fingerPrinter);
+					if (fingerPrinter[0]) {
+						totalLength += sizeof(size_t) + nickname.length();
+					}
+					if (fingerPrinter[1]) {
+						totalLength += sizeof(level);
+					}
+					return totalLength;
 				}
 
 			public:
+				void setNickname(std::string value) {
+					nickname = value;
+					fingerPrinter[0] = true;
+				}
+				std::string getNickname() { return nickname; }
+				void setLevel(short value) {
+					level = value;
+					fingerPrinter[1] = true;
+				}
+				short getLevel() { return level; }
+
+			private:
+				bool fingerPrinter[2] = { false, };
 				std::string nickname;
 				short level;
 			};
@@ -347,7 +368,8 @@ namespace DBBDTest
 			};
 
 			LoginReq req;
-			User user{ "doby", 99 };
+			User user;
+			user.setLevel(15);
 
 			req.setUser(user);
 
@@ -390,8 +412,8 @@ namespace DBBDTest
 			}
 
 			Assert::AreEqual(req.getTypeId(), loginReq.getTypeId());
-			Assert::AreEqual(req.getUser().nickname, loginReq.getUser().nickname);
-			Assert::AreEqual(req.getUser().level, loginReq.getUser().level);
+			//Assert::AreEqual(req.getUser().nickname, loginReq.getUser().nickname);
+			Assert::AreEqual(req.getUser().getLevel(), loginReq.getUser().getLevel());
 		}
 
 		TEST_METHOD(RequestTest2) {
@@ -917,9 +939,9 @@ namespace DBBDTest
 			std::string a = "test";
 			auto b = a.c_str();
 			const char* value = "test";
-			MariaDBManager::Instance()->exeQuery("delete from TestTable where name = ?", nullptr, b);
-			MariaDBManager::Instance()->exeSP("TEST_INSERT_SP", nullptr, b);
-			auto result = MariaDBManager::Instance()->exeSP("TEST_SELECT_SP", nullptr, b);
+			MariaDBManager::Instance()->exeQuery("delete from TestTable where name = ?", b);
+			MariaDBManager::Instance()->exeSP("TEST_INSERT_SP", b);
+			auto result = MariaDBManager::Instance()->exeSP("TEST_SELECT_SP", b);
 
 			auto name = result["name"];
 			Assert::IsTrue(strcmp(name.c_str(), "test") == 0);

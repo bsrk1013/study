@@ -16,21 +16,30 @@ public:
 public:
 	virtual void serialize(DBBD::Buffer& buffer) {
 		DBBD::Request::writeHeader(buffer, getLength());
-		DBBD::Serialize::write(buffer, SessionId);
+		DBBD::Serialize::writeArray(buffer, fingerPrinter);
+		if(fingerPrinter[0]) { DBBD::Serialize::write(buffer, SessionId); }
 	}
 	virtual void deserialize(DBBD::Buffer& buffer) {
 		DBBD::Request::readHeader(buffer);
-		DBBD::Deserialize::read(buffer, SessionId);
+		DBBD::Serialize::readArray(buffer, fingerPrinter);
+		if(fingerPrinter[0]) { DBBD::Deserialize::read(buffer, SessionId); }
 	}
 	virtual size_t getLength() {
-		return DBBD::Request::getLength()sizeof(long);
+		size_t totalLength = DBBD::Request::getLength();
+		totalLength += sizeof(size_t) + sizeof(fingerPrinter);
+		if(fingerPrinter[0]) { totalLength += sizeof(long); }
+		return totalLength;
 	}
 
 public:
 	long getSessionId() { return SessionId; }
-	void setSessionId(long value) { SessionId = value; }
+	void setSessionId(long value) {
+		SessionId = value;
+		fingerPrinter[0] = true;
+	}
 
 protected:
+	bool fingerPrinter[1] = { false, };
 	long SessionId;
 };
 
@@ -48,9 +57,9 @@ public:
 		DBBD::Response::readHeader(buffer);
 	}
 	virtual size_t getLength() {
-		return DBBD::Response::getLength();
+		size_t totalLength = DBBD::Response::getLength();
+		return totalLength;
 	}
-
 };
 
 // 핑 요청
@@ -71,9 +80,9 @@ public:
 		DBBD::Request::readHeader(buffer);
 	}
 	virtual size_t getLength() {
-		return DBBD::Request::getLength();
+		size_t totalLength = DBBD::Request::getLength();
+		return totalLength;
 	}
-
 };
 
 // 핑 응답
@@ -94,8 +103,8 @@ public:
 		DBBD::Response::readHeader(buffer);
 	}
 	virtual size_t getLength() {
-		return DBBD::Response::getLength();
+		size_t totalLength = DBBD::Response::getLength();
+		return totalLength;
 	}
-
 };
 
