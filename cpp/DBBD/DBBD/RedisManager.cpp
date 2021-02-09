@@ -2,7 +2,8 @@
 
 namespace DBBD
 {
-	void RedisManager::init(const std::string& address, const short& port, const short& maxConnCount)
+	void RedisManager::init(const std::string& address, const short& port,
+		const short& maxConnCount)
 	{
 		this->address = address;
 		this->port = port;
@@ -25,6 +26,15 @@ namespace DBBD
 
 		isInit = true;
 		std::cout << "RedisManager init, ip: " << address << ", port: " << port << std::endl;
+	}
+
+	void RedisManager::release()
+	{
+		for (auto info : infoSet) {
+			closeInfoInternal(info);
+		}
+
+		infoSet.clear();
 	}
 
 #pragma region KEYS

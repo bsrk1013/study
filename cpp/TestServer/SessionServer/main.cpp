@@ -12,19 +12,22 @@ int main() {
 	DBBD::RedisManager::Instance()->init("118.67.134.160", 6379);
 	DBBD::MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a");
 
-	server.start();
 
-	auto mysqlConn = DBBD::MysqlManager::Instance()->getConn();
-	//auto mariaConn = DBBD::MariaDBManager::Instance()->getConn();
+	try {
+		server.start();
 
-	while (true) {
-		std::string a;
-		std::getline(std::cin, a);
+		while (true) {
+			std::string a;
+			std::getline(std::cin, a);
 
-		if (a == "exit") {
-			server.stop();
-			break;
+			if (a == "exit") {
+				server.stop();
+				break;
+			}
 		}
+	}
+	catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
 	}
 
 	return 0;

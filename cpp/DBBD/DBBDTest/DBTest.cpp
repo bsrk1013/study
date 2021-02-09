@@ -39,11 +39,59 @@ namespace DBBDTest
 			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a", "Test");
 
 			const char* value1 = "ENQUEU_QUERY_TEST1";
-			MariaDBManager::Instance()->enqueSP("TEST_INSERT_SP", value1);
 			const char* value2 = "ENQUEU_QUERY_TEST2";
+
+			MariaDBManager::Instance()->exeQuery("delete from TestTable where name = ?", "ENQUEU_QUERY_TEST1");
+			MariaDBManager::Instance()->exeQuery("delete from TestTable where name = ?", "ENQUEU_QUERY_TEST2");
+
+			MariaDBManager::Instance()->enqueSP("TEST_INSERT_SP", value1);
 			MariaDBManager::Instance()->enqueSP("TEST_INSERT_SP", value2);
 
-			std::this_thread::sleep_for(std::chrono::seconds(10));
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+
+			auto result1 = MariaDBManager::Instance()->exeSP("TEST_SELECT_SP", "ENQUEU_QUERY_TEST1");
+			auto result2 = MariaDBManager::Instance()->exeSP("TEST_SELECT_SP", value2);
+
+			Assert::IsTrue(strcmp(result1["name"].c_str(), "ENQUEU_QUERY_TEST1") == 0);
+			Assert::IsTrue(strcmp(result2["name"].c_str(), "ENQUEU_QUERY_TEST2") == 0);
+		}
+
+		TEST_METHOD(DBReleaseTest) {
+			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a", "Test");
+
+			const char* value1 = "ENQUEU_QUERY_TEST1";
+			const char* value2 = "ENQUEU_QUERY_TEST2";
+
+			MariaDBManager::Instance()->exeSP("TEST_INSERT_SP", value1);
+			MariaDBManager::Instance()->exeSP("TEST_INSERT_SP", value2);
+
+			MariaDBManager::Instance()->enqueQuery("delete from TestTable where name = ?", value1);
+			MariaDBManager::Instance()->enqueQuery("delete from TestTable where name = ?", value2);
+		}
+
+		TEST_METHOD(DBThreadSafeTest) {
+			MariaDBManager::Instance()->init("118.67.134.160", 3306, "root", "1231013a", "Test");
+
+			std::vector<ThreadSP> threadList;
+
+			for (size_t i = 0; i < 8; i++) {
+				ThreadSP thread = NEW_THREAD_SP([&]() {
+					for (size_t j = 0; j < 1000000; j++) {
+						std::string value = "THREAD_TEST";
+						if (j % 2 == 0) {
+							MariaDBManager::Instance()->enqueSP("TEST_INSERT_SP", value);
+						}
+						else {
+							MariaDBManager::Instance()->exeSP("TEST_INSERT_SP", value);
+						}
+					}
+					});
+				threadList.push_back(thread);
+			}
+
+			for (auto thread : threadList) {
+				thread->join();
+			}
 		}
 
 		TEST_METHOD(QueryParsingTest) {

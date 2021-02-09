@@ -17,6 +17,20 @@ namespace DBBD
 			}
 
 			T info;
+			do
+			{
+				{
+					std::lock_guard<std::mutex> lock(lockObject);
+					for (auto tempInfo : infoSet) {
+						info = tempInfo;
+						break;
+					}
+				}
+			} while (!info);
+			return info;
+
+			// XXX
+			/*return;
 			{
 				std::lock_guard<std::mutex> lock(lockObject);
 				for (auto tempInfo : infoSet) {
@@ -34,7 +48,7 @@ namespace DBBD
 
 			refreshInfo();
 
-			return info;
+			return info;*/
 		}
 
 		void putInfo(T info)
@@ -45,7 +59,11 @@ namespace DBBD
 
 		void refreshInfo()
 		{
+			// XXX
+			return;
+
 			auto now = std::chrono::system_clock::now();
+
 			std::lock_guard<std::mutex> lock(lockObject);
 			for (auto iter = infoSet.begin(); iter != infoSet.end();) {
 				auto info = *iter;

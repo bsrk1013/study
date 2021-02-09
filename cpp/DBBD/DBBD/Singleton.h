@@ -13,9 +13,17 @@ namespace DBBD {
         {
             if (instance == NULL) {
                 instance = new T;
+                atexit(destroyInstance);
             }
             return instance;
         };
+
+        static void destroyInstance()
+        {
+            if (instance) {
+                instance->release();
+            }
+        }
 
        /* static void DestroyInstance()
         {
@@ -25,6 +33,9 @@ namespace DBBD {
                 m_pInstance = NULL;
             }
         };*/
+
+    protected:
+        virtual void release() = 0;
 
     private:
         static T* instance;

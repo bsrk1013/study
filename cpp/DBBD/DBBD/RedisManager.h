@@ -19,10 +19,14 @@ namespace DBBD
 
 	using RedisSP = std::shared_ptr<RedisConnInfo>;
 	
-	class RedisManager : public DBBaseManager<RedisSP>, public Singleton<RedisManager>
+	class RedisManager 
+		: public DBBaseManager<RedisSP>, 
+		public Singleton<RedisManager>
 	{
 	public:
-		void init(const std::string& address, const short& port, const short& maxConnCount = 8);
+		void init(const std::string& address, const short& port,
+			const short& maxConnCount = 8);
+		virtual void release() override;
 
 #pragma region KEYS
 	public:

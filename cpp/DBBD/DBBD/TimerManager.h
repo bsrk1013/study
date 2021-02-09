@@ -13,6 +13,7 @@ namespace DBBD
 	{
 	public:
 		void init(size_t threadCount);
+		virtual void release() override;
 		void addTimer(TimerInfoWP);
 
 	private:

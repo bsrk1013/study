@@ -31,18 +31,41 @@ namespace DBBD
 		std::cout << name << " init, ip: " << address << ", port: " << port << std::endl;
 	}
 
+	void MariaDBManager::release()
+	{
+		if (!queryQueue.empty()) {
+			std::string totalQuery;
+			{
+				while (!queryQueue.empty()) {
+					std::string query = queryQueue.front();
+					queryQueue.pop();
+					totalQuery += query += ";";
+				}
+			}
+
+			execute(totalQuery);
+		}
+
+		for (auto info : infoSet) {
+			closeInfoInternal(info);
+		}
+
+		infoSet.clear();
+	}
+
 	std::map<std::string, std::string> MariaDBManager::execute(std::string query)
 	{
 		std::map<std::string, std::string> result;
 
 		auto maria = getInfo();
-
 		int error = mysql_query(maria->conn, query.c_str());
 		if (error) {
 			std::string errorString = mysql_error(maria->conn);
 			std::cout << "MariaDBManager, exeQuery error, message: " << errorString << std::endl;
 			return result;
 		}
+
+		mysql_insert_id(maria->conn);
 
 		auto queryResult = mysql_store_result(maria->conn);
 		if (queryResult) {
@@ -64,6 +87,8 @@ namespace DBBD
 
 			mysql_free_result(queryResult);
 		}
+
+		putInfo(maria);
 
 		return result;
 	}
@@ -134,7 +159,6 @@ namespace DBBD
 			}
 		}
 
-		auto maria = getInfo();
 		execute(totalQuery);
 	}
 
@@ -157,6 +181,5 @@ namespace DBBD
 	void MariaDBManager::closeInfoInternal(MariaSP info)
 	{
 		mysql_close(info->conn);
-		delete info->conn;
 	}
 }

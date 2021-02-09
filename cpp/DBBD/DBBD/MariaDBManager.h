@@ -20,12 +20,16 @@ namespace DBBD
 	};
 
 	using MariaSP = std::shared_ptr<MariaConnInfo>;
-	class MariaDBManager : public DBBaseManager<MariaSP>, public Singleton<MariaDBManager>, public TimerObject
+	class MariaDBManager 
+		: public DBBaseManager<MariaSP>, 
+		public Singleton<MariaDBManager>, 
+		public TimerObject
 	{
 	public:
 		void init(const std::string& address, const int& port,
 			const std::string& user, const std::string& psw,
 			const std::string& db = "", const short& maxConnCount = 8);
+		virtual void release() override;
 
 	public:
 		template <typename ... Args>
