@@ -3,7 +3,7 @@
 #include <set>
 #include <map>
 #include <queue>
-#include <mutex>
+#include <shared_mutex>
 #include "Define.h"
 #include "Singleton.h"
 #include "DBBaseManager.h"
@@ -39,7 +39,7 @@ namespace DBBD
 			auto resultQuery = queryBind(query, argVec);
 
 			{
-				std::scoped_lock<std::mutex> lock(lockObject);
+				std::unique_lock<std::shared_mutex> wlock(queueRWLock);
 				queryQueue.push(resultQuery);
 			}
 		}
@@ -61,13 +61,13 @@ namespace DBBD
 			std::string resultQuery = queryBind(query, argVec);
 
 			{
-				std::scoped_lock<std::mutex> lock(lockObject);
+				std::unique_lock<std::shared_mutex> lock(queueRWLock);
 				queryQueue.push(resultQuery);
 			}
 		}
 
 		template <typename ... Args>
-		std::map<std::string, std::string> exeQuery(std::string query, Args ... args)
+		std::vector<std::map<std::string, std::string>> exeQuery(std::string query, Args ... args)
 		{
 			std::vector<std::any> argVec = { args... };
 			auto resultQuery = queryBind(query, argVec);
@@ -76,7 +76,7 @@ namespace DBBD
 		}
 
 		template <typename ... Args>
-		std::map<std::string, std::string> exeSP(std::string spName, Args ... args)
+		std::vector<std::map<std::string, std::string>> exeSP(std::string spName, Args ... args)
 		{
 			std::vector<std::any> argVec = { args... };
 			int paramCount = argVec.size();
@@ -95,7 +95,7 @@ namespace DBBD
 		}
 
 	private:
-		std::map<std::string, std::string> execute(std::string query);
+		std::vector<std::map<std::string, std::string>> execute(std::string query);
 		std::string queryBind(std::string origin, std::vector<std::any> args);
 		std::vector<std::string> split(std::string input, char delimiter);
 		void update();
@@ -113,5 +113,6 @@ namespace DBBD
 		short maxConnCount;
 		ThreadSP thread;
 		std::queue<std::string> queryQueue;
+		std::shared_mutex queueRWLock;
 	};
 }

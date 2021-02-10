@@ -17,12 +17,12 @@ namespace DBBD
 
 		for (size_t i = 0; i < maxConnCount; i++) {
 			auto maria = createInfo();
-			infoSet.insert(maria);
+			putInfo(maria);
 		}
 
 		thread = NEW_THREAD_SP([this]() {
 			while (true) {
-				std::this_thread::sleep_for(std::chrono::seconds(1));
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 				update();
 			}
 			});
@@ -33,7 +33,7 @@ namespace DBBD
 
 	void MariaDBManager::release()
 	{
-		if (!queryQueue.empty()) {
+		/*if (!queryQueue.empty()) {
 			std::string totalQuery;
 			{
 				while (!queryQueue.empty()) {
@@ -44,7 +44,9 @@ namespace DBBD
 			}
 
 			execute(totalQuery);
-		}
+		}*/
+
+		update();
 
 		for (auto info : infoSet) {
 			closeInfoInternal(info);
@@ -53,21 +55,88 @@ namespace DBBD
 		infoSet.clear();
 	}
 
-	std::map<std::string, std::string> MariaDBManager::execute(std::string query)
+	void MariaDBManager::update()
 	{
-		std::map<std::string, std::string> result;
+		std::string totalQuery;
+
+		std::shared_lock<std::shared_mutex> rlock(queueRWLock);
+		if (queryQueue.empty()) { return; }
+
+		bool loop = true;
+		while (loop) {
+			std::shared_lock<std::shared_mutex> wlock(std::move(rlock));
+			for (size_t i = 0; i < 1000; i++) {
+				std::string query = queryQueue.front();
+				queryQueue.pop();
+				totalQuery += query += ";";
+
+				if (queryQueue.empty()) {
+					loop = false;
+					break;
+				}
+			}
+
+			execute(totalQuery);
+		}
+	}
+
+	std::vector<std::map<std::string, std::string>> MariaDBManager::execute(std::string query)
+	{
+		std::vector<std::map<std::string, std::string>> result;
 
 		auto maria = getInfo();
 		int error = mysql_query(maria->conn, query.c_str());
 		if (error) {
 			std::string errorString = mysql_error(maria->conn);
-			std::cout << "MariaDBManager, exeQuery error, message: " << errorString << std::endl;
+			std::cout << "MariaDBManager, exeQuery error(" << error << "), message: " << errorString << ", query: " << query << std::endl;
 			return result;
 		}
 
-		mysql_insert_id(maria->conn);
+		std::cout << "MariaDBManager, query: " << query << std::endl;
 
-		auto queryResult = mysql_store_result(maria->conn);
+		auto now = std::chrono::system_clock::now();
+		do {
+			auto queryResult = mysql_store_result(maria->conn);
+			if (queryResult) {
+				int fieldCount = mysql_num_fields(queryResult);
+
+				std::vector<std::string> fields;
+				while (auto field = mysql_fetch_field(queryResult)) {
+					fields.push_back(field->name);
+				}
+
+				while (auto row = mysql_fetch_row(queryResult)) {
+					std::map<std::string, std::string> map;
+					for (int i = 0; i < fieldCount; i++) {
+						std::string field = fields[i];
+						std::string value = row[i];
+
+						map[field] = value;
+					}
+					result.push_back(map);
+				}
+				mysql_free_result(queryResult);
+			}
+			else {
+				if (mysql_field_count(maria->conn) == 0) {
+					mysql_affected_rows(maria->conn);
+				}
+				else {
+					std::cout << "Could not retrieve result set" << std::endl;
+					break;
+				}
+			}
+
+			if ((error = mysql_next_result(maria->conn)) > 0) {
+				std::cout << "Could not execute statement" << std::endl;
+			}
+
+		} while (!error);
+
+		std::chrono::duration elapsed = std::chrono::system_clock::now() - now;
+		auto elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
+		std::cout << "Elapsed: " << elapsedMilliseconds.count() << "ms ..." << std::endl;
+		/*auto queryResult = mysql_store_result(maria->conn);
 		if (queryResult) {
 			int fieldCount = mysql_num_fields(queryResult);
 
@@ -77,16 +146,17 @@ namespace DBBD
 			}
 
 			while (auto row = mysql_fetch_row(queryResult)) {
+				std::map<std::string, std::string> map;
 				for (int i = 0; i < fieldCount; i++) {
 					std::string field = fields[i];
 					std::string value = row[i];
 
-					result[field] = value;
+					map[field] = value;
 				}
+				result.push_back(map);
 			}
-
-			mysql_free_result(queryResult);
 		}
+		mysql_free_result(queryResult);*/
 
 		putInfo(maria);
 
@@ -98,7 +168,7 @@ namespace DBBD
 		auto queryParts = split(origin, '?');
 
 		if (queryParts.size() != args.size()) {
-			if(args.size() == 1 && queryParts.size() == 2){}
+			if (args.size() == 1 && queryParts.size() == 2) {}
 			else {
 				std::string error = "illegal query bind, query: " + origin + ", argsCount: " + std::to_string(args.size());
 				throw std::exception(error.c_str());
@@ -146,22 +216,6 @@ namespace DBBD
 		return answer;
 	}
 
-	void MariaDBManager::update() {
-		std::string totalQuery;
-		{
-			std::scoped_lock<std::mutex> lock(lockObject);
-			if (queryQueue.empty()) { return; }
-
-			while (!queryQueue.empty()) {
-				std::string query = queryQueue.front();
-				queryQueue.pop();
-				totalQuery += query += ";";
-			}
-		}
-
-		execute(totalQuery);
-	}
-
 	MariaSP MariaDBManager::createInfo()
 	{
 		MYSQL* mysql = mysql_init(NULL);
@@ -170,6 +224,7 @@ namespace DBBD
 		mysql_set_character_set(mysql, "euckr");
 		mysql_options(mysql, MYSQL_INIT_COMMAND, "SET NAMES euckr");
 		mysql_options(mysql, MARIADB_OPT_MULTI_STATEMENTS, (void*)"");
+		mysql_options(mysql, MARIADB_OPT_MULTI_RESULTS, (void*)"");
 		mysql_set_server_option(mysql, MYSQL_OPTION_MULTI_STATEMENTS_ON);
 
 		MariaSP maria = std::make_shared<MariaConnInfo>();
