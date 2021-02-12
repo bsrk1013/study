@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
 #include <set>
-#include <mutex>
+#include <shared_mutex>
+#include <iostream>
 
 namespace DBBD
 {
@@ -17,16 +18,20 @@ namespace DBBD
 			}
 
 			T info;
+			std::shared_lock<std::shared_mutex> rlock(rwLockObject);
 			do
 			{
-				{
-					std::lock_guard<std::mutex> lock(lockObject);
-					for (auto tempInfo : infoSet) {
-						info = tempInfo;
-						break;
-					}
+				for (auto tempInfo : infoSet) {
+					info = tempInfo;
+					break;
 				}
 			} while (!info);
+
+			std::cout << "Try getInfo" << std::endl;
+
+			std::unique_lock<std::shared_mutex> wlock(std::move(rlock));
+			infoSet.erase(info);
+
 			return info;
 
 			// XXX
@@ -53,8 +58,10 @@ namespace DBBD
 
 		void putInfo(T info)
 		{
-			std::lock_guard<std::mutex> lock(lockObject);
+			std::unique_lock<std::shared_mutex> wlock(rwLockObject);
+			//std::lock_guard<std::mutex> lock(lockObject);
 			infoSet.insert(info);
+			std::cout << "Try putInfo" << std::endl;
 		}
 
 		void refreshInfo()
@@ -64,7 +71,7 @@ namespace DBBD
 
 			auto now = std::chrono::system_clock::now();
 
-			std::lock_guard<std::mutex> lock(lockObject);
+			//std::lock_guard<std::mutex> lock(lockObject);
 			for (auto iter = infoSet.begin(); iter != infoSet.end();) {
 				auto info = *iter;
 				std::chrono::duration elapsed = now - info->usedTime;
@@ -93,6 +100,6 @@ namespace DBBD
 		bool isInit = false;
 		std::string name;
 		std::set<T, ConnOrder> infoSet;
-		std::mutex lockObject;
+		std::shared_mutex rwLockObject;
 	};
 }
