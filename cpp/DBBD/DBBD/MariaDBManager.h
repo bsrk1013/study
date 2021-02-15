@@ -39,7 +39,7 @@ namespace DBBD
 			auto resultQuery = queryBind(query, argVec);
 
 			{
-				std::unique_lock<std::shared_mutex> wlock(queueRWLock);
+				std::scoped_lock lock(queueLockObject);
 				queryQueue.push(resultQuery);
 			}
 		}
@@ -61,7 +61,7 @@ namespace DBBD
 			std::string resultQuery = queryBind(query, argVec);
 
 			{
-				std::unique_lock<std::shared_mutex> lock(queueRWLock);
+				std::scoped_lock lock(queueLockObject);
 				queryQueue.push(resultQuery);
 			}
 		}
@@ -110,9 +110,8 @@ namespace DBBD
 		std::string user;
 		std::string psw;
 		std::string db;
-		short maxConnCount;
 		ThreadSP thread;
 		std::queue<std::string> queryQueue;
-		std::shared_mutex queueRWLock;
+		std::mutex queueLockObject;
 	};
 }

@@ -16,35 +16,11 @@ int main() {
 	try {
 		server.start();
 
-		bool loop = true;
-		std::string value = "THREAD_TEST";
-		std::vector<DBBD::ThreadSP> threadList;
-		for (size_t i = 0; i < 8; i++) {
-			DBBD::ThreadSP thread = NEW_THREAD_SP([&]() {
-				for (size_t j = 0; j < 1000; j++) {
-					if (!loop) { break; }
-					if ((j % 2) == 0) {
-						DBBD::MariaDBManager::Instance()->enqueSP("TEST_INSERT_SP", value);
-					}
-					else {
-						DBBD::MariaDBManager::Instance()->exeSP("TEST_INSERT_SP", value);
-					}
-				}
-				});
-			threadList.push_back(thread);
-		}
-
 		while (true) {
 			std::string a;
 			std::getline(std::cin, a);
 
 			if (a == "exit") {
-				loop = false;
-				/*for (auto thread : threadList) {
-					thread->join();
-				}*/
-				threadList.clear();
-
 				server.stop();
 				break;
 			}

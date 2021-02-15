@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include <set>
-#include <shared_mutex>
 #include <iostream>
+#include <mutex>
 
 namespace DBBD
 {
@@ -18,24 +18,6 @@ namespace DBBD
 			}
 
 			T info;
-			std::shared_lock<std::shared_mutex> rlock(rwLockObject);
-			do
-			{
-				for (auto tempInfo : infoSet) {
-					info = tempInfo;
-					break;
-				}
-			} while (!info);
-
-			std::cout << "Try getInfo" << std::endl;
-
-			std::unique_lock<std::shared_mutex> wlock(std::move(rlock));
-			infoSet.erase(info);
-
-			return info;
-
-			// XXX
-			/*return;
 			{
 				std::lock_guard<std::mutex> lock(lockObject);
 				for (auto tempInfo : infoSet) {
@@ -43,8 +25,10 @@ namespace DBBD
 					break;
 				}
 
-				infoSet.erase(info);
-				info->usedTime = std::chrono::system_clock::now();
+				if (info) {
+					infoSet.erase(info);
+					info->usedTime = std::chrono::system_clock::now();
+				}
 			}
 
 			if (!info) {
@@ -53,13 +37,12 @@ namespace DBBD
 
 			refreshInfo();
 
-			return info;*/
+			return info;
 		}
 
 		void putInfo(T info)
 		{
-			std::unique_lock<std::shared_mutex> wlock(rwLockObject);
-			//std::lock_guard<std::mutex> lock(lockObject);
+			std::scoped_lock<std::mutex> lock(lockObject);
 			infoSet.insert(info);
 			std::cout << "Try putInfo" << std::endl;
 		}
@@ -67,11 +50,10 @@ namespace DBBD
 		void refreshInfo()
 		{
 			// XXX
-			return;
-
 			auto now = std::chrono::system_clock::now();
 
-			//std::lock_guard<std::mutex> lock(lockObject);
+			std::scoped_lock<std::mutex> lock(lockObject);
+			if (infoSet.size() <= maxConnCount) { return; }
 			for (auto iter = infoSet.begin(); iter != infoSet.end();) {
 				auto info = *iter;
 				std::chrono::duration elapsed = now - info->usedTime;
@@ -96,10 +78,15 @@ namespace DBBD
 			}
 		};
 
+	public:
+		std::set<T, ConnOrder> infoSet;
+
 	protected:
 		bool isInit = false;
 		std::string name;
-		std::set<T, ConnOrder> infoSet;
-		std::shared_mutex rwLockObject;
+		short maxConnCount;
+	
+	private:
+		std::mutex lockObject;
 	};
 }

@@ -33,19 +33,6 @@ namespace DBBD
 
 	void MariaDBManager::release()
 	{
-		/*if (!queryQueue.empty()) {
-			std::string totalQuery;
-			{
-				while (!queryQueue.empty()) {
-					std::string query = queryQueue.front();
-					queryQueue.pop();
-					totalQuery += query += ";";
-				}
-			}
-
-			execute(totalQuery);
-		}*/
-
 		update();
 
 		for (auto info : infoSet) {
@@ -59,12 +46,11 @@ namespace DBBD
 	{
 		std::string totalQuery;
 
-		std::shared_lock<std::shared_mutex> rlock(queueRWLock);
+		std::scoped_lock lock(queueLockObject);
 		if (queryQueue.empty()) { return; }
 
 		bool loop = true;
 		while (loop) {
-			std::shared_lock<std::shared_mutex> wlock(std::move(rlock));
 			for (size_t i = 0; i < 1000; i++) {
 				std::string query = queryQueue.front();
 				queryQueue.pop();
@@ -136,27 +122,6 @@ namespace DBBD
 		std::chrono::duration elapsed = std::chrono::system_clock::now() - now;
 		auto elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
 		std::cout << "Elapsed: " << elapsedMilliseconds.count() << "ms ..." << std::endl;
-		/*auto queryResult = mysql_store_result(maria->conn);
-		if (queryResult) {
-			int fieldCount = mysql_num_fields(queryResult);
-
-			std::vector<std::string> fields;
-			while (auto field = mysql_fetch_field(queryResult)) {
-				fields.push_back(field->name);
-			}
-
-			while (auto row = mysql_fetch_row(queryResult)) {
-				std::map<std::string, std::string> map;
-				for (int i = 0; i < fieldCount; i++) {
-					std::string field = fields[i];
-					std::string value = row[i];
-
-					map[field] = value;
-				}
-				result.push_back(map);
-			}
-		}
-		mysql_free_result(queryResult);*/
 
 		putInfo(maria);
 
@@ -230,6 +195,9 @@ namespace DBBD
 		MariaSP maria = std::make_shared<MariaConnInfo>();
 		maria->conn = mysql;
 		maria->usedTime = std::chrono::system_clock::now();
+
+		std::cout << "Try createInfo" << std::endl;
+
 		return maria;
 	}
 
