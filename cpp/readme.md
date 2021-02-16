@@ -85,3 +85,20 @@
      - \$(SolutionDir)..\Visual Leak Detector\include
    - 추가 라이브러리 디렉터리
      - \$(SolutionDir)..\Visual Leak Detector\lib\Win64
+
+# yaml-cpp
+
+#### 설치 경로 : cpp/
+1. 설치
+   - git clone https://github.com/jbeder/yaml-cpp
+   - yaml-cpp 폴더 내에 build 폴더 생성
+   - cmake-gui를 이용해 yaml-cpp를 빌드(Test는 COnfigure에서 제외)
+   - YAML_CPP.sln 솔루션에서 Debug, Release로 빌드
+
+2. 프로젝트 설정
+   - 추가 포함 디렉터리
+     - \$(SolutionDir)..\yaml-cpp\include
+   - 추가 라이브러리 디렉터리
+     - \$(SolutionDir)..\yaml-cpp\build\Debug or Release
+   - 추가 종속성
+     - Debug : yaml-cppd.lib, Release : yaml-cpp.lib

@@ -31,7 +31,7 @@ namespace DBBDTest
 			MariaDBManager::Instance()->exeSP("TEST_INSERT_SP", b);
 			auto result = MariaDBManager::Instance()->exeSP("TEST_SELECT_SP", b);
 
-			auto name = result["name"];
+			auto name = result[0]["name"];
 			Assert::IsTrue(strcmp(name.c_str(), "test") == 0);
 		}
 
@@ -52,8 +52,8 @@ namespace DBBDTest
 			auto result1 = MariaDBManager::Instance()->exeSP("TEST_SELECT_SP", "ENQUEU_QUERY_TEST1");
 			auto result2 = MariaDBManager::Instance()->exeSP("TEST_SELECT_SP", value2);
 
-			Assert::IsTrue(strcmp(result1["name"].c_str(), "ENQUEU_QUERY_TEST1") == 0);
-			Assert::IsTrue(strcmp(result2["name"].c_str(), "ENQUEU_QUERY_TEST2") == 0);
+			Assert::IsTrue(strcmp(result1[0]["name"].c_str(), "ENQUEU_QUERY_TEST1") == 0);
+			Assert::IsTrue(strcmp(result2[0]["name"].c_str(), "ENQUEU_QUERY_TEST2") == 0);
 		}
 
 		TEST_METHOD(DBReleaseTest) {

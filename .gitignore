@@ -11,6 +11,9 @@ cpp_redis/
 ### DB ###
 DB/
 
+### Yaml-cpp ###
+yaml-cpp/
+
 ### VLD ###
 cpp/"Visual Leak Detector"/*
 cpp/"visual leak detector"/*
