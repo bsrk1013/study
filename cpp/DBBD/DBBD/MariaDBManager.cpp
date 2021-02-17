@@ -196,8 +196,6 @@ namespace DBBD
 		maria->conn = mysql;
 		maria->usedTime = std::chrono::system_clock::now();
 
-		std::cout << "Try createInfo" << std::endl;
-
 		return maria;
 	}
 

@@ -44,7 +44,6 @@ namespace DBBD
 		{
 			std::scoped_lock<std::mutex> lock(lockObject);
 			infoSet.insert(info);
-			std::cout << "Try putInfo" << std::endl;
 		}
 
 		void refreshInfo()

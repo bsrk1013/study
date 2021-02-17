@@ -412,6 +412,7 @@ namespace DBBD
 	{
 		std::shared_ptr<cpp_redis::client> conn = std::make_shared<cpp_redis::client>();
 		conn->connect(address, port);
+		conn->auth("1231013a");
 		RedisSP redis = std::make_shared<RedisConnInfo>();
 		redis->conn = conn;
 		redis->usedTime = std::chrono::system_clock::now();

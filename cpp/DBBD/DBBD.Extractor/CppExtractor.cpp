@@ -1,4 +1,5 @@
 #include "CppExtractor.h"
+#include <string>
 
 using namespace std;
 
@@ -13,6 +14,7 @@ void CppExtractor::writeHeader(ofstream& ofs) {
 	ofs << "#include \"DBBD/Request.h\"" << endl;
 	ofs << "#include \"DBBD/Response.h\"" << endl;
 	ofs << "#include \"ProtocolType.hpp\"" << endl;
+	ofs << "#include \"DBBD/Common.hpp\"" << endl;
 	ofs << endl;
 }
 
@@ -119,6 +121,10 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		if (contentsInfo.fileType != XmlElementType::Property) { continue; }
 		realContents.push_back(contentsInfo);
 	}
+
+	/*std::string temp = R"(public:
+	virtual void serialize(DBBD::Buffer& buffer) {
+		DBBD::Serialize::writeArray(buffer, fingerPrinter);)";*/
 
 	ofs << "public:" << endl;
 	ofs << "\tvirtual void serialize(DBBD::Buffer& buffer) {" << endl;

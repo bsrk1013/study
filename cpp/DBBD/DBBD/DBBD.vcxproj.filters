@@ -70,6 +70,18 @@
     <Filter Include="소스 파일\DB\MariaDB">
       <UniqueIdentifier>{37f641ef-d0ee-4924-8c8e-97f38823edd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\rapidjson">
+      <UniqueIdentifier>{7b11455a-b375-43ee-aad3-71e2623ddf39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\rapidjson\error">
+      <UniqueIdentifier>{0cbfdcaf-bdc4-4fdc-864f-aedbb1eabd81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\rapidjson\internal">
+      <UniqueIdentifier>{0825099a-da8d-46b2-b1eb-7d46d4f0e1bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\rapidjson\msinttypes">
+      <UniqueIdentifier>{b8f303d2-bfbb-49e6-8589-fa0daf8875be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Random.h">
@@ -138,9 +150,6 @@
     <ClInclude Include="RedisManager.h">
       <Filter>헤더 파일\DB\Redis</Filter>
     </ClInclude>
-    <ClInclude Include="MysqlManager.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="MariaDBManager.h">
       <Filter>헤더 파일\DB\MariaDB</Filter>
     </ClInclude>
@@ -148,6 +157,123 @@
       <Filter>헤더 파일\DB</Filter>
     </ClInclude>
     <ClInclude Include="YamlParser.hpp">
+      <Filter>헤더 파일\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\allocators.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\cursorstreamwrapper.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\document.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\encodedstream.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\encodings.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\filereadstream.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\filewritestream.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\fwd.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\istreamwrapper.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\memorybuffer.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\memorystream.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\ostreamwrapper.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\pointer.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\prettywriter.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\rapidjson.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\reader.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\schema.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\stream.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\stringbuffer.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\writer.h">
+      <Filter>헤더 파일\rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\error\en.h">
+      <Filter>헤더 파일\rapidjson\error</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\error\error.h">
+      <Filter>헤더 파일\rapidjson\error</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\biginteger.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\clzll.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\diyfp.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\dtoa.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\ieee754.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\itoa.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\meta.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\pow10.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\regex.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\stack.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\strfunc.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\strtod.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\internal\swap.h">
+      <Filter>헤더 파일\rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\msinttypes\inttypes.h">
+      <Filter>헤더 파일\rapidjson\msinttypes</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidjson\msinttypes\stdint.h">
+      <Filter>헤더 파일\rapidjson\msinttypes</Filter>
+    </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>헤더 파일\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="refl.hpp">
       <Filter>헤더 파일\Common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -187,9 +313,6 @@
     </ClCompile>
     <ClCompile Include="RedisManager.cpp">
       <Filter>소스 파일\DB\Redis</Filter>
-    </ClCompile>
-    <ClCompile Include="MysqlManager.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="MariaDBManager.cpp">
       <Filter>소스 파일\DB\MariaDB</Filter>

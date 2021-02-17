@@ -9,6 +9,9 @@
 #include "../DBBD/Random.h"
 #include "../DBBD/TimerObject.h"
 #include "../DBBD/YamlParser.hpp"
+#include "../DBBD/json.hpp"
+#include "../DBBD/RedisManager.h"
+#include "../DBBD/Common.hpp"
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
 #include <boost/bind.hpp>
@@ -554,6 +557,77 @@ namespace DBBDTest
 			auto white2 = serverWhitelist[1];
 			Assert::IsTrue(strcmp(white1.c_str(), "127.0.0.1") == 0);
 			Assert::IsTrue(strcmp(white2.c_str(), "172.168.50.1") == 0);
+		}
+
+		/*void to_json(nlohmann::json& j, const PlayerRankingInfo& info) {
+			j = nlohmann::json{ {"nickname", info.nickname}, {"level", info.level}, {"ranking", info.ranking} };
+		}
+
+		void from_json(const nlohmann::json& j, PlayerRankingInfo& info) {
+			j.at("nickname").get_to(info.nickname);
+			j.at("level").get_to(info.level);
+			j.at("ranking").get_to(info.ranking);
+		}*/
+
+		TEST_METHOD(JsonTest) {
+			class PlayerRankingInfo {
+			public:
+				size_t uid;
+				std::string nickname;
+				int level;
+				short ranking;
+			};
+
+			PlayerRankingInfo info{ 1, "도비", 10, 2400 };
+
+			nlohmann::json j1;
+			j1["uid"] = info.uid;
+			j1["nickname"] = strconv(info.nickname);
+			j1["level"] = info.level;
+			j1["ranking"] = info.ranking;
+
+			Assert::IsTrue(info.uid == j1["uid"].get<size_t>());
+			Assert::IsTrue(strcmp(info.nickname.c_str(), strconv(j1["nickname"].get<std::wstring>()).c_str()) == 0);
+			Assert::IsTrue(info.level == j1["level"].get<int>());
+			Assert::IsTrue(info.ranking == j1["ranking"].get<short>());
+
+			std::string rawJson = "{\"uid\":2, \"nickname\":\"douner\", \"level\":99, \"ranking\":1}";
+			nlohmann::json j2 = nlohmann::json::parse(rawJson);
+
+			Assert::IsTrue(j2["uid"].get<size_t>() == 2);
+			Assert::IsTrue(strcmp(j2["nickname"].get<std::string>().c_str(), "douner") == 0);
+			Assert::IsTrue(j2["level"].get<int>() == 99);
+			Assert::IsTrue(j2["ranking"].get<short>() == 1);
+
+			RedisManager::Instance()->init("118.67.134.160", 6379);
+			std::string rawInfo1 = j1.dump();
+			std::string rawInfo2 = j2.dump();
+			RedisManager::Instance()->hset(0, "Ranking:DetailInfo", "1", rawInfo1);
+			RedisManager::Instance()->hset(0, "Ranking:DetailInfo", "2", rawInfo2);
+
+			auto redisData1 = RedisManager::Instance()->hget<std::string>(0, "Ranking:DetailInfo", "1");
+			auto redisData2 = RedisManager::Instance()->hget<std::string>(0, "Ranking:DetailInfo", "2");
+
+			nlohmann::json j3 = nlohmann::json::parse(redisData1);
+			nlohmann::json j4 = nlohmann::json::parse(redisData2);
+
+			Assert::IsTrue(j3["uid"].get<size_t>() == 1);
+			std::wstring wnickname1 = j3["nickname"].get<std::wstring>();
+			Assert::IsTrue(strcmp(strconv(wnickname1).c_str(), "도비") == 0);
+			Assert::IsTrue(j3["level"].get<int>() == 10);
+			Assert::IsTrue(j3["ranking"].get<int>() == 2400);
+
+			Assert::IsTrue(j4["uid"].get<size_t>() == 2);
+			try {
+				std::wstring wnickname2 = j4["nickname"].get<std::wstring>();
+				Assert::IsTrue(strcmp(strconv(wnickname2).c_str(), "douner") == 0);
+			}
+			catch (const std::exception&) {
+				std::string nickname2 = j4["nickname"].get<std::string>();
+				Assert::IsTrue(strcmp(nickname2.c_str(), "douner") == 0);
+			}
+			Assert::IsTrue(j4["level"].get<int>() == 99);
+			Assert::IsTrue(j4["ranking"].get<int>() == 1);
 		}
 	};
 }

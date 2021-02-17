@@ -3,23 +3,18 @@
 #include <sstream>
 #include <vector>
 #include <Windows.h>
+#include <atlconv.h>
 
 namespace DBBD {
-	template <typename T>
-	size_t GetPacketLength(T value) {
-		return sizeof(T);
-	}
+	std::wstring strconv(const std::string& _src)
+	{
+		USES_CONVERSION;
+		return std::wstring(A2W(_src.c_str()));
+	};
 
-	template <typename T>
-	size_t GetPacketLength() {
-		return sizeof(T);
-	}
-
-	size_t GetPacketLength(std::string value) {
-		return sizeof(size_t) + value.size();
-	}
-
-	size_t GetPacketLength(char* value) {
-		return sizeof(size_t) + strlen(value);
-	}
+	std::string strconv(const std::wstring& _src)
+	{
+		USES_CONVERSION;
+		return std::string(W2A(_src.c_str()));
+	};
 }
