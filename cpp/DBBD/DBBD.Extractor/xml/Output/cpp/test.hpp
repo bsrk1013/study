@@ -1,9 +1,10 @@
 #pragma once
-	#include "DBBD/Cell.h"
+#include "DBBD/Cell.h"
 #include "DBBD/Request.h"
 #include "DBBD/Response.h"
-#include "DBBD/ProtocolType.hpp"
+#include "ProtocolType.hpp"
 #include "DBBD/Common.hpp"
+
 // 유저 정보
 class UserInfo : public DBBD::Cell {
 public:
@@ -16,19 +17,25 @@ public:
 public:
 	virtual void serialize(DBBD::Buffer& buffer) {
 		DBBD::Serialize::writeArray(buffer, fingerPrinter);
-		if(fingerPrinter[0]) { DBBD::Serialize::write(buffer, Nickname); }
-		if(fingerPrinter[1]) { DBBD::Serialize::write(buffer, Level); }
+		if (fingerPrinter[0]) { DBBD::Serialize::write(buffer, Nickname); }
+		if (fingerPrinter[1]) { DBBD::Serialize::write(buffer, Level); }
 	}
 	virtual void deserialize(DBBD::Buffer& buffer) {
 		DBBD::Deserialize::readArray(buffer, fingerPrinter);
-		if(fingerPrinter[0]) { DBBD::Deserialize::read(buffer, Nickname); }
-		if(fingerPrinter[1]) { DBBD::Deserialize::read(buffer, Level); }
+		if (fingerPrinter[0]) { DBBD::Deserialize::read(buffer, Nickname); }
+		if (fingerPrinter[1]) { DBBD::Deserialize::read(buffer, Level); }
 	}
 	virtual size_t getLength() {
 		size_t totalLength = sizeof(size_t) + sizeof(fingerPrinter);
-		if(fingerPrinter[0]) { totalLength += sizeof(size_t) + Nickname.length(); }
-		if(fingerPrinter[1]) { totalLength += sizeof(long); }
+		if (fingerPrinter[0]) { totalLength += sizeof(size_t) + Nickname.length(); }
+		if (fingerPrinter[1]) { totalLength += sizeof(long); }
 		return totalLength();
+	}
+	void std::string toJson() {
+		nlohmann::json j;
+		if (fingerPrinter[0]) { j["Nickname"] = strconv(Nickname); }
+		if (fingerPrinter[1]) { j["Level"] = Level; }
+		return j.dump();
 	}
 
 public:

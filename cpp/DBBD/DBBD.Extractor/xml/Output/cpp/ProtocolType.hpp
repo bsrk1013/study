@@ -1,9 +1,10 @@
 #pragma once
-	#include "DBBD/Cell.h"
+#include "DBBD/Cell.h"
 #include "DBBD/Request.h"
 #include "DBBD/Response.h"
-#include "DBBD/ProtocolType.hpp"
+#include "ProtocolType.hpp"
 #include "DBBD/Common.hpp"
+
 #include <map>
 
 namespace ProtocolType {

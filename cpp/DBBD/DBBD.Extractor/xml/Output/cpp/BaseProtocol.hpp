@@ -1,9 +1,10 @@
 #pragma once
-	#include "DBBD/Cell.h"
+#include "DBBD/Cell.h"
 #include "DBBD/Request.h"
 #include "DBBD/Response.h"
-#include "DBBD/ProtocolType.hpp"
+#include "ProtocolType.hpp"
 #include "DBBD/Common.hpp"
+
 class ServerConnectReq : public DBBD::Request {
 public:
 	ServerConnectReq() {
@@ -17,17 +18,17 @@ public:
 	virtual void serialize(DBBD::Buffer& buffer) {
 		DBBD::Request::writeHeader(buffer, getLength());
 		DBBD::Serialize::writeArray(buffer, fingerPrinter);
-		if(fingerPrinter[0]) { DBBD::Serialize::write(buffer, SessionId); }
+		if (fingerPrinter[0]) { DBBD::Serialize::write(buffer, SessionId); }
 	}
 	virtual void deserialize(DBBD::Buffer& buffer) {
 		DBBD::Request::readHeader(buffer);
 		DBBD::Serialize::readArray(buffer, fingerPrinter);
-		if(fingerPrinter[0]) { DBBD::Deserialize::read(buffer, SessionId); }
+		if (fingerPrinter[0]) { DBBD::Deserialize::read(buffer, SessionId); }
 	}
 	virtual size_t getLength() {
 		size_t totalLength = DBBD::Request::getLength();
 		totalLength += sizeof(size_t) + sizeof(fingerPrinter);
-		if(fingerPrinter[0]) { totalLength += sizeof(long); }
+		if (fingerPrinter[0]) { totalLength += sizeof(long); }
 		return totalLength;
 	}
 

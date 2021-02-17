@@ -132,7 +132,7 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		ofs << "\t\tDBBD::Serialize::writeArray(buffer, fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
-			ofs << "\t\tif(fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, true) << " }" << endl;
+			ofs << "\t\tif (fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, true) << " }" << endl;
 		}
 	}
 	ofs << "\t}" << endl;;
@@ -142,7 +142,7 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		ofs << "\t\tDBBD::Deserialize::readArray(buffer, fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
-			ofs << "\t\tif(fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, false) << " }" << endl;
+			ofs << "\t\tif (fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, false) << " }" << endl;
 		}
 	}
 	ofs << "\t}" << endl;;
@@ -152,11 +152,31 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		ofs << "\t\tsize_t totalLength = sizeof(size_t) + sizeof(fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
-			ofs << "\t\tif(fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
+			ofs << "\t\tif (fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
 		}
 	}
 	ofs << "\t\treturn totalLength();" << endl;
 	ofs << "\t}" << endl;
+
+
+	ofs << "\tvoid std::string toJson() {" << endl;
+	ofs << "\t\tnlohmann::json j;" << endl;
+	for (size_t i = 0; i < realContents.size(); i++) {
+		auto info = realContents[i];
+		ofs << "\t\tif (fingerPrinter[" << i << "]) { j[\"" << info.name << "\"] = ";
+		if (strcmp(info.type.c_str(), "string") == 0) {
+			ofs << "strconv(" << info.name << ")";
+		}
+		else {
+			ofs << info.name;
+		}
+		ofs << "; }" << endl;
+	}
+	ofs << "\t\treturn j.dump();" << endl;
+	ofs << "\t}" << endl;
+
+	ofs << "\tvoid fromJson(std::string rawJson) {" << endl;
+	ofs << "\t\tnlohmann::json j = nlohmann::json::parse(rawJson);" << endl;
 
 	if (realContents.size() <= 0) { return; }
 
@@ -213,7 +233,7 @@ void CppExtractor::writeProtocolContents(ofstream& ofs, string base) {
 		ofs << "\t\tDBBD::Serialize::writeArray(buffer, fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
-			ofs << "\t\tif(fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, true) << " }" << endl;
+			ofs << "\t\tif (fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, true) << " }" << endl;
 		}
 	}
 	ofs << "\t}" << endl;;
@@ -224,7 +244,7 @@ void CppExtractor::writeProtocolContents(ofstream& ofs, string base) {
 		ofs << "\t\tDBBD::Serialize::readArray(buffer, fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
-			ofs << "\t\tif(fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, false) << " }" << endl;
+			ofs << "\t\tif (fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, false) << " }" << endl;
 		}
 	}
 	ofs << "\t}" << endl;;
@@ -235,7 +255,7 @@ void CppExtractor::writeProtocolContents(ofstream& ofs, string base) {
 		ofs << "\t\ttotalLength += sizeof(size_t) + sizeof(fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
-			ofs << "\t\tif(fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
+			ofs << "\t\tif (fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
 		}
 	}
 	ofs << "\t\treturn totalLength;" << endl;
