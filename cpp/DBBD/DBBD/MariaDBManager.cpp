@@ -1,5 +1,6 @@
 #include "MariaDBManager.h"
 #include "mysql.h"
+#include "Log.h"
 
 namespace DBBD
 {
@@ -28,7 +29,7 @@ namespace DBBD
 			});
 
 		isInit = true;
-		std::cout << name << " init, ip: " << address << ", port: " << port << std::endl;
+		LOG_INFO("{} init, ip: {}, port: {}", name, address, port);
 	}
 
 	void MariaDBManager::release()
@@ -74,13 +75,10 @@ namespace DBBD
 		int error = mysql_query(maria->conn, query.c_str());
 		if (error) {
 			std::string errorString = mysql_error(maria->conn);
-			std::cout << "MariaDBManager, exeQuery error(" << error << "), message: " << errorString << ", query: " << query << std::endl;
+			LOG_ERROR("MariaDBManager, exeQuery error({}), message: {}, query: {}", error, errorString, query);
 			return result;
 		}
 
-		std::cout << "MariaDBManager, query: " << query << std::endl;
-
-		auto now = std::chrono::system_clock::now();
 		do {
 			auto queryResult = mysql_store_result(maria->conn);
 			if (queryResult) {
@@ -108,20 +106,16 @@ namespace DBBD
 					mysql_affected_rows(maria->conn);
 				}
 				else {
-					std::cout << "Could not retrieve result set" << std::endl;
+					LOG_WARN("Could not retrieve result set");
 					break;
 				}
 			}
 
 			if ((error = mysql_next_result(maria->conn)) > 0) {
-				std::cout << "Could not execute statement" << std::endl;
+				LOG_WARN("Could not execute statement");
 			}
 
 		} while (!error);
-
-		std::chrono::duration elapsed = std::chrono::system_clock::now() - now;
-		auto elapsedMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
-		std::cout << "Elapsed: " << elapsedMilliseconds.count() << "ms ..." << std::endl;
 
 		putInfo(maria);
 
@@ -135,6 +129,7 @@ namespace DBBD
 		if (queryParts.size() != args.size()) {
 			if (args.size() == 1 && queryParts.size() == 2) {}
 			else {
+				LOG_ERROR("illegal query bind, query: {}, argsCount: {}", origin, args.size());
 				std::string error = "illegal query bind, query: " + origin + ", argsCount: " + std::to_string(args.size());
 				throw std::exception(error.c_str());
 			}

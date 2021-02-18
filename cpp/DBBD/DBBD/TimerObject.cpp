@@ -1,5 +1,6 @@
 #include "TimerObject.h"
 #include "TimerManager.h"
+#include "Log.h"
 
 namespace DBBD {
 	TimerObject::~TimerObject()
@@ -16,7 +17,7 @@ namespace DBBD {
 
 	void TimerObject::methodEvent(const size_t& eventType) {
 		if (!existInfo(eventType)) {
-			std::cout << "methodEvent, info is null, eventType: " << eventType << std::endl;;
+			LOG_WARN("methodEvent, info is null, eventType: {}", eventType);
 			return;
 		}
 
@@ -59,7 +60,6 @@ namespace DBBD {
 	void TimerObject::removeTimerEvent(const size_t& eventType) {
 		if (!existInfo(eventType)) { return; }
 
-		std::cout << "removeTimerEvent, eventType: " << eventType << std::endl;
 		auto info = timerMap[eventType];
 		info.reset();
 		timerMap.erase(eventType);

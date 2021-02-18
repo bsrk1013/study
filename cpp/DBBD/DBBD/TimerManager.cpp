@@ -1,4 +1,5 @@
 #include "TimerManager.h"
+#include "Log.h"
 
 namespace DBBD
 {
@@ -13,8 +14,7 @@ namespace DBBD
 		}
 
 		isInit = true;
-		//LOG_DEBUG("TimerManager init, threadCount: " + std::to_string(threadCount));
-		LOG_DEBUG("TimerManager init, threadCount: {}", threadCount);
+		LOG_INFO("TimerManager init, threadCount: {}", threadCount);
 	}
 
 	void TimerManager::release()

@@ -1,6 +1,7 @@
 #include "TcpClientBase.h"
 #include <boost/bind.hpp>
 #include "TcpClientSession.h"
+#include "Log.h"
 
 DBBD::TcpClientBase::TcpClientBase(const std::string& address, const short& port, const bool& tryReconnect)
 {
@@ -69,7 +70,7 @@ void DBBD::TcpClientBase::connect()
 void DBBD::TcpClientBase::handleConnect(const boost::system::error_code& error)
 {
 	if (error) {
-		std::cout << address << ":" << port << " connect failed..." << std::endl;
+		LOG_ERROR("{}:{} connect failed...", address, port);
 		if (tryReconnect) {
 			reconnect();
 		}

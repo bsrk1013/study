@@ -1,6 +1,7 @@
 #include "SessionServer.h"
 #include <boost/bind.hpp>
 #include "PlayerClientSession.h"
+#include "DBBD/Log.h"
 
 SessionServer::SessionServer(std::string name, std::string address, int port, size_t threadCount)
 	: TcpServerBase(name, address, port, threadCount)
@@ -34,7 +35,7 @@ void SessionServer::acceptInternal(DBBD::SocketSP socket, size_t sessionId)
 	sessionMap[sessionId] = session;
 	session->start();
 
-	std::cout << "acceptInternal, sessionId: " << sessionId << std::endl;
+	LOG_INFO("acceptInternal, sessionId: {}", sessionId);
 }
 
 void SessionServer::disconnectInternal(size_t sessionId)
@@ -46,5 +47,5 @@ void SessionServer::disconnectInternal(size_t sessionId)
 
 	sessionMap.erase(sessionId);
 
-	std::cout << "disconnectInternal, sessionId: " << sessionId << std::endl;
+	LOG_INFO("disconnectInternal, sessionId: {}", sessionId);
 }

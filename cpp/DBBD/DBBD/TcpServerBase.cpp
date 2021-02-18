@@ -1,6 +1,7 @@
 #include <iostream>
 #include <boost/bind.hpp>
 #include "TcpServerBase.h"
+#include "Log.h"
 
 DBBD::TcpServerBase::TcpServerBase(const std::string& name,
 	const std::string& address,
@@ -42,7 +43,7 @@ void DBBD::TcpServerBase::start()
 		threadList.push_back(thread);
 	}
 
-	std::cout << name << " Server Started..." << std::endl;
+	LOG_INFO("{} Server started...", name);
 }
 
 void DBBD::TcpServerBase::stop()

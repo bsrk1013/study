@@ -1,4 +1,5 @@
 #include "PlayerClientSession.h"
+#include "DBBD/Log.h"
 
 PlayerClientSession::PlayerClientSession(DBBD::IoContextSP context, DBBD::SocketSP socket, size_t sessionId)
 	: TcpSessionBase(context, socket, sessionId)
@@ -22,5 +23,5 @@ void PlayerClientSession::writeInternal()
 }
 
 void PlayerClientSession::update() {
-	std::cout << "updated..." << std::endl;
+	LOG_DEBUG("player updated...");
 }

@@ -1,4 +1,5 @@
 #include "RedisManager.h"
+#include "Log.h"
 
 namespace DBBD
 {
@@ -26,7 +27,7 @@ namespace DBBD
 		}*/
 
 		isInit = true;
-		std::cout << "RedisManager init, ip: " << address << ", port: " << port << std::endl;
+		LOG_INFO("RedisManager init, ip: {}, port: {}", address, port);
 	}
 
 	void RedisManager::release()

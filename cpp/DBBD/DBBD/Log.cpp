@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "Cell.h"
 
 namespace DBBD
 {
@@ -60,8 +61,13 @@ namespace DBBD
 
 	void Log::writeLog(LogLevel level, const std::string& msg)
 	{
-		spdlog::stderr_color_mt("stderr");
-		spdlog::get("console")->debug(msg);
+		//spdlog::stderr_color_mt("stderr");
+		switch (level) {
+		case LogLevel::Debug: spdlog::get("console")->debug(msg); break;
+		case LogLevel::Info: spdlog::get("console")->info(msg); break;
+		case LogLevel::Warning: spdlog::get("console")->warn(msg); break;
+		case LogLevel::Error: spdlog::get("console")->error(msg); break;
+		}
 		if (level <= LogLevel::Debug) { return; }
 	}
 
@@ -86,7 +92,7 @@ namespace DBBD
 		std::vector<std::string> msgArray;
 		
 		std::string temp;
-		char prev;
+		char prev = ' ';
 		for (auto c : msg) {
 			if (c == '{') {
 				prev = c;
@@ -113,8 +119,11 @@ namespace DBBD
 			if (arg._Cast<int>()) { resultMsg += std::to_string(*arg._Cast<int>()); }
 			else if (arg._Cast<std::string>()) { resultMsg += *arg._Cast<std::string>(); }
 			else if (arg._Cast<short>()) { resultMsg += std::to_string(*arg._Cast<short>()); }
+			else if (arg._Cast<size_t>()) { resultMsg += std::to_string(*arg._Cast<size_t>()); }
+			else if (arg._Cast<float>()) { resultMsg += std::to_string(*arg._Cast<float>()); }
+			//else if (arg._Cast<Cell>()) { resultMsg += *arg._Cast<Cell>().toString(); }
 		}
 
-		return "";
+		return resultMsg;
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "DBBD/Singleton.h"
 #include "DBBD/YamlParser.hpp"
+#include "DBBD/Log.h"
 
 class CommonConfig: public DBBD::Singleton<CommonConfig>
 {
@@ -10,7 +11,7 @@ public:
 		Redis = Common.get<DBBD::Config>("Redis");
 		MariaDB = Common.get<DBBD::Config>("MariaDB");
 
-		std::cout << "Config load complete..." << std::endl;
+		LOG_INFO("Config load complete...");
 	}
 	// Singleton을(를) 통해 상속됨
 	virtual void release() override {

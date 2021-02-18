@@ -10,8 +10,8 @@
 #include <atlconv.h>
 
 int main() {
-	CommonConfig::Instance()->load();
 	DBBD::Log::Instance()->init("Session");
+	CommonConfig::Instance()->load();
 	SessionServer server("Session", "127.0.0.1", 8101, 1);
 	DBBD::TimerManager::Instance()->init(8);
 	DBBD::RedisManager::Instance()->init(

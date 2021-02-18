@@ -6,7 +6,6 @@
 #include "Singleton.h"
 #include "TimerObject.h"
 #include "Define.h"
-#include "Log.h"
 
 namespace DBBD
 {
