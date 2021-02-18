@@ -11,7 +11,7 @@ namespace DBBD {
     public:
         static T* Instance()
         {
-            if (instance == NULL) {
+            if (instance == nullptr) {
                 instance = new T;
                 atexit(destroyInstance);
             }

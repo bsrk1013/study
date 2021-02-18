@@ -4,8 +4,9 @@
 #include <deque>
 #include <map>
 #include "Singleton.h"
-#include "Define.h"
 #include "TimerObject.h"
+#include "Define.h"
+#include "Log.h"
 
 namespace DBBD
 {

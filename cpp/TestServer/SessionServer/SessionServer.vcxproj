@@ -118,14 +118,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\DBBD;$(SolutionDir)..\boost_1_74_0;$(SolutionDir)..\cpp_redis\includes;$(SolutionDir)..\cpp_redis\tacopie\includes;C:\Program Files\MariaDB\MariaDB Connector C 64-bit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\DBBD;$(SolutionDir)..\boost_1_74_0;$(SolutionDir)..\cpp_redis\includes;$(SolutionDir)..\cpp_redis\tacopie\includes;$(SolutionDir)..\DB\MariaDB Connector\include;$(SolutionDir)..\yaml-cpp\include;$(SolutionDir)..\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\DBBD\x64\Debug;$(SolutionDir)..\boost_1_74_0\stage\lib;$(SolutionDir)..\cpp_redis\msvc15\x64\Debug;C:\Program Files\MariaDB\MariaDB Connector C 64-bit\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cpp_redis.lib;tacopie.lib;libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\DBBD\x64\Debug;$(SolutionDir)..\boost_1_74_0\stage\lib;$(SolutionDir)..\cpp_redis\msvc15\x64\Debug;$(SolutionDir)..\DB\MariaDB Connector\lib;$(SolutionDir)..\yaml-cpp\build\Debug;$(SolutionDir)..\spdlog\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cpp_redis.lib;tacopie.lib;libmariadb.lib;yaml-cppd.lib;spdlogd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,6 +153,7 @@
     <ClCompile Include="SessionServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommonConfig.h" />
     <ClInclude Include="PlayerClientSession.h" />
     <ClInclude Include="SessionServer.h" />
   </ItemGroup>

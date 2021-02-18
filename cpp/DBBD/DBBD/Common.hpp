@@ -6,15 +6,27 @@
 #include <atlconv.h>
 
 namespace DBBD {
-	std::wstring strconv(const std::string& _src)
+	static std::wstring strconv(const std::string& _src)
 	{
 		USES_CONVERSION;
 		return std::wstring(A2W(_src.c_str()));
 	};
 
-	std::string strconv(const std::wstring& _src)
+	static std::string strconv(const std::wstring& _src)
 	{
 		USES_CONVERSION;
 		return std::string(W2A(_src.c_str()));
 	};
+
+	 static std::vector<std::string> dbbdsplit(std::string input, char delimiter) {
+		 std::vector<std::string> answer;
+		 std::stringstream ss(input);
+		 std::string temp;
+
+		 while (getline(ss, temp, delimiter)) {
+			 answer.push_back(temp);
+		 }
+
+		 return answer;
+	 }
 }

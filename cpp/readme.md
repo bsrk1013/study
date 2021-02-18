@@ -102,3 +102,21 @@
      - \$(SolutionDir)..\yaml-cpp\build\Debug or Release
    - 추가 종속성
      - Debug : yaml-cppd.lib, Release : yaml-cpp.lib
+
+
+# spdlog
+
+#### 설치 경로 : cpp/
+1. 설치
+   - git clone https://github.com/gabime/spdlog.git
+   - spdlog 폴더 내에 build 폴더 생성
+   - cmake-gui를 이용해 spdlog를 빌드
+   - spdlog.sln 솔루션에서 Debug, Release로 빌드
+
+2. 프로젝트 설정
+   - 추가 포함 디렉터리
+     - \$(SolutionDir)..\spdlog\include
+   - 추가 라이브러리 디렉터리
+     - \$(SolutionDir)..\spdlog\build\Debug or Release
+   - 추가 종속성
+     - Debug : spdlogd.lib, Release : spdlog.lib

@@ -13,15 +13,15 @@ void CppExtractor::writeHeader(ofstream& ofs) {
 	ofs << "#include \"DBBD/Cell.h\"" << endl;
 	ofs << "#include \"DBBD/Request.h\"" << endl;
 	ofs << "#include \"DBBD/Response.h\"" << endl;
-	ofs << "#include \"ProtocolType.hpp\"" << endl;
 	ofs << "#include \"DBBD/Common.hpp\"" << endl;
+	ofs << "#include \"ProtocolType.hpp\"" << endl;
 	ofs << endl;
 }
 
 void CppExtractor::writeCell(ofstream& ofs) {
 	writeContentsHeader(ofs);
 	writeCellContents(ofs);
-	ofs << "}" << endl;
+	ofs << "};" << endl;
 }
 
 void CppExtractor::writeProtocol(ofstream& ofs) {
@@ -42,7 +42,7 @@ void CppExtractor::writeConst(ofstream& ofs, string fileName) {
 	auto namespaceName = fileName.substr(0, pos);
 	ofs << "#include <map>" << endl << endl;
 	ofs << "namespace " << namespaceName << " {" << endl;
-	ofs << "\tenum class Value {" << endl;
+	ofs << "\tenum Value {" << endl;
 	for (auto info : headerInfoList) {
 		ofs << "\t\t" << info.name << " = " << info.value << "," << endl;
 	}
@@ -155,17 +155,17 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 			ofs << "\t\tif (fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
 		}
 	}
-	ofs << "\t\treturn totalLength();" << endl;
+	ofs << "\t\treturn totalLength;" << endl;
 	ofs << "\t}" << endl;
 
 
-	ofs << "\tvoid std::string toJson() {" << endl;
+	ofs << "\tstd::string toJson() {" << endl;
 	ofs << "\t\tnlohmann::json j;" << endl;
 	for (size_t i = 0; i < realContents.size(); i++) {
 		auto info = realContents[i];
 		ofs << "\t\tif (fingerPrinter[" << i << "]) { j[\"" << info.name << "\"] = ";
 		if (strcmp(info.type.c_str(), "string") == 0) {
-			ofs << "strconv(" << info.name << ")";
+			ofs << "DBBD::strconv(" << info.name << ")";
 		}
 		else {
 			ofs << info.name;
@@ -177,6 +177,25 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 
 	ofs << "\tvoid fromJson(std::string rawJson) {" << endl;
 	ofs << "\t\tnlohmann::json j = nlohmann::json::parse(rawJson);" << endl;
+	for (size_t i = 0; i < realContents.size(); i++) {
+		auto info = realContents[i];
+		ofs << "\t\tif (!j[\"" << info.name << "\"].is_null()) {" << endl;
+		if (strcmp(info.type.c_str(), "string") == 0) {
+			ofs << "\t\t\ttry {" << endl;
+			ofs << "\t\t\t\tstd::wstring wstr = j[\"" << info.name << "\"].get<std::wstring>();" << endl;
+			ofs << "\t\t\t\t" << info.name << " = DBBD::strconv(wstr);" << endl;
+			ofs << "\t\t\t}" << endl;
+			ofs << "\t\t\tcatch (const std::exception&) {" << endl;
+			ofs << "\t\t\t\tstd::string str = j[\"" << info.name << "\"].get<std::string>();" << endl;
+			ofs << "\t\t\t\t" << info.name << " = str;" << endl;
+			ofs << "\t\t\t}" << endl;
+		}
+		else {
+			ofs << "\t\t\t" << info.name << " = " << "j[\"" << info.name << "\"].get<" << getPropertyType(info.type) << ">();" << endl;
+		}
+		ofs << "\t\t}" << endl;
+	}
+	ofs << "\t}" << endl;
 
 	if (realContents.size() <= 0) { return; }
 

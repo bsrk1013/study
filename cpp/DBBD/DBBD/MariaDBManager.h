@@ -5,6 +5,7 @@
 #include <queue>
 #include <shared_mutex>
 #include "Define.h"
+#include "Common.hpp"
 #include "Singleton.h"
 #include "DBBaseManager.h"
 #include "TimerObject.h"
@@ -97,7 +98,6 @@ namespace DBBD
 	private:
 		std::vector<std::map<std::string, std::string>> execute(std::string query);
 		std::string queryBind(std::string origin, std::vector<std::any> args);
-		std::vector<std::string> split(std::string input, char delimiter);
 		void update();
 
 	private:

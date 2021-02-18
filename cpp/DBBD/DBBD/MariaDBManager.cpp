@@ -130,7 +130,7 @@ namespace DBBD
 
 	std::string MariaDBManager::queryBind(std::string origin, std::vector<std::any> args)
 	{
-		auto queryParts = split(origin, '?');
+		auto queryParts = dbbdsplit(origin, '?');
 
 		if (queryParts.size() != args.size()) {
 			if (args.size() == 1 && queryParts.size() == 2) {}
@@ -167,18 +167,6 @@ namespace DBBD
 		}
 
 		return query;
-	}
-
-	std::vector<std::string> MariaDBManager::split(std::string input, char delimiter) {
-		std::vector<std::string> answer;
-		std::stringstream ss(input);
-		std::string temp;
-
-		while (getline(ss, temp, delimiter)) {
-			answer.push_back(temp);
-		}
-
-		return answer;
 	}
 
 	MariaSP MariaDBManager::createInfo()

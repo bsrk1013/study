@@ -161,7 +161,7 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(RedisHashTest) {
-			RedisManager::Instance()->init("118.67.134.160", 6379);
+			RedisManager::Instance()->init("118.67.134.160", 6379, "1231013a");
 
 			RedisManager::Instance()->hset(0, "study:test", "hello", "world");
 			auto stringGet = RedisManager::Instance()->hget<std::string>(0, "study:test", "hello");
@@ -195,7 +195,7 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(RedisSortedSetTest) {
-			RedisManager::Instance()->init("118.67.134.160", 6379);
+			RedisManager::Instance()->init("118.67.134.160", 6379, "1231013a");
 
 			RedisManager::Instance()->zadd(0, "test", "doby", 100);
 			auto dobyScore = RedisManager::Instance()->zscore(0, "test", "doby");
@@ -221,7 +221,7 @@ namespace DBBDTest
 		}
 
 		TEST_METHOD(RedisKeyTest) {
-			RedisManager::Instance()->init("118.67.134.160", 6379);
+			RedisManager::Instance()->init("118.67.134.160", 6379, "1231013a");
 
 			RedisManager::Instance()->sadd(0, "test1", "hello");
 			RedisManager::Instance()->sadd(0, "test2", "hello");

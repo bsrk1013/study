@@ -13,7 +13,8 @@ namespace DBBD
 		}
 
 		isInit = true;
-		std::cout << "TimerManager init, threadCount: " << threadCount << std::endl;
+		//LOG_DEBUG("TimerManager init, threadCount: " + std::to_string(threadCount));
+		LOG_DEBUG("TimerManager init, threadCount: {}", threadCount);
 	}
 
 	void TimerManager::release()

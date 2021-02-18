@@ -17,6 +17,9 @@ yaml-cpp/
 ### rapidjson ###
 rapidjson/
 
+### spdlog ###
+spdlog/
+
 ### VLD ###
 cpp/"Visual Leak Detector"/*
 cpp/"visual leak detector"/*

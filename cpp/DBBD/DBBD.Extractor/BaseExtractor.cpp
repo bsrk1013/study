@@ -55,6 +55,8 @@ std::string BaseExtractor::getPropertyType(std::string type) {
 		break;
 	case HashCode("int64"):
 		return "long";
+	case HashCode("int32"):
+		return "int";
 	default:
 		break;
 	}

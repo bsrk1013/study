@@ -12,6 +12,7 @@
 #include "../DBBD/json.hpp"
 #include "../DBBD/RedisManager.h"
 #include "../DBBD/Common.hpp"
+#include "../DBBD/test.hpp"
 #include <boost/asio.hpp>
 #include <boost/timer.hpp>
 #include <boost/bind.hpp>
@@ -559,16 +560,6 @@ namespace DBBDTest
 			Assert::IsTrue(strcmp(white2.c_str(), "172.168.50.1") == 0);
 		}
 
-		/*void to_json(nlohmann::json& j, const PlayerRankingInfo& info) {
-			j = nlohmann::json{ {"nickname", info.nickname}, {"level", info.level}, {"ranking", info.ranking} };
-		}
-
-		void from_json(const nlohmann::json& j, PlayerRankingInfo& info) {
-			j.at("nickname").get_to(info.nickname);
-			j.at("level").get_to(info.level);
-			j.at("ranking").get_to(info.ranking);
-		}*/
-
 		TEST_METHOD(JsonTest) {
 			class PlayerRankingInfo {
 			public:
@@ -599,7 +590,7 @@ namespace DBBDTest
 			Assert::IsTrue(j2["level"].get<int>() == 99);
 			Assert::IsTrue(j2["ranking"].get<short>() == 1);
 
-			RedisManager::Instance()->init("118.67.134.160", 6379);
+			RedisManager::Instance()->init("118.67.134.160", 6379, "1231013a");
 			std::string rawInfo1 = j1.dump();
 			std::string rawInfo2 = j2.dump();
 			RedisManager::Instance()->hset(0, "Ranking:DetailInfo", "1", rawInfo1);
@@ -617,6 +608,8 @@ namespace DBBDTest
 			Assert::IsTrue(j3["level"].get<int>() == 10);
 			Assert::IsTrue(j3["ranking"].get<int>() == 2400);
 
+			Assert::IsTrue(j4["a"].is_null());
+			Assert::IsFalse(j4["uid"].is_null());
 			Assert::IsTrue(j4["uid"].get<size_t>() == 2);
 			try {
 				std::wstring wnickname2 = j4["nickname"].get<std::wstring>();
@@ -628,6 +621,28 @@ namespace DBBDTest
 			}
 			Assert::IsTrue(j4["level"].get<int>() == 99);
 			Assert::IsTrue(j4["ranking"].get<int>() == 1);
+
+			UserInfo userInfo1;
+			userInfo1.setNickname("백종환일");
+			userInfo1.setLevel(99);
+
+			RedisManager::Instance()->hset(0, "UserInfo", "0", userInfo1.toJson());
+			UserInfo userInfo2;
+			auto redisData3 = RedisManager::Instance()->hget<std::string>(0, "UserInfo", "0");
+			userInfo2.fromJson(redisData3);
+
+			Assert::IsTrue(strcmp(userInfo1.getNickname().c_str(), userInfo2.getNickname().c_str()) == 0);
+			Assert::IsTrue(userInfo1.getLevel() == userInfo2.getLevel());
+
+			UserInfo userInfo3;
+			userInfo3.setNickname("Douner");
+
+			RedisManager::Instance()->hset(0, "UserInfo", "1", userInfo3.toJson());
+			UserInfo userInfo4;
+			auto redisData4 = RedisManager::Instance()->hget<std::string>(0, "UserInfo", "1");
+			userInfo4.fromJson(redisData4);
+
+			Assert::IsTrue(strcmp(userInfo3.getNickname().c_str(), userInfo4.getNickname().c_str()) == 0);
 		}
 	};
 }

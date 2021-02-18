@@ -3,10 +3,11 @@
 namespace DBBD
 {
 	void RedisManager::init(const std::string& address, const short& port,
-		const short& maxConnCount)
+		const std::string& psw, const short& maxConnCount)
 	{
 		this->address = address;
 		this->port = port;
+		this->psw = psw;
 		this->maxConnCount = maxConnCount;
 
 		for (size_t i = 0; i < maxConnCount; i++) {
@@ -412,7 +413,7 @@ namespace DBBD
 	{
 		std::shared_ptr<cpp_redis::client> conn = std::make_shared<cpp_redis::client>();
 		conn->connect(address, port);
-		conn->auth("1231013a");
+		conn->auth(psw);
 		RedisSP redis = std::make_shared<RedisConnInfo>();
 		redis->conn = conn;
 		redis->usedTime = std::chrono::system_clock::now();

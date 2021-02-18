@@ -2,8 +2,8 @@
 #include "DBBD/Cell.h"
 #include "DBBD/Request.h"
 #include "DBBD/Response.h"
-#include "ProtocolType.hpp"
 #include "DBBD/Common.hpp"
+#include "ProtocolType.hpp"
 
 class ServerConnectReq : public DBBD::Request {
 public:

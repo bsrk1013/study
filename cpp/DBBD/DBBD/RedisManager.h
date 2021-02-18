@@ -25,7 +25,7 @@ namespace DBBD
 	{
 	public:
 		void init(const std::string& address, const short& port,
-			const short& maxConnCount = 8);
+			const std::string& psw, const short& maxConnCount = 8);
 		virtual void release() override;
 
 #pragma region KEYS
@@ -264,6 +264,7 @@ namespace DBBD
 	private:
 		std::string address;
 		short port;
+		std::string psw;
 		short curCreateConnCount = 0;
 		short maxConnCount;
 	};
