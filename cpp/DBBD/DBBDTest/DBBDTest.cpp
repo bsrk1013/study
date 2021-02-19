@@ -45,6 +45,7 @@ namespace DBBDTest
 		virtual size_t getLength() {
 			return Request::getLength() + item.getLength();
 		}
+		virtual std::string toString() { return ""; }
 
 		T item;
 	};
@@ -489,6 +490,8 @@ namespace DBBDTest
 					return sizeof(BYTE) + sizeof(size_t) + name.size() + sizeof(long);
 				}
 
+				virtual std::string toString() { return "[ItemBase]"; }
+
 			public:
 				BYTE type;
 				std::string name;
@@ -534,6 +537,16 @@ namespace DBBDTest
 			tempReq.deserialize(buffer);
 
 			Assert::IsTrue(req.item.uid == tempReq.item.uid);
+
+			ItemBase item;
+			item.name = "¡ˆ∆Œ¿Ã";
+			item.type = ItemType::Equip;
+			item.uid = 100;
+
+			std::any anyData = item;
+			auto cell = anyData._Cast<Cell>();
+			auto anyDataStr = cell->toString();
+			Assert::IsTrue(strcmp(anyDataStr.c_str(), "[ItemBase]") == 0);
 		}
 
 		TEST_METHOD(YamlTest) {

@@ -66,6 +66,8 @@ namespace DBBDTest
 					return 0;
 				}
 
+				virtual std::string toString() { return ""; }
+
 			public:
 				std::string name;
 				short level;
@@ -94,6 +96,8 @@ namespace DBBDTest
 				virtual size_t getLength() {
 					return 0;
 				}
+
+				virtual std::string toString() { return ""; }
 
 			public:
 				std::string name;
@@ -149,6 +153,8 @@ namespace DBBDTest
 					return totalLength;
 				}
 
+				virtual std::string toString() { return ""; }
+
 			public:
 				void setNickname(std::string value) {
 					nickname = value;
@@ -188,6 +194,8 @@ namespace DBBDTest
 				virtual size_t getLength() {
 					return Request::getLength() + user.getLength();
 				}
+
+				virtual std::string toString() { return ""; }
 
 			public:
 				size_t getTypeId() { return typeId; }
@@ -275,6 +283,8 @@ namespace DBBDTest
 				virtual size_t getLength() {
 					return Request::getLength() + sizeof(size_t) + token.size() + sizeof(size_t) + deviceId.size();
 				}
+
+				virtual std::string toString() { return ""; }
 
 			public:
 				std::string token;

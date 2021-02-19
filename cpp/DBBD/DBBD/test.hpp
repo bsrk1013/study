@@ -31,6 +31,7 @@ public:
 		if (fingerPrinter[1]) { totalLength += sizeof(long); }
 		return totalLength;
 	}
+	virtual std::string toString() { return ""; }
 	std::string toJson() {
 		nlohmann::json j;
 		if (fingerPrinter[0]) { j["Nickname"] = DBBD::strconv(Nickname); }

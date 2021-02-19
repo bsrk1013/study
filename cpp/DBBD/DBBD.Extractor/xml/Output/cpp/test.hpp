@@ -26,10 +26,14 @@ public:
 		if (fingerPrinter[1]) { DBBD::Deserialize::read(buffer, Level); }
 	}
 	virtual size_t getLength() {
-		size_t totalLength = sizeof(size_t) + sizeof(fingerPrinter);
+		size_t totalLength = 0;
+		totalLength = sizeof(size_t) + sizeof(fingerPrinter);
 		if (fingerPrinter[0]) { totalLength += sizeof(size_t) + Nickname.length(); }
 		if (fingerPrinter[1]) { totalLength += sizeof(long); }
 		return totalLength;
+	}
+	virtual std::string toString() { 
+		return "[UserInfo] {  }";
 	}
 	std::string toJson() {
 		nlohmann::json j;

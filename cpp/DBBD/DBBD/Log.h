@@ -19,6 +19,7 @@ namespace DBBD
 	{
 	public:
 		void init(std::string name);
+		void usingTelegramBot();
 		virtual void release() override;
 
 	public:
@@ -26,9 +27,7 @@ namespace DBBD
 		template<typename ... Args>
 		void log(const LogLevel& level, const std::string& fileName, const long& line, const std::string& msg, const Args&... args)
 		{
-			std::vector<std::any> argVec = { args... };
-			auto resultMsg = parse(msg, argVec);
-			log(level, fileName, line, resultMsg);
+			log(level, fileName, line, strFormat(msg, args...));
 		}
 
 	private:
@@ -39,11 +38,11 @@ namespace DBBD
 
 	private:
 		void writeLog(LogLevel level, const std::string& msg);
-		std::shared_ptr<spdlog::logger> getFileLogger();
-		std::string parse(const std::string& msg, const std::vector<std::any>& argVec);
+		std::shared_ptr<spdlog::logger> getFileLogger(LogLevel level);
 
 	private:
 		std::string name;
+		bool telegramBot = false;
 		std::shared_ptr<spdlog::logger> consoleLogger;
 		std::shared_ptr<spdlog::logger> fileLogger;
 		int lastHour = 0;

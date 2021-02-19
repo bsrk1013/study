@@ -121,6 +121,10 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		if (contentsInfo.fileType != XmlElementType::Property) { continue; }
 		realContents.push_back(contentsInfo);
 	}
+	vector<FileInfo> header;
+	for (auto headerInfo : headerInfoList) {
+		if (headerInfo.fileType == XmlElementType::Cell) { header.push_back(headerInfo); break; }
+	}
 
 	/*std::string temp = R"(public:
 	virtual void serialize(DBBD::Buffer& buffer) {
@@ -148,8 +152,9 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 	ofs << "\t}" << endl;;
 
 	ofs << "\tvirtual size_t getLength() {" << endl;
+	ofs << "\t\tsize_t totalLength = 0;" << endl;
 	if (realContents.size() > 0) {
-		ofs << "\t\tsize_t totalLength = sizeof(size_t) + sizeof(fingerPrinter);" << endl;
+		ofs << "\t\ttotalLength = sizeof(size_t) + sizeof(fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
 			ofs << "\t\tif (fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
@@ -158,6 +163,18 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 	ofs << "\t\treturn totalLength;" << endl;
 	ofs << "\t}" << endl;
 
+	// FIXME 내용물 toString 해줘야함
+	ofs << "\tvirtual std::string toString() { " << endl;
+	if (header.size() <= 0) { ofs << "return \"\";"; }
+	else { 
+		ofs << "\t\treturn \"[" << header[0].name << "] { ";
+		/*for (size_t i = 0; i < realContents.size(); i++) {
+			auto info = realContents[i];
+			ofs << "";
+		}*/
+		ofs << " }\";" << endl;
+	}
+	ofs << "\t}" << endl;
 
 	ofs << "\tstd::string toJson() {" << endl;
 	ofs << "\t\tnlohmann::json j;" << endl;

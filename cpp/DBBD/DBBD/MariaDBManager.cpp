@@ -124,7 +124,7 @@ namespace DBBD
 
 	std::string MariaDBManager::queryBind(std::string origin, std::vector<std::any> args)
 	{
-		auto queryParts = dbbdsplit(origin, '?');
+		auto queryParts = strSplit(origin, '?');
 
 		if (queryParts.size() != args.size()) {
 			if (args.size() == 1 && queryParts.size() == 2) {}
