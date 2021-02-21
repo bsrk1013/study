@@ -13,7 +13,7 @@ namespace DBBD
 		static void write(Buffer& buffer, const T& value) {
 			size_t size = sizeof(T);
 			for (size_t i = 0; i < size; i++) {
-				char data = value >> i * DBBD::Buffer::byte;
+				char data = (char)(value >> i * DBBD::Buffer::byte);
 				buffer.putByte(data);
 			}
 		}

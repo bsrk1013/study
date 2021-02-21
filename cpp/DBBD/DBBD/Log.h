@@ -18,8 +18,8 @@ namespace DBBD
 	class Log: public Singleton<Log>
 	{
 	public:
-		void init(std::string name);
-		void usingTelegramBot();
+		Log* init(std::string name);
+		Log* usingTelegramBot(std::string token, int chatId);
 		virtual void release() override;
 
 	public:
@@ -43,6 +43,7 @@ namespace DBBD
 	private:
 		std::string name;
 		bool telegramBot = false;
+		std::string telegramSendURL;
 		std::shared_ptr<spdlog::logger> consoleLogger;
 		std::shared_ptr<spdlog::logger> fileLogger;
 		int lastHour = 0;

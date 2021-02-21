@@ -6,13 +6,20 @@
 
 namespace DBBD
 {
-	void Log::init(std::string name)
+	Log* Log::init(std::string name)
 	{
 		this->name = name;
 		spdlog::cfg::load_env_levels();
 		consoleLogger = spdlog::stdout_color_mt("Console");
 		std::string fileName = "logs/" + name + ".log";
 		fileLogger = spdlog::hourly_logger_mt<spdlog::async_factory>(name, fileName);
+		return Log::Instance();
+	}
+
+	Log* Log::usingTelegramBot(std::string token, int chatId) {
+		telegramBot = true;
+		telegramSendURL = strFormat("https://api.telegram.org/{}/sendmessage?chat_id={}&text=", token, chatId);
+		return Log::Instance();
 	}
 
 	void Log::release()
