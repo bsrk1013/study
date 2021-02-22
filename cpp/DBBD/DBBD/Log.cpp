@@ -3,6 +3,8 @@
 #include "spdlog/cfg/env.h"
 #include "spdlog/sinks/hourly_file_sink.h"
 #include "spdlog/async.h"
+#include <future>
+#include <iostream>
 
 namespace DBBD
 {
@@ -106,7 +108,12 @@ namespace DBBD
 
 		std::string convertMsg = toUrlString(telegramMsg);
 
-		auto res = telegramClient->Get(strFormat("/bot{}/sendmessage?chat_id={}&text={}",
+		httplib::Result(httplib::Client::*gf)(const char*) = &httplib::Client::Get;
+		std::async(std::launch::async, gf, telegramClient, 
+			strFormat("/bot{}/sendmessage?chat_id={}&text={}",
 			telegramToken, telegramChatId, convertMsg).c_str());
+
+		/*auto res = telegramClient->Get(strFormat("/bot{}/sendmessage?chat_id={}&text={}",
+			telegramToken, telegramChatId, convertMsg).c_str());*/
 	}
 }

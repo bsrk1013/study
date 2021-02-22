@@ -4,16 +4,14 @@
 #include "DBBD/RedisManager.h"
 #include "DBBD/MariaDBManager.h"
 #include "DBBD/Log.h"
-#include "DBBD/ExceptionHandler.h"
+//#include "DBBD/ExceptionHandler.h"
 #include "SessionServer.h"
 #include "CommonConfig.h"
 
 
 int main() {
 	try {
-		DBBD::ExceptionHandler::Instance()->init("Session");
-		int* a = nullptr;
-		*a = 12345;
+		//DBBD::ExceptionHandler::Instance()->init("Session");
 		CommonConfig::Instance()->load();
 		DBBD::Log::Instance()->init("Session")
 			->usingTelegramBot(
