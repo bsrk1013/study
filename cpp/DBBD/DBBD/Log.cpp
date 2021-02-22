@@ -18,12 +18,16 @@ namespace DBBD
 
 	Log* Log::usingTelegramBot(std::string token, int chatId) {
 		telegramBot = true;
-		telegramSendURL = strFormat("https://api.telegram.org/{}/sendmessage?chat_id={}&text=", token, chatId);
+		telegramToken = token;
+		telegramChatId = chatId;
+		telegramClient = std::make_shared<httplib::Client>("https://api.telegram.org");
+		//telegramSendURL = strFormat("https://api.telegram.org/bot{}/sendmessage?chat_id={}&text=", token, chatId);
 		return Log::Instance();
 	}
 
 	void Log::release()
 	{
+		telegramClient->stop();
 	}
 
 	void Log::log(const LogLevel& level, const std::string& fileName, const long& line, const std::string& msg)
@@ -77,18 +81,32 @@ namespace DBBD
 
 	void Log::writeLog(LogLevel level, const std::string& msg)
 	{
-		//spdlog::stderr_color_mt("stderr");
 		switch (level) {
 		case LogLevel::Debug: consoleLogger->debug(msg); break;
 		case LogLevel::Info: consoleLogger->info(msg); fileLogger->info(msg); break;
 		case LogLevel::Warning: consoleLogger->warn(msg); fileLogger->warn(msg);  break;
 		case LogLevel::Error: consoleLogger->error(msg); fileLogger->error(msg); break;
 		}
-
 		fileLogger->flush();
 
-		if (telegramBot) {
+		sendTelegramBot(level, msg);
+	}
 
+	void Log::sendTelegramBot(LogLevel level, const std::string& msg)
+	{
+		if (!telegramBot
+			|| level < LogLevel::Warning) {
+			return;
 		}
+
+		std::string levelStr = level == LogLevel::Warning ? "Warn" : "Error";
+
+		std::string telegramMsg = strFormat("[{}] [{}] [{}] {}",
+			getNowString(), name, levelStr, msg);
+
+		std::string convertMsg = toUrlString(telegramMsg);
+
+		auto res = telegramClient->Get(strFormat("/bot{}/sendmessage?chat_id={}&text={}",
+			telegramToken, telegramChatId, convertMsg).c_str());
 	}
 }

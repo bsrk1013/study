@@ -82,6 +82,9 @@
     <Filter Include="헤더 파일\rapidjson\msinttypes">
       <UniqueIdentifier>{b8f303d2-bfbb-49e6-8589-fa0daf8875be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Network\Web">
+      <UniqueIdentifier>{449a2a3e-f895-4c66-98f7-558b19eba4cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Random.h">
@@ -280,6 +283,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Log.h">
+      <Filter>헤더 파일\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="httplib.h">
+      <Filter>헤더 파일\Network\Web</Filter>
+    </ClInclude>
+    <ClInclude Include="ExceptionHandler.h">
       <Filter>헤더 파일\Common</Filter>
     </ClInclude>
   </ItemGroup>

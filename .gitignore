@@ -20,6 +20,9 @@ rapidjson/
 ### spdlog ###
 spdlog/
 
+### openssl ###
+OpenSSL-Win64/
+
 ### VLD ###
 cpp/"Visual Leak Detector"/*
 cpp/"visual leak detector"/*

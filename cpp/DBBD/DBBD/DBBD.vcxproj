@@ -119,9 +119,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\module\boost_1_74_0;$(SolutionDir)..\module\cpp_redis\includes;$(SolutionDir)..\module\cpp_redis\tacopie\includes;$(SolutionDir)..\module\DB\Mariadb Connector\include;$(SolutionDir)..\module\yaml-cpp\include;$(SolutionDir)..\module\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\module\boost_1_74_0;$(SolutionDir)..\module\cpp_redis\includes;$(SolutionDir)..\module\cpp_redis\tacopie\includes;$(SolutionDir)..\module\DB\Mariadb Connector\include;$(SolutionDir)..\module\yaml-cpp\include;$(SolutionDir)..\module\spdlog\include;$(SolutionDir)..\module\OpenSSL-Win64\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +131,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\module\boost_1_74_0\stage\lib;$(SolutionDir)..\module\cpp_redis\msvc15\x64\Debug;$(SolutionDir)..\module\DB\Mariadb Connector\lib;$(SolutionDir)..\module\yaml-cpp\build\Debug;$(SolutionDir)..\module\spdlog\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\module\boost_1_74_0\stage\lib;$(SolutionDir)..\module\cpp_redis\msvc15\x64\Debug;$(SolutionDir)..\module\DB\Mariadb Connector\lib;$(SolutionDir)..\module\yaml-cpp\build\Debug;$(SolutionDir)..\module\spdlog\build\Debug;$(SolutionDir)..\module\OpenSSL-Win64\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -167,6 +168,8 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="Deserialize.h" />
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="ExceptionHandler.h" />
+    <ClInclude Include="httplib.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MariaDBManager.h" />

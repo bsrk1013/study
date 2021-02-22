@@ -92,7 +92,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)..\DBBD;$(SolutionDir)..\module\boost_1_74_0;$(SolutionDir)..\module\cpp_redis\includes;$(SolutionDir)..\module\cpp_redis\tacopie\includes;$(SolutionDir)..\module\DB\Mariadb Connector\include;$(SolutionDir)..\module\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)..\DBBD;$(SolutionDir)..\module\boost_1_74_0;$(SolutionDir)..\module\cpp_redis\includes;$(SolutionDir)..\module\cpp_redis\tacopie\includes;$(SolutionDir)..\module\DB\Mariadb Connector\include;$(SolutionDir)..\module\yaml-cpp\include;$(SolutionDir)..\module\OpenSSL-Win64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -101,8 +101,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;$(SolutionDir)..\DBBD\x64\Debug;$(SolutionDir)..\module\boost_1_74_0\stage\lib;$(SolutionDir)..\module\cpp_redis\msvc15\x64\Debug;$(SolutionDir)..\module\DB\Mariadb Connector\lib;$(SolutionDir)..\module\yaml-cpp\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cpp_redis.lib;tacopie.lib;libmariadb.lib;yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;$(SolutionDir)..\DBBD\x64\Debug;$(SolutionDir)..\module\boost_1_74_0\stage\lib;$(SolutionDir)..\module\cpp_redis\msvc15\x64\Debug;$(SolutionDir)..\module\DB\Mariadb Connector\lib;$(SolutionDir)..\module\yaml-cpp\build\Debug;$(SolutionDir)..\module\OpenSSL-Win64\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cpp_redis.lib;tacopie.lib;libmariadb.lib;yaml-cppd.lib;libcrypto64MDd.lib;libcrypto64MTd.lib;libssl64MDd.lib;libssl64MTd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

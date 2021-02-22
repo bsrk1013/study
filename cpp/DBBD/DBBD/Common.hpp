@@ -3,9 +3,12 @@
 #include <sstream>
 #include <vector>
 #include <any>
+#include <chrono>
+#include <locale>
 #include <Windows.h>
 #include <atlconv.h>
 #include "Cell.h"
+#include "boost/format.hpp"
 
 namespace DBBD {
 	static std::wstring strconv(const std::string& _src)
@@ -80,5 +83,77 @@ namespace DBBD {
 		}
 
 		return answer;
+	}
+
+	static std::string toAnsiString(const std::wstring& src, UINT codePage)
+	{
+		std::string strReturn;
+
+		const int nLength = ::WideCharToMultiByte(codePage, 0UL, src.c_str(), -1, nullptr, 0, nullptr, nullptr);
+
+		if (nLength < 0)
+			return strReturn;
+
+		strReturn.resize(nLength);
+		const int nResult = ::WideCharToMultiByte(codePage, 0UL, src.c_str(), -1, &strReturn[0], nLength, nullptr, nullptr);
+
+		(void)nResult;
+		return strReturn;
+	}
+
+	static std::wstring toWideString(const std::string& src, UINT codePage)
+	{
+		std::wstring strReturn;
+
+		const int nLength = ::MultiByteToWideChar(codePage, 0UL, src.c_str(), -1, nullptr, 0);
+
+		if (nLength < 0)
+			return strReturn;
+
+		strReturn.resize(nLength);
+
+		const int nResult = ::MultiByteToWideChar(codePage, 0UL, src.c_str(), -1, &strReturn[0], nLength);
+
+		(void)nResult;
+
+		return std::move(strReturn);
+	}
+
+	static std::string utfStringToUrlString(const std::string& src)
+	{
+		std::stringstream stm;
+
+		for(char ch : src)
+		{
+			if (ch == 0)	// 가장 마지막 널문자는 변환하지 않는다.
+				break;
+
+			stm << boost::format("%%%X") % (ch & 0xff);
+		}
+
+		return stm.str();
+	}
+
+	static std::string toUrlString(const std::wstring& src)
+	{
+		return utfStringToUrlString(toAnsiString(src, CP_UTF8));
+	}
+
+	static std::string toUrlString(const std::string& src)
+	{
+		return toUrlString(toWideString(src, CP_ACP));
+	}
+
+	static std::string getNowString() {
+		auto now = std::chrono::system_clock::now();
+		time_t nowTime = std::chrono::system_clock::to_time_t(now);
+		tm tm;
+		localtime_s(&tm, &nowTime);
+
+		std::string nowStr = strFormat("{}-{}-{} {}:{}:{}",
+			(tm.tm_year + 1900), (tm.tm_mon + 1), tm.tm_mday,
+			tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+		return nowStr;
 	}
 }

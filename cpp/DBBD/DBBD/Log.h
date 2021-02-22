@@ -6,6 +6,9 @@
 #include "Common.hpp"
 #include <any>
 
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include "httplib.h"
+
 namespace DBBD
 {
 	enum LogLevel {
@@ -38,12 +41,15 @@ namespace DBBD
 
 	private:
 		void writeLog(LogLevel level, const std::string& msg);
+		void sendTelegramBot(LogLevel level, const std::string& msg);
 		std::shared_ptr<spdlog::logger> getFileLogger(LogLevel level);
 
 	private:
 		std::string name;
 		bool telegramBot = false;
-		std::string telegramSendURL;
+		std::string telegramToken;
+		int telegramChatId;
+		std::shared_ptr<httplib::Client> telegramClient;
 		std::shared_ptr<spdlog::logger> consoleLogger;
 		std::shared_ptr<spdlog::logger> fileLogger;
 		int lastHour = 0;

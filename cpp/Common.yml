@@ -9,3 +9,7 @@ MariaDB:
   id: root
   psw: 1231013a
   db: Test
+
+TelegramBot:
+  token: 1670808230:AAGEc-LmpQhvk1tx5KfEPkTV3L_EV4A1Ijc
+  chatid: -576790544
