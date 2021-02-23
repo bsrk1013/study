@@ -4,7 +4,9 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "Common.hpp"
+#include "Define.h"
 #include <any>
+#include <queue>
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib.h"
@@ -33,6 +35,9 @@ namespace DBBD
 			log(level, fileName, line, strFormat(msg, args...));
 		}
 
+	public:
+		bool IsInit() { return isInit; }
+
 	private:
 		void debug(const std::string& msg);
 		void info(const std::string& msg);
@@ -42,14 +47,20 @@ namespace DBBD
 	private:
 		void writeLog(LogLevel level, const std::string& msg);
 		void sendTelegramBot(LogLevel level, const std::string& msg);
+		void updateTelegram();
 		std::shared_ptr<spdlog::logger> getFileLogger(LogLevel level);
 
 	private:
 		std::string name;
+		bool isInit = false;
+		
 		bool telegramBot = false;
 		std::string telegramToken;
 		int telegramChatId;
 		std::shared_ptr<httplib::Client> telegramClient;
+		std::queue<std::string> telegramMsgQueue;
+		ThreadSP telegramThread;
+
 		std::shared_ptr<spdlog::logger> consoleLogger;
 		std::shared_ptr<spdlog::logger> fileLogger;
 		int lastHour = 0;

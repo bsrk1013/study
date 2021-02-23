@@ -15,6 +15,7 @@ namespace DBBD
 		consoleLogger = spdlog::stdout_color_mt("Console");
 		std::string fileName = "logs/" + name + ".log";
 		fileLogger = spdlog::hourly_logger_mt<spdlog::async_factory>(name, fileName);
+		isInit = true;
 		return Log::Instance();
 	}
 
@@ -24,12 +25,19 @@ namespace DBBD
 		telegramChatId = chatId;
 		telegramClient = std::make_shared<httplib::Client>("https://api.telegram.org");
 		//telegramSendURL = strFormat("https://api.telegram.org/bot{}/sendmessage?chat_id={}&text=", token, chatId);
+
+		telegramThread = NEW_THREAD_SP([&]() {
+			updateTelegram();
+			});
+
 		return Log::Instance();
 	}
 
 	void Log::release()
 	{
-		telegramClient->stop();
+		if (telegramBot) {
+			telegramClient->stop();
+		}
 	}
 
 	void Log::log(const LogLevel& level, const std::string& fileName, const long& line, const std::string& msg)
@@ -55,21 +63,21 @@ namespace DBBD
 	}
 
 	void Log::debug(const std::string& msg)
-	{ 
+	{
 		consoleLogger->set_level(spdlog::level::debug);
 		fileLogger->set_level(spdlog::level::debug);
 		writeLog(LogLevel::Debug, msg);
 	}
 
 	void Log::info(const std::string& msg)
-	{ 
+	{
 		consoleLogger->set_level(spdlog::level::info);
 		fileLogger->set_level(spdlog::level::info);
 		writeLog(LogLevel::Info, msg);
 	}
 
 	void Log::warning(const std::string& msg)
-	{ 
+	{
 		consoleLogger->set_level(spdlog::level::warn);
 		fileLogger->set_level(spdlog::level::warn);
 		writeLog(LogLevel::Warning, msg);
@@ -108,12 +116,27 @@ namespace DBBD
 
 		std::string convertMsg = toUrlString(telegramMsg);
 
-		httplib::Result(httplib::Client::*gf)(const char*) = &httplib::Client::Get;
-		std::async(std::launch::async, gf, telegramClient, 
+		/*httplib::Result(httplib::Client::*gf)(const char*) = &httplib::Client::Get;
+		std::async(std::launch::async, gf, telegramClient,
 			strFormat("/bot{}/sendmessage?chat_id={}&text={}",
-			telegramToken, telegramChatId, convertMsg).c_str());
+			telegramToken, telegramChatId, convertMsg).c_str());*/
+
+		telegramMsgQueue.push(convertMsg);
 
 		/*auto res = telegramClient->Get(strFormat("/bot{}/sendmessage?chat_id={}&text={}",
 			telegramToken, telegramChatId, convertMsg).c_str());*/
+	}
+
+	void Log::updateTelegram() {
+		while (true) {
+			while (!telegramMsgQueue.empty()) {
+				auto msg = telegramMsgQueue.front();
+				telegramMsgQueue.pop();
+
+				telegramClient->Get(strFormat("/bot{}/sendmessage?chat_id={}&text={}",
+					telegramToken, telegramChatId, msg).c_str());
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
 	}
 }

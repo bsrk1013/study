@@ -7,7 +7,7 @@ class CommonConfig: public DBBD::Singleton<CommonConfig>
 {
 public:
 	void load() {
-		Common = DBBD::YamlParser::loadConfig("..\\..\\Common.yml");
+		Common = DBBD::YamlParser::loadConfig("Common.yml");
 		Redis = Common.get<DBBD::Config>("Redis");
 		MariaDB = Common.get<DBBD::Config>("MariaDB");
 		TelegramBot = Common.get<DBBD::Config>("TelegramBot");

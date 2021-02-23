@@ -2,7 +2,7 @@
 #define _WIN32_WINNT 0x0501
 #define WIN32_LEAN_AND_MEAN
 
-#include "Singleton"
+#include "Singleton.h"
 #include "Common.hpp"
 
 #include <windows.h>

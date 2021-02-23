@@ -10,8 +10,10 @@
 
 
 int main() {
+	/*DBBD::ExceptionHandler::Instance()->init("Session");
+	int* a = nullptr;
+	*a = 12345;*/
 	try {
-		//DBBD::ExceptionHandler::Instance()->init("Session");
 		CommonConfig::Instance()->load();
 		DBBD::Log::Instance()->init("Session")
 			->usingTelegramBot(
@@ -46,8 +48,14 @@ int main() {
 		}
 	}
 	catch (const std::exception& e) {
-		LOG_ERROR(e.what());
+		if (!DBBD::Log::Instance()->IsInit()) {
+			std::cout << e.what() << std::endl;
+		}
+		else {
+			LOG_ERROR(e.what());
+		}
 	}
 
+	std::getchar();
 	return 0;
 }
