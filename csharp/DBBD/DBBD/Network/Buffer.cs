@@ -9,22 +9,22 @@ namespace DBBD
         public Buffer(uint size) 
         {
             bufferCapacity = size;
-            buffer = new char[size];
+            buffer = new byte[size];
             blockSize = size / 16;
-            block = new char[blockSize];
+            block = new byte[blockSize];
         }
         
-        public void PutByte(char byteData)
+        public void PutByte(byte byteData)
         {
             buffer[bufferLastPos++] = byteData;
         }
 
-        public char[] ViewByteBlock(uint size) 
+        public byte[] ViewByteBlock(uint size) 
         {
             return ReadByte(size);
         }
 
-        public char[] ReadByteBlock(uint size) 
+        public byte[] ReadByteBlock(uint size) 
         {
             ReadByte(size);
 
@@ -44,7 +44,7 @@ namespace DBBD
             }
             else if(bufferOffset > 0 && spare >0)
             {
-                char[] tempArray = new char[spare];
+                byte[] tempArray = new byte[spare];
                 for(int i = 0; i < spare; i++)
                 {
                     tempArray[i] = buffer[bufferOffset + i];
@@ -63,12 +63,12 @@ namespace DBBD
 
         public void IncreaseLastPos(uint size) { bufferLastPos += size; }
 
-        private char[] ReadByte(uint size)
+        private byte[] ReadByte(uint size)
         {
             if(size > blockSize)
             {
                 blockSize *= 2;
-                block = new char[blockSize];
+                block = new byte[blockSize];
             }
 
             uint dataIndex = 0;
@@ -87,12 +87,12 @@ namespace DBBD
             bufferLastPos = 0;
         }
 
-        public char[] RawBuffer { get { return buffer; } }
+        public byte[] RawBuffer { get { return buffer; } }
         public uint BufferLastPos { get { return bufferLastPos; } set { bufferLastPos = value; } }
         public uint BufferOffset { get { return bufferOffset; } set { bufferOffset = value; } }
 
-        private char[] buffer;
-        private char[] block;
+        private byte[] buffer;
+        private byte[] block;
         private uint blockSize = 0;
         private uint bufferOffset = 0;
         private uint bufferLastPos = 0;
