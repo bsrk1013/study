@@ -63,11 +63,8 @@ namespace DBBD {
 
 	void Buffer::adjust() {
 		size_t spare = bufferLastPos - bufferOffset;
-		if (spare > bufferCapacity) {
-			bufferOffset = 0;
-			bufferLastPos = 0;
-		}
-		else if (spare == 0) {
+		if (spare > bufferCapacity
+			|| spare == 0) {
 			bufferOffset = 0;
 			bufferLastPos = 0;
 		}

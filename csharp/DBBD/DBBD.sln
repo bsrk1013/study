@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBBD", "DBBD\DBBD.csproj", "{F5DD43BB-30BA-4BEC-9CD5-D2AE320C8545}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBBD", "DBBD\DBBD.csproj", "{F5DD43BB-30BA-4BEC-9CD5-D2AE320C8545}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBBDTest", "DBBDTest\DBBDTest.csproj", "{4C2A7F68-FB12-45E9-8E60-49B9B4CEBEC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{F5DD43BB-30BA-4BEC-9CD5-D2AE320C8545}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5DD43BB-30BA-4BEC-9CD5-D2AE320C8545}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5DD43BB-30BA-4BEC-9CD5-D2AE320C8545}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C2A7F68-FB12-45E9-8E60-49B9B4CEBEC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C2A7F68-FB12-45E9-8E60-49B9B4CEBEC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C2A7F68-FB12-45E9-8E60-49B9B4CEBEC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C2A7F68-FB12-45E9-8E60-49B9B4CEBEC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
