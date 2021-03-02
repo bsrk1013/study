@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBBD", "DBBD\DBBD.csproj", "{F5DD43BB-30BA-4BEC-9CD5-D2AE320C8545}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBBDTest", "DBBDTest\DBBDTest.csproj", "{4C2A7F68-FB12-45E9-8E60-49B9B4CEBEC7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F5DD43BB-30BA-4BEC-9CD5-D2AE320C8545} = {F5DD43BB-30BA-4BEC-9CD5-D2AE320C8545}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
