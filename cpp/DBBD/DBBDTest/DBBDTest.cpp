@@ -20,6 +20,9 @@
 #include <queue>
 #include <vector>
 #include <cmath>
+#include <codecvt>
+#include <string>
+#include <locale>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace DBBD;
@@ -320,11 +323,23 @@ namespace DBBDTest
 			Assert::IsFalse(minFloor < targetFloor2&& targetFloor2 <= maxFloor);
 			Assert::IsFalse(minFloor < targetFloor3&& targetFloor3 <= maxFloor);
 
-			/*float fSection = lastClearFloor / 10.0f;
-			int nSection = std::ceill(fSection) * 10;
-			Assert::IsTrue(nSection >= targetFloor);
-			targetFloor = 41;
-			Assert::IsFalse(nSection >= targetFloor);*/
+			std::string s1 = "»§Ä®¹ý»ç";
+			std::wstring s2 = strconv(s1);
+
+			size_t size1 = s1.size() * sizeof(char);
+			size_t size2 = s2.size() * sizeof(wchar_t);
+
+			const char* begin = reinterpret_cast<const char*>(&s2[0]);
+			std::vector<char>(begin, begin + size2);
+
+			for (int i = 0; i < size2; i++)
+			{
+				char data = begin[i];
+				bool boolean = true;
+			}
+
+			size_t sizetSize = sizeof(size_t);
+			bool boolean = true;
 		}
 
 		TEST_METHOD(FunctionTest) {

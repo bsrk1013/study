@@ -6,27 +6,30 @@ namespace DBBD
 {
     public class Buffer
     {
-        public Buffer(uint size) 
+        public Buffer(ulong size) 
         {
             bufferCapacity = size;
-            buffer = new byte[size];
-            blockSize = size / 16;
-            block = new byte[blockSize];
+            buffer = new sbyte[size];
         }
         
         public void PutByte(byte byteData)
         {
+            buffer[bufferLastPos++] = (sbyte)byteData;
+        }
+
+        public void PutByte(sbyte byteData)
+        {
             buffer[bufferLastPos++] = byteData;
         }
 
-        public byte[] ViewByteBlock(uint size) 
+        public byte[] ViewByteBlock(ulong size) 
         {
             return ReadByte(size);
         }
 
-        public byte[] ReadByteBlock(uint size) 
+        public byte[] ReadByteBlock(ulong size) 
         {
-            ReadByte(size);
+            byte[] block = ReadByte(size);
 
             bufferOffset += size;
             
@@ -35,46 +38,41 @@ namespace DBBD
 
         public void Adjust()
         {
-            uint spare = bufferLastPos - bufferOffset;
+            ulong spare = bufferLastPos - bufferOffset;
             if(spare > bufferCapacity
                 || spare == 0)
             {
                 bufferOffset = 0;
                 bufferLastPos = 0;
             }
-            else if(bufferOffset > 0 && spare >0)
+            else if(bufferOffset > 0 && spare > 0)
             {
-                byte[] tempArray = new byte[spare];
-                for(int i = 0; i < spare; i++)
+                sbyte[] tempArray = new sbyte[spare];
+                for(ulong i = 0; i < spare; i++)
                 {
                     tempArray[i] = buffer[bufferOffset + i];
                 }
                 
                 System.Array.Clear(buffer, 0, (int)bufferCapacity);
-                for(int i = 0; i < spare; i++)
+                for(ulong i = 0; i < spare; i++)
                 {
                     buffer[i] = tempArray[i];
                 }
 
                 bufferOffset = 0;
-                bufferLastPos = spare;
+                bufferLastPos = (ulong)spare;
             }
         }
 
         public void IncreaseLastPos(uint size) { bufferLastPos += size; }
 
-        private byte[] ReadByte(uint size)
+        private byte[] ReadByte(ulong size)
         {
-            if(size > blockSize)
+            ulong dataIndex = 0;
+            byte[] block = new byte[size];
+            for(ulong i = bufferOffset; i < bufferOffset + size; i++)
             {
-                blockSize *= 2;
-                block = new byte[blockSize];
-            }
-
-            uint dataIndex = 0;
-            for(uint i = bufferOffset; i < bufferOffset + size; i++)
-            {
-                block[dataIndex++] = buffer[i];
+                block[dataIndex++] = (byte)buffer[i];
             }
 
             return block;
@@ -87,15 +85,13 @@ namespace DBBD
             bufferLastPos = 0;
         }
 
-        public byte[] RawBuffer { get { return buffer; } }
-        public uint BufferLastPos { get { return bufferLastPos; } set { bufferLastPos = value; } }
-        public uint BufferOffset { get { return bufferOffset; } set { bufferOffset = value; } }
+        public sbyte[] RawBuffer { get { return buffer; } }
+        public ulong BufferLastPos { get { return bufferLastPos; } set { bufferLastPos = value; } }
+        public ulong BufferOffset { get { return bufferOffset; } set { bufferOffset = value; } }
 
-        private byte[] buffer;
-        private byte[] block;
-        private uint blockSize = 0;
-        private uint bufferOffset = 0;
-        private uint bufferLastPos = 0;
-        private uint bufferCapacity = 0;
+        private sbyte[] buffer;
+        private ulong bufferOffset = 0;
+        private ulong bufferLastPos = 0;
+        private ulong bufferCapacity = 0;
     }
 }

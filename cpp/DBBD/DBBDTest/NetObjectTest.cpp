@@ -105,7 +105,7 @@ namespace DBBDTest
 				Equip equip;
 			};
 
-			User person("doby", 29, Equip("Sword", 15));
+			User person("»§Ä®¹ý»ç", 29, Equip("Sword", 15));
 
 			Buffer buffer(8192);
 
