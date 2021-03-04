@@ -1,5 +1,6 @@
 #include <string>
 #include "Deserialize.h"
+#include "Common.hpp"
 
 namespace DBBD {
 	void Deserialize::read(Buffer& buffer, std::string& value) {
@@ -8,6 +9,13 @@ namespace DBBD {
 		char* dataBuffer = buffer.readByteBlock(strSize);
 		std::string str(&dataBuffer[0], &dataBuffer[0] + strSize);
 		value = str;
+	}
+
+	void Deserialize::read(Buffer& buffer, std::wstring& value) {
+		std::string utf8;
+		read(buffer, utf8);
+
+		value = utf8ToUni(utf8);
 	}
 
 	void Deserialize::read(Buffer& buffer, char* value) {

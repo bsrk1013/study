@@ -127,6 +127,16 @@ namespace DBBD
 		return reply.as_integer() > 0;
 	}
 
+	bool RedisManager::hset(const short& db, const std::string& key, const int& field, const int& value)
+	{
+		return hset(db, key, std::to_string(field), std::to_string(value));
+	}
+
+	bool RedisManager::hset(const short& db, const std::string& key, const int& field, const std::string& value)
+	{
+		return hset(db, key, std::to_string(field), value);
+	}
+
 	std::vector<std::string> RedisManager::hkeys(const short& db, const std::string& key)
 	{
 		std::vector<std::string> vec;

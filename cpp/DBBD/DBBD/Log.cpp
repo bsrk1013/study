@@ -42,6 +42,7 @@ namespace DBBD
 
 	void Log::log(const LogLevel& level, const std::string& fileName, const long& line, const std::string& msg)
 	{
+		if (!isInit) { return; }
 		auto fileNameVec = strSplit(fileName, '\\');
 		std::string originFileName = fileNameVec[fileNameVec.size() - 1];
 		std::string resultMsg = "[" + originFileName + "](" + std::to_string(line) + ") << " + msg;

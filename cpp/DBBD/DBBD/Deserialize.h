@@ -14,6 +14,7 @@ namespace DBBD {
 			memcpy(&value, dataBuffer, sizeof(T));
 		}
 		static void read(Buffer& buffer, std::string& value);
+		static void read(Buffer& buffer, std::wstring& value);
 		static void read(Buffer& buffer, char* value);
 		static void read(Buffer& buffer, Cell* value);
 

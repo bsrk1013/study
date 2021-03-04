@@ -48,6 +48,8 @@ namespace DBBD
 		bool hdel(const short& db, const std::string& key, const std::vector<std::string>& fields);
 		bool hset(const short& db, const std::string& key, const std::string& filed, const int& value);
 		bool hset(const short& db, const std::string& key, const std::string& field, const std::string& value);
+		bool hset(const short& db, const std::string& key, const int& filed, const int& value);
+		bool hset(const short& db, const std::string& key, const int& field, const std::string& value);
 		std::vector<std::string> hkeys(const short& db, const std::string& key);
 		int hincrby(const short& db, const std::string& key, const std::string& field, const int& incr);
 		template <typename T>
@@ -62,6 +64,11 @@ namespace DBBD
 		{
 			auto reply = execute("hget", db, key, field);
 			return convertElem<T>(reply);
+		}
+		template <typename T>
+		T hget(const short& db, const std::string& key, const int& field)
+		{
+			return hget<T>(db, key, std::to_string(field));
 		}
 		template <typename T>
 		std::map<std::string, T> hgetall(const short& db, const std::string& key)

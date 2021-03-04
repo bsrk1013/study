@@ -9,7 +9,7 @@
 class UserInfo : public DBBD::Cell {
 public:
 	UserInfo() {}
-	UserInfo(std::string Nickname, long Level)
+	UserInfo(std::wstring Nickname, long Level)
 		: Nickname(Nickname), Level(Level)
 	{}
 	virtual ~UserInfo() {}
@@ -28,7 +28,7 @@ public:
 	virtual size_t getLength() {
 		size_t totalLength = 0;
 		totalLength = sizeof(size_t) + sizeof(fingerPrinter);
-		if (fingerPrinter[0]) { totalLength += sizeof(size_t) + Nickname.length(); }
+		if (fingerPrinter[0]) { totalLength += sizeof(size_t) + (Nickname.size() * sizeof(wchar_t)); }
 		if (fingerPrinter[1]) { totalLength += sizeof(long); }
 		return totalLength;
 	}
@@ -37,21 +37,15 @@ public:
 	}
 	std::string toJson() {
 		nlohmann::json j;
-		if (fingerPrinter[0]) { j["Nickname"] = DBBD::strconv(Nickname); }
+		if (fingerPrinter[0]) { j["Nickname"] = DBBD::uniToUtf8(Nickname); }
 		if (fingerPrinter[1]) { j["Level"] = Level; }
 		return j.dump();
 	}
 	void fromJson(std::string rawJson) {
 		nlohmann::json j = nlohmann::json::parse(rawJson);
 		if (!j["Nickname"].is_null()) {
-			try {
-				std::wstring wstr = j["Nickname"].get<std::wstring>();
-				Nickname = DBBD::strconv(wstr);
-			}
-			catch (const std::exception&) {
-				std::string str = j["Nickname"].get<std::string>();
-				Nickname = str;
-			}
+			std::string utf8 = j["Nickname"].get<std::string>();
+			Nickname = DBBD::utf8ToUni(utf8);
 		}
 		if (!j["Level"].is_null()) {
 			Level = j["Level"].get<long>();
@@ -59,8 +53,8 @@ public:
 	}
 
 public:
-	std::string getNickname() { return Nickname; }
-	void setNickname(std::string value) {
+	std::wstring getNickname() { return Nickname; }
+	void setNickname(std::wstring value) {
 		Nickname = value;
 		fingerPrinter[0] = true;
 	}
@@ -73,7 +67,7 @@ public:
 protected:
 	bool fingerPrinter[2] = { false, };
 	// 닉네임
-	std::string Nickname;
+	std::wstring Nickname;
 	// 레벨
 	long Level;
 };

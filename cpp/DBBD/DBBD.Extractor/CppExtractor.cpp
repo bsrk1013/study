@@ -182,7 +182,7 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		auto info = realContents[i];
 		ofs << "\t\tif (fingerPrinter[" << i << "]) { j[\"" << info.name << "\"] = ";
 		if (strcmp(info.type.c_str(), "string") == 0) {
-			ofs << "DBBD::strconv(" << info.name << ")";
+			ofs << "DBBD::uniToUtf8(" << info.name << ")";
 		}
 		else {
 			ofs << info.name;
@@ -198,14 +198,8 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		auto info = realContents[i];
 		ofs << "\t\tif (!j[\"" << info.name << "\"].is_null()) {" << endl;
 		if (strcmp(info.type.c_str(), "string") == 0) {
-			ofs << "\t\t\ttry {" << endl;
-			ofs << "\t\t\t\tstd::wstring wstr = j[\"" << info.name << "\"].get<std::wstring>();" << endl;
-			ofs << "\t\t\t\t" << info.name << " = DBBD::strconv(wstr);" << endl;
-			ofs << "\t\t\t}" << endl;
-			ofs << "\t\t\tcatch (const std::exception&) {" << endl;
-			ofs << "\t\t\t\tstd::string str = j[\"" << info.name << "\"].get<std::string>();" << endl;
-			ofs << "\t\t\t\t" << info.name << " = str;" << endl;
-			ofs << "\t\t\t}" << endl;
+			ofs << "\t\t\tstd::string utf8 = j[\"" << info.name << "\"].get<std::string>();" << endl;
+			ofs << "\t\t\t" << info.name << " = DBBD::utf8ToUni(utf8);" << endl;
 		}
 		else {
 			ofs << "\t\t\t" << info.name << " = " << "j[\"" << info.name << "\"].get<" << getPropertyType(info.type) << ">();" << endl;
@@ -362,7 +356,7 @@ string CppExtractor::getLength(string type, string name) {
 		return "sizeof(" + getPropertyType(type) + ")";
 		break;
 	case HashCode("string"):
-		return "sizeof(size_t) + " + name + ".length()";
+		return "sizeof(size_t) + (" + name + ".size() * sizeof(wchar_t))";
 	default:
 		return name + ".getLength()";
 	}

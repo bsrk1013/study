@@ -1,4 +1,5 @@
 #include "Serialize.h"
+#include "Common.hpp"
 
 namespace DBBD {
 	void Serialize::write(Buffer& buffer, const std::string& value) {
@@ -8,6 +9,11 @@ namespace DBBD {
 			char data = value[i];
 			buffer.putByte(data);
 		}
+	}
+
+	void Serialize::write(Buffer& buffer, const std::wstring& value) {
+		std::string utf8 = uniToUtf8(value);
+		write(buffer, utf8);
 	}
 
 	void Serialize::write(Buffer& buffer, char* const& value) {

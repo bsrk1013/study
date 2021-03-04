@@ -50,8 +50,8 @@ std::filesystem::path BaseExtractor::getOutputFileName(std::string fileName) {
 std::string BaseExtractor::getPropertyType(std::string type) {
 	switch (HashCode(type.c_str())) {
 	case HashCode("string"):
-		if (this->type == ExtractorType::Cpp) { return "std::string"; }
-		else if (this->type == ExtractorType::Csharp) { return "String"; }
+		if (this->type == ExtractorType::Cpp) { return "std::wstring"; }
+		else if (this->type == ExtractorType::Csharp) { return "string"; }
 		break;
 	case HashCode("int64"):
 		return "long";

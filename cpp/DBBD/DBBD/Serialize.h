@@ -18,6 +18,7 @@ namespace DBBD
 			}
 		}
 		static void write(Buffer& buffer, const std::string& value);
+		static void write(Buffer& buffer, const std::wstring& value);
 		static void write(Buffer& buffer, char* const& value);
 		static void write(Buffer& buffer, Cell* value);
 

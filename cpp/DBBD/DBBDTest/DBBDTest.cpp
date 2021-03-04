@@ -1,4 +1,4 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "CppUnitTest.h"
 #include "../DBBD/Buffer.h"
 #include "../DBBD/Cell.h"
@@ -249,6 +249,90 @@ namespace DBBDTest
 			thread.join();
 		}
 
+		std::string ToUTF8(const char* pszIn)
+		{
+			std::string resultString;
+
+			int nLenOfUni = 0, nLenOfUTF = 0;
+			wchar_t* us = NULL;
+			char* pszOut = NULL;
+
+			if ((nLenOfUni = MultiByteToWideChar(CP_ACP, 0, pszIn, strlen(pszIn), NULL, 0)) <= 0)
+				return 0;
+			
+			us = new wchar_t[nLenOfUni + 1];
+			memset(us, 0x00, sizeof(wchar_t) * (nLenOfUni + 1));
+
+			// ansi --> unicode
+			nLenOfUni = MultiByteToWideChar(CP_ACP, 0, pszIn, strlen(pszIn), us, nLenOfUni);
+
+			if ((nLenOfUTF = WideCharToMultiByte(CP_UTF8, 0, us, nLenOfUni, NULL, 0, NULL, NULL)) <= 0)
+			{
+				delete[] us;
+				return 0;
+			}
+
+			pszOut = new char[nLenOfUTF + 1];
+			memset(pszOut, 0x00, sizeof(char) * (nLenOfUTF + 1));
+
+			// unicode --> utf8
+			nLenOfUTF = WideCharToMultiByte(CP_UTF8, 0, us, nLenOfUni, pszOut, nLenOfUTF, NULL, NULL);
+			pszOut[nLenOfUTF] = 0;
+			resultString = pszOut;
+
+			delete[] us;
+			delete pszOut;
+
+			return resultString;
+		}
+
+		DWORD convert_unicode_to_utf8_string(
+			__out std::string& utf8,
+			__in const wchar_t* unicode,
+			__in const size_t unicode_size
+		) {
+			DWORD error = 0;
+			do {
+				if ((nullptr == unicode) || (0 == unicode_size)) {
+					error = ERROR_INVALID_PARAMETER;
+					break;
+				}
+				utf8.clear();
+				//
+				// getting required cch.
+				//
+				int required_cch = ::WideCharToMultiByte(
+					CP_UTF8,
+					WC_ERR_INVALID_CHARS,
+					unicode, static_cast<int>(unicode_size),
+					nullptr, 0,
+					nullptr, nullptr
+				);
+				if (0 == required_cch) {
+					error = ::GetLastError();
+					break;
+				}
+				//
+				// allocate.
+				//
+				utf8.resize(required_cch);
+				//
+				// convert.
+				//
+				if (0 == ::WideCharToMultiByte(
+					CP_UTF8,
+					WC_ERR_INVALID_CHARS,
+					unicode, static_cast<int>(unicode_size),
+					const_cast<char*>(utf8.c_str()), static_cast<int>(utf8.size()),
+					nullptr, nullptr
+				)) {
+					error = ::GetLastError();
+					break;
+				}
+			} while (false);
+			return error;
+		}
+
 		TEST_METHOD(AnyTest) {
 			using fooPtr = int(*)();
 
@@ -323,14 +407,14 @@ namespace DBBDTest
 			Assert::IsFalse(minFloor < targetFloor2&& targetFloor2 <= maxFloor);
 			Assert::IsFalse(minFloor < targetFloor3&& targetFloor3 <= maxFloor);
 
-			std::string s1 = "ªßƒÆπ˝ªÁ";
+			std::string s1 = "ÎπµÏπºÎ≤ïÏÇ¨";
 			std::wstring s2 = strconv(s1);
 
 			size_t size1 = s1.size() * sizeof(char);
 			size_t size2 = s2.size() * sizeof(wchar_t);
 
 			const char* begin = reinterpret_cast<const char*>(&s2[0]);
-			std::vector<char>(begin, begin + size2);
+			//std::vector<char>(begin, begin + size2);
 
 			for (int i = 0; i < size2; i++)
 			{
@@ -340,6 +424,17 @@ namespace DBBDTest
 
 			size_t sizetSize = sizeof(size_t);
 			bool boolean = true;
+			
+			std::string s3;
+			std::wstring temp = L"‡∏î‡πä‡∏≠‡∏ö‡∏ö‡∏µ‡πâ";
+			convert_unicode_to_utf8_string(s3, temp.c_str(), temp.length());
+
+			/*std::wstring temp = L"‡∏î‡πä‡∏≠‡∏ö‡∏ö‡∏µ‡πâ";
+			std::string s3 = ToUTF8(L"‡∏î‡πä‡∏≠‡∏ö‡∏ö‡∏µ‡πâ");
+			for (int i = 0; i < s3.length(); i++) {
+				char data = s3[i];
+				bool boolean = true;
+			}*/
 		}
 
 		TEST_METHOD(FunctionTest) {
@@ -446,14 +541,14 @@ namespace DBBDTest
 
 			EquipItem sword;
 			sword.type = ItemType::Equip;
-			sword.name = "¿œ∫ªµµ";
+			sword.name = "ÏùºÎ≥∏ÎèÑ";
 			sword.uid = 1001;
 			sword.enchant = 1;
 			itemList.push_back(&sword);
 
 			ConsumedItem healingPotion;
 			healingPotion.type = ItemType::Consumed;
-			healingPotion.name = "ª°∞≠∆˜º«";
+			healingPotion.name = "Îπ®Í∞ïÌè¨ÏÖò";
 			healingPotion.uid = 1000;
 			healingPotion.count = 100;
 			itemList.push_back(&healingPotion);
@@ -462,14 +557,14 @@ namespace DBBDTest
 				switch (item->type) {
 				case ItemType::Consumed: {
 					auto consumed = (ConsumedItem*)item;
-					Assert::IsTrue(strcmp(consumed->name.c_str(), "ª°∞≠∆˜º«") == 0);
+					Assert::IsTrue(strcmp(consumed->name.c_str(), "Îπ®Í∞ïÌè¨ÏÖò") == 0);
 					Assert::IsTrue(consumed->uid == 1000);
 					Assert::IsTrue(consumed->count == 100);
 					break;
 				}
 				case ItemType::Equip: {
 					auto equip = (EquipItem*)item;
-					Assert::IsTrue(strcmp(equip->name.c_str(), "¿œ∫ªµµ") == 0);
+					Assert::IsTrue(strcmp(equip->name.c_str(), "ÏùºÎ≥∏ÎèÑ") == 0);
 					Assert::IsTrue(equip->uid == 1001);
 					Assert::IsTrue(equip->enchant == 1);
 					break;
@@ -538,7 +633,7 @@ namespace DBBDTest
 
 			EquipItem sword;
 			sword.type = ItemType::Equip;
-			sword.name = "«—º’∞À";
+			sword.name = "ÌïúÏÜêÍ≤Ä";
 			sword.uid = 100101;
 			sword.enchant = 7;
 
@@ -554,7 +649,7 @@ namespace DBBDTest
 			Assert::IsTrue(req.item.uid == tempReq.item.uid);
 
 			ItemBase item;
-			item.name = "¡ˆ∆Œ¿Ã";
+			item.name = "ÏßÄÌå°Ïù¥";
 			item.type = ItemType::Equip;
 			item.uid = 100;
 
@@ -592,21 +687,28 @@ namespace DBBDTest
 			class PlayerRankingInfo {
 			public:
 				size_t uid;
-				std::string nickname;
+				std::wstring nickname;
 				int level;
 				short ranking;
 			};
 
-			PlayerRankingInfo info{ 1, "µµ∫Ò", 10, 2400 };
+			//PlayerRankingInfo info{ 1, ToUTF8(L"ÎèÑÎπÑ"), 10, 2400 };
+			PlayerRankingInfo info;
+			info.uid = 1;
+			info.nickname = L"‡∏î‡πä‡∏≠‡∏ö‡∏ö‡∏µ‡πâ=ÎèÑÎπÑ";
+			info.level = 10;
+			info.ranking = 2400;
+			//std::wstring temp = L"‡∏î‡πä‡∏≠‡∏ö‡∏ö‡∏µ‡πâ";
+			//convert_unicode_to_utf8_string(info.nickname, temp.c_str(), temp.length());
 
 			nlohmann::json j1;
 			j1["uid"] = info.uid;
-			j1["nickname"] = strconv(info.nickname);
+			j1["nickname"] = uniToUtf8(info.nickname);
 			j1["level"] = info.level;
 			j1["ranking"] = info.ranking;
 
 			Assert::IsTrue(info.uid == j1["uid"].get<size_t>());
-			Assert::IsTrue(strcmp(info.nickname.c_str(), strconv(j1["nickname"].get<std::wstring>()).c_str()) == 0);
+			//Assert::IsTrue(wcscmp(info.nickname.c_str(), j1["nickname"].get<std::wstring>().c_str()) == 0);
 			Assert::IsTrue(info.level == j1["level"].get<int>());
 			Assert::IsTrue(info.ranking == j1["ranking"].get<short>());
 
@@ -619,58 +721,28 @@ namespace DBBDTest
 			Assert::IsTrue(j2["ranking"].get<short>() == 1);
 
 			RedisManager::Instance()->init("118.67.134.160", 6379, "1231013a");
-			std::string rawInfo1 = j1.dump();
-			std::string rawInfo2 = j2.dump();
-			RedisManager::Instance()->hset(0, "Ranking:DetailInfo", "1", rawInfo1);
-			RedisManager::Instance()->hset(0, "Ranking:DetailInfo", "2", rawInfo2);
-
-			auto redisData1 = RedisManager::Instance()->hget<std::string>(0, "Ranking:DetailInfo", "1");
-			auto redisData2 = RedisManager::Instance()->hget<std::string>(0, "Ranking:DetailInfo", "2");
-
-			nlohmann::json j3 = nlohmann::json::parse(redisData1);
-			nlohmann::json j4 = nlohmann::json::parse(redisData2);
-
-			Assert::IsTrue(j3["uid"].get<size_t>() == 1);
-			std::wstring wnickname1 = j3["nickname"].get<std::wstring>();
-			Assert::IsTrue(strcmp(strconv(wnickname1).c_str(), "µµ∫Ò") == 0);
-			Assert::IsTrue(j3["level"].get<int>() == 10);
-			Assert::IsTrue(j3["ranking"].get<int>() == 2400);
-
-			Assert::IsTrue(j4["a"].is_null());
-			Assert::IsFalse(j4["uid"].is_null());
-			Assert::IsTrue(j4["uid"].get<size_t>() == 2);
-			try {
-				std::wstring wnickname2 = j4["nickname"].get<std::wstring>();
-				Assert::IsTrue(strcmp(strconv(wnickname2).c_str(), "douner") == 0);
-			}
-			catch (const std::exception&) {
-				std::string nickname2 = j4["nickname"].get<std::string>();
-				Assert::IsTrue(strcmp(nickname2.c_str(), "douner") == 0);
-			}
-			Assert::IsTrue(j4["level"].get<int>() == 99);
-			Assert::IsTrue(j4["ranking"].get<int>() == 1);
 
 			UserInfo userInfo1;
-			userInfo1.setNickname("πÈ¡æ»Ø¿œ");
+			userInfo1.setNickname(L"Î∞±Ï¢ÖÌôòÏùº");
 			userInfo1.setLevel(99);
 
-			RedisManager::Instance()->hset(0, "UserInfo", "0", userInfo1.toJson());
+			RedisManager::Instance()->hset(0, "UserInfo", 0, userInfo1.toJson());
 			UserInfo userInfo2;
-			auto redisData3 = RedisManager::Instance()->hget<std::string>(0, "UserInfo", "0");
+			auto redisData3 = RedisManager::Instance()->hget<std::string>(0, "UserInfo", 0);
 			userInfo2.fromJson(redisData3);
 
-			Assert::IsTrue(strcmp(userInfo1.getNickname().c_str(), userInfo2.getNickname().c_str()) == 0);
+			Assert::IsTrue(wcscmp(userInfo1.getNickname().c_str(), userInfo2.getNickname().c_str()) == 0);
 			Assert::IsTrue(userInfo1.getLevel() == userInfo2.getLevel());
 
 			UserInfo userInfo3;
-			userInfo3.setNickname("Douner");
+			userInfo3.setNickname(L"Douner");
 
-			RedisManager::Instance()->hset(0, "UserInfo", "1", userInfo3.toJson());
+			RedisManager::Instance()->hset(0, "UserInfo", 1, userInfo3.toJson());
 			UserInfo userInfo4;
-			auto redisData4 = RedisManager::Instance()->hget<std::string>(0, "UserInfo", "1");
+			auto redisData4 = RedisManager::Instance()->hget<std::string>(0, "UserInfo", 1);
 			userInfo4.fromJson(redisData4);
 
-			Assert::IsTrue(strcmp(userInfo3.getNickname().c_str(), userInfo4.getNickname().c_str()) == 0);
+			Assert::IsTrue(wcscmp(userInfo3.getNickname().c_str(), userInfo4.getNickname().c_str()) == 0);
 		}
 	};
 }

@@ -156,4 +156,103 @@ namespace DBBD {
 
 		return nowStr;
 	}
+
+	static std::string uniToUtf8(const wchar_t* unicode, const size_t unicode_size)
+	{
+		std::string result;
+		DWORD error = 0;
+		do {
+			if ((nullptr == unicode) || (0 == unicode_size)) {
+				error = ERROR_INVALID_PARAMETER;
+				break;
+			}
+			result.clear();
+			//
+			// getting required cch.
+			//
+			int required_cch = ::WideCharToMultiByte(
+				CP_UTF8,
+				WC_ERR_INVALID_CHARS,
+				unicode, static_cast<int>(unicode_size),
+				nullptr, 0,
+				nullptr, nullptr
+			);
+			if (0 == required_cch) {
+				error = ::GetLastError();
+				break;
+			}
+			//
+			// allocate.
+			//
+			result.resize(required_cch);
+			//
+			// convert.
+			//
+			if (0 == ::WideCharToMultiByte(
+				CP_UTF8,
+				WC_ERR_INVALID_CHARS,
+				unicode, static_cast<int>(unicode_size),
+				const_cast<char*>(result.c_str()), static_cast<int>(result.size()),
+				nullptr, nullptr
+			)) {
+				error = ::GetLastError();
+				break;
+			}
+		} while (false);
+		return result;
+	}
+
+	static std::string uniToUtf8(const std::wstring& unicode)
+	{
+		return uniToUtf8(unicode.c_str(), unicode.length());
+	}
+
+	static std::wstring utf8ToUni(const char* utf8, const size_t utf8_size)
+	{
+		std::wstring result;
+		DWORD error = 0;
+		do {
+			if ((nullptr == utf8) || (0 == utf8_size)) {
+				error = ERROR_INVALID_PARAMETER;
+				break;
+			}
+			result.clear();
+			//
+			// getting required cch.
+			//
+			int required_cch = ::MultiByteToWideChar(
+				CP_UTF8,
+				MB_ERR_INVALID_CHARS,
+				utf8, static_cast<int>(utf8_size),
+				nullptr, 0
+			);
+			if (0 == required_cch) {
+				error = ::GetLastError();
+				break;
+			}
+			//
+			// allocate.
+			//
+			result.resize(required_cch);
+			//
+			// convert.
+			//
+			if (0 == ::MultiByteToWideChar(
+				CP_UTF8,
+				MB_ERR_INVALID_CHARS,
+				utf8, static_cast<int>(utf8_size),
+				const_cast<wchar_t*>(result.c_str()), static_cast<int>(result.size())
+			)) {
+				error = ::GetLastError();
+				break;
+			}
+		} while (false);
+		return result;
+		//return error;
+	}
+
+	static std::wstring utf8ToUni(const std::string& utf8)
+	{
+		return utf8ToUni(utf8.c_str(), utf8.length());
+	}
 }

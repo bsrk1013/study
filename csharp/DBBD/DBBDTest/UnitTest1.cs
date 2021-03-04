@@ -1,4 +1,4 @@
-using NUnit.Framework;
+ï»¿using NUnit.Framework;
 using DBBD;
 using System;
 using System.Text;
@@ -63,7 +63,7 @@ namespace DBBDTest
 
             int t1 = -987654;
             uint t2 = 987654321;
-            string t3 = "»§Ä®¹ý»ç";
+            string t3 = "ë¹µì¹¼ë²•ì‚¬";
 
             int r1 = 0;
             uint r2 = 0;
@@ -136,6 +136,12 @@ namespace DBBDTest
         }
 
         [Test]
+        public void DeSerializeTest()
+        {
+
+        }
+
+        [Test]
         public void Test1()
         {
             int a1 = -15674;
@@ -166,7 +172,7 @@ namespace DBBDTest
             string s1 = Encoding.UTF8.GetString(block1);
             Assert.AreEqual(s1, "doby");
 
-            //string s2 = "»§Ä®¹ý»ç";
+            //string s2 = "ë¹µì¹¼ë²•ì‚¬";
             //var b2 = Encoding.Unicode.GetBytes(s2);
 
             sbyte[] block2 = new sbyte[] { 117, -66, 124, -50, -107, -68, -84, -64 };
@@ -181,7 +187,12 @@ namespace DBBDTest
             ulong sizetSize = sizeof(ulong);
             bool a = true;
 
-            //string s2 = Encoding.ASCII.GetString();
+
+
+            sbyte[] block4 = new sbyte[] { -32, -72, -108, -32, -71, -118, -32, -72, -83, -32, -72, -102, -32, -72, -102, -32, -72, -75, -32, -71, -119 };
+            byte[] block5 = (byte[])(Array)block4;
+
+            string s3 = Encoding.UTF8.GetString(block5);
         }
     }
 }
