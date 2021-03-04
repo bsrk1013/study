@@ -151,10 +151,10 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 	}
 	ofs << "\t}" << endl;;
 
-	ofs << "\tvirtual size_t getLength() {" << endl;
-	ofs << "\t\tsize_t totalLength = 0;" << endl;
+	ofs << "\tvirtual unsigned int getLength() {" << endl;
+	ofs << "\t\tunsigned int totalLength = 0;" << endl;
 	if (realContents.size() > 0) {
-		ofs << "\t\ttotalLength = sizeof(size_t) + sizeof(fingerPrinter);" << endl;
+		ofs << "\t\ttotalLength = sizeof(unsigned int) + sizeof(fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
 			ofs << "\t\tif (fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
@@ -279,10 +279,10 @@ void CppExtractor::writeProtocolContents(ofstream& ofs, string base) {
 	}
 	ofs << "\t}" << endl;;
 
-	ofs << "\tvirtual size_t getLength() {" << endl;
-	ofs << "\t\tsize_t totalLength = DBBD::" << base << "::getLength();" << endl;
+	ofs << "\tvirtual unsigned int getLength() {" << endl;
+	ofs << "\t\tunsigned int totalLength = DBBD::" << base << "::getLength();" << endl;
 	if (realContents.size() > 0) {
-		ofs << "\t\ttotalLength += sizeof(size_t) + sizeof(fingerPrinter);" << endl;
+		ofs << "\t\ttotalLength += sizeof(unsigned int) + sizeof(fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
 			ofs << "\t\tif (fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
@@ -356,7 +356,7 @@ string CppExtractor::getLength(string type, string name) {
 		return "sizeof(" + getPropertyType(type) + ")";
 		break;
 	case HashCode("string"):
-		return "sizeof(size_t) + (" + name + ".size() * sizeof(wchar_t))";
+		return "sizeof(unsigned int) + (" + name + ".size() * sizeof(wchar_t))";
 	default:
 		return name + ".getLength()";
 	}

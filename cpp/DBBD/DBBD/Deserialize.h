@@ -22,10 +22,10 @@ namespace DBBD {
 	public:
 		template<typename T, size_t size>
 		static void readArray(Buffer& buffer, T(&values)[size]) {
-			size_t arraySize;
+			unsigned int arraySize;
 			read(buffer, arraySize);
 			//values = new T[arraySize];
-			for (size_t i = 0; i < arraySize; i++) {
+			for (unsigned int i = 0; i < arraySize; i++) {
 				T value;
 				read(buffer, value);
 				values[i] = value;

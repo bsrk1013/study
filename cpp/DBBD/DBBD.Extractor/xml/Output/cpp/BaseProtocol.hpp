@@ -25,9 +25,9 @@ public:
 		DBBD::Serialize::readArray(buffer, fingerPrinter);
 		if (fingerPrinter[0]) { DBBD::Deserialize::read(buffer, SessionId); }
 	}
-	virtual size_t getLength() {
-		size_t totalLength = DBBD::Request::getLength();
-		totalLength += sizeof(size_t) + sizeof(fingerPrinter);
+	virtual unsigned int getLength() {
+		unsigned int totalLength = DBBD::Request::getLength();
+		totalLength += sizeof(unsigned int) + sizeof(fingerPrinter);
 		if (fingerPrinter[0]) { totalLength += sizeof(long); }
 		return totalLength;
 	}
@@ -57,8 +57,8 @@ public:
 	virtual void deserialize(DBBD::Buffer& buffer) {
 		DBBD::Response::readHeader(buffer);
 	}
-	virtual size_t getLength() {
-		size_t totalLength = DBBD::Response::getLength();
+	virtual unsigned int getLength() {
+		unsigned int totalLength = DBBD::Response::getLength();
 		return totalLength;
 	}
 };
@@ -80,8 +80,8 @@ public:
 	virtual void deserialize(DBBD::Buffer& buffer) {
 		DBBD::Request::readHeader(buffer);
 	}
-	virtual size_t getLength() {
-		size_t totalLength = DBBD::Request::getLength();
+	virtual unsigned int getLength() {
+		unsigned int totalLength = DBBD::Request::getLength();
 		return totalLength;
 	}
 };
@@ -103,8 +103,8 @@ public:
 	virtual void deserialize(DBBD::Buffer& buffer) {
 		DBBD::Response::readHeader(buffer);
 	}
-	virtual size_t getLength() {
-		size_t totalLength = DBBD::Response::getLength();
+	virtual unsigned int getLength() {
+		unsigned int totalLength = DBBD::Response::getLength();
 		return totalLength;
 	}
 };

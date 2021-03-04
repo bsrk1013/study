@@ -2,7 +2,7 @@
 #include "TcpSessionBase.h"
 #include "Serialize.h"
 
-DBBD::TcpSessionBase::TcpSessionBase(IoContextSP context, SocketSP socket, size_t bufferSize)
+DBBD::TcpSessionBase::TcpSessionBase(IoContextSP context, SocketSP socket, unsigned int bufferSize)
 {
 	this->context = context;
 	this->socket = socket;
@@ -66,7 +66,7 @@ void DBBD::TcpSessionBase::read()
 	}
 }
 
-void DBBD::TcpSessionBase::handleRead(const boost::system::error_code& error, size_t bytesTransferred)
+void DBBD::TcpSessionBase::handleRead(const boost::system::error_code& error, unsigned int bytesTransferred)
 {
 	if (error) {
 		stop();
@@ -104,7 +104,7 @@ void DBBD::TcpSessionBase::write()
 	}
 }
 
-void DBBD::TcpSessionBase::handleWrite(const boost::system::error_code& error, size_t bytesTransferred)
+void DBBD::TcpSessionBase::handleWrite(const boost::system::error_code& error, unsigned int bytesTransferred)
 {
 	if (error) {
 		stop();

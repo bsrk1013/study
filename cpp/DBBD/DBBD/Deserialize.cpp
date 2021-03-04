@@ -4,7 +4,7 @@
 
 namespace DBBD {
 	void Deserialize::read(Buffer& buffer, std::string& value) {
-		size_t strSize;
+		unsigned int strSize;
 		read(buffer, strSize);
 		char* dataBuffer = buffer.readByteBlock(strSize);
 		std::string str(&dataBuffer[0], &dataBuffer[0] + strSize);
@@ -19,7 +19,7 @@ namespace DBBD {
 	}
 
 	void Deserialize::read(Buffer& buffer, char* value) {
-		size_t strSize;
+		unsigned int strSize;
 		read(buffer, strSize);
 		char* dataBuffer = buffer.readByteBlock(strSize);
 		value = dataBuffer;
@@ -31,10 +31,10 @@ namespace DBBD {
 
 	template<typename T1, typename T2>
 	void Deserialize::readVector(Buffer& buffer, T1& vec) {
-		size_t vecSize;
+		unsigned int vecSize;
 		read(buffer, vecSize);
 
-		for (size_t i = 0; i < vecSize; i++) {
+		for (unsigned int i = 0; i < vecSize; i++) {
 			T2 value;
 			read(buffer, value);
 			vec.push_back(value);

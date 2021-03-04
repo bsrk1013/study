@@ -29,7 +29,7 @@ namespace DBBD
 
         public static void Write(Buffer buffer, short value)
         {
-            int size = sizeof(short);
+            uint size = sizeof(short);
             for(int i = 0; i < size; i++)
             {
                 byte data = (byte)(value >> i * 8);
@@ -39,7 +39,7 @@ namespace DBBD
 
         public static void Write(Buffer buffer, ushort value)
         {
-            int size = sizeof(ushort);
+            uint size = sizeof(ushort);
             for(int i = 0; i < size; i++)
             {
                 byte data = (byte)(value >> i * 8);
@@ -49,7 +49,7 @@ namespace DBBD
 
         public static void Write(Buffer buffer, int value)
         {
-            int size = sizeof(int);
+            uint size = sizeof(int);
             for(int i = 0; i < size; i++)
             {
                 byte data = (byte)(value >> i * 8);
@@ -59,7 +59,7 @@ namespace DBBD
 
         public static void Write(Buffer buffer, uint value)
         {
-            int size = sizeof(uint);
+            uint size = sizeof(uint);
             for (int i = 0; i < size; i++)
             {
                 byte data = (byte)(value >> i * 8);
@@ -69,7 +69,7 @@ namespace DBBD
 
         public static void Write(Buffer buffer, long value)
         {
-            int size = sizeof(long);
+            uint size = sizeof(long);
             for(int i = 0; i < size; i++)
             {
                 byte data = (byte)(value >> i * 8);
@@ -79,7 +79,7 @@ namespace DBBD
 
         public static void Write(Buffer buffer, ulong value)
         {
-            int size = sizeof(ulong);
+            uint size = sizeof(ulong);
             for (int i = 0; i < size; i++)
             {
                 byte data = (byte)(value >> i * 8);
@@ -109,8 +109,9 @@ namespace DBBD
 
         public static void Write(Buffer buffer, string value)
         {
-            byte[] strBlock = Encoding.Unicode.GetBytes(value);
-            int size = strBlock.Length;
+            byte[] strBlock = Encoding.UTF8.GetBytes(value);
+            uint size = (uint)strBlock.Length;
+            Write(buffer, size);
             for(int i = 0; i < size; i++)
             {
                 byte data = strBlock[i];

@@ -6,7 +6,7 @@ namespace DBBD
 {
     public class Buffer
     {
-        public Buffer(ulong size) 
+        public Buffer(uint size) 
         {
             bufferCapacity = size;
             buffer = new sbyte[size];
@@ -22,12 +22,12 @@ namespace DBBD
             buffer[bufferLastPos++] = byteData;
         }
 
-        public byte[] ViewByteBlock(ulong size) 
+        public byte[] ViewByteBlock(uint size) 
         {
             return ReadByte(size);
         }
 
-        public byte[] ReadByteBlock(ulong size) 
+        public byte[] ReadByteBlock(uint size) 
         {
             byte[] block = ReadByte(size);
 
@@ -38,7 +38,7 @@ namespace DBBD
 
         public void Adjust()
         {
-            ulong spare = bufferLastPos - bufferOffset;
+            uint spare = bufferLastPos - bufferOffset;
             if(spare > bufferCapacity
                 || spare == 0)
             {
@@ -48,19 +48,19 @@ namespace DBBD
             else if(bufferOffset > 0 && spare > 0)
             {
                 sbyte[] tempArray = new sbyte[spare];
-                for(ulong i = 0; i < spare; i++)
+                for(uint i = 0; i < spare; i++)
                 {
                     tempArray[i] = buffer[bufferOffset + i];
                 }
                 
                 System.Array.Clear(buffer, 0, (int)bufferCapacity);
-                for(ulong i = 0; i < spare; i++)
+                for(uint i = 0; i < spare; i++)
                 {
                     buffer[i] = tempArray[i];
                 }
 
                 bufferOffset = 0;
-                bufferLastPos = (ulong)spare;
+                bufferLastPos = (uint)spare;
             }
         }
 
@@ -68,9 +68,9 @@ namespace DBBD
 
         private byte[] ReadByte(ulong size)
         {
-            ulong dataIndex = 0;
+            uint dataIndex = 0;
             byte[] block = new byte[size];
-            for(ulong i = bufferOffset; i < bufferOffset + size; i++)
+            for(uint i = bufferOffset; i < bufferOffset + size; i++)
             {
                 block[dataIndex++] = (byte)buffer[i];
             }
@@ -86,12 +86,12 @@ namespace DBBD
         }
 
         public sbyte[] RawBuffer { get { return buffer; } }
-        public ulong BufferLastPos { get { return bufferLastPos; } set { bufferLastPos = value; } }
-        public ulong BufferOffset { get { return bufferOffset; } set { bufferOffset = value; } }
+        public uint BufferLastPos { get { return bufferLastPos; } set { bufferLastPos = value; } }
+        public uint BufferOffset { get { return bufferOffset; } set { bufferOffset = value; } }
 
         private sbyte[] buffer;
-        private ulong bufferOffset = 0;
-        private ulong bufferLastPos = 0;
-        private ulong bufferCapacity = 0;
+        private uint bufferOffset = 0;
+        private uint bufferLastPos = 0;
+        private uint bufferCapacity = 0;
     }
 }

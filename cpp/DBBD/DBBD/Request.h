@@ -11,27 +11,27 @@ namespace DBBD {
 		virtual ~Request() {}
 
 	public:
-		void writeHeader(Buffer& buffer, const size_t& length) {
+		void writeHeader(Buffer& buffer, const unsigned int& length) {
 			Serialize::write(buffer, length);
 			Serialize::write(buffer, typeId);
 		}
 
 		void readHeader(Buffer& buffer) {
-			size_t temp = 0;
+			unsigned int temp = 0;
 			Deserialize::read(buffer, temp);
 			Deserialize::read(buffer, typeId);
 		}
 
 		virtual void serialize(Buffer& buffer) = 0;
 		virtual void deserialize(Buffer& buffer) = 0;
-		virtual size_t getLength() {
+		virtual unsigned int getLength() {
 			return sizeof(Header);
 		}
 		virtual std::string toString() = 0;
 
-		size_t getTypeId() { return typeId; }
+		unsigned int getTypeId() { return typeId; }
 
 	protected:
-		size_t typeId;
+		unsigned int typeId;
 	};
 }

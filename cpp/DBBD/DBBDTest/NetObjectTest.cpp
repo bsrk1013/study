@@ -62,7 +62,7 @@ namespace DBBDTest
 					Deserialize::read(buffer, level);
 				}
 
-				virtual size_t getLength() {
+				virtual unsigned int getLength() {
 					return 0;
 				}
 
@@ -93,7 +93,7 @@ namespace DBBDTest
 					Deserialize::read(buffer, dynamic_cast<Cell*>(&equip));
 				}
 
-				virtual size_t getLength() {
+				virtual unsigned int getLength() {
 					return 0;
 				}
 
@@ -142,10 +142,10 @@ namespace DBBDTest
 					if (fingerPrinter[1]) { Deserialize::read(buffer, level); }
 				}
 
-				virtual size_t getLength() {
-					size_t totalLength = sizeof(size_t) + sizeof(fingerPrinter);
+				virtual unsigned int getLength() {
+					unsigned int totalLength = sizeof(unsigned int) + sizeof(fingerPrinter);
 					if (fingerPrinter[0]) {
-						totalLength += sizeof(size_t) + nickname.length();
+						totalLength += sizeof(unsigned int) + nickname.length();
 					}
 					if (fingerPrinter[1]) {
 						totalLength += sizeof(level);
@@ -191,7 +191,7 @@ namespace DBBDTest
 					Deserialize::read(buffer, dynamic_cast<Cell*>(&user));
 				}
 
-				virtual size_t getLength() {
+				virtual unsigned int getLength() {
 					return Request::getLength() + user.getLength();
 				}
 
@@ -280,8 +280,8 @@ namespace DBBDTest
 					Deserialize::read(buffer, deviceId);
 				}
 
-				virtual size_t getLength() {
-					return Request::getLength() + sizeof(size_t) + token.size() + sizeof(size_t) + deviceId.size();
+				virtual unsigned int getLength() {
+					return Request::getLength() + sizeof(unsigned int) + token.size() + sizeof(unsigned int) + deviceId.size();
 				}
 
 				virtual std::string toString() { return ""; }

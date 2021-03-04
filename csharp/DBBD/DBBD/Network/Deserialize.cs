@@ -80,7 +80,7 @@ namespace DBBD
 
         public static void Read(Buffer buffer, out string value)
         {
-            Read(buffer, out ulong size);
+            Read(buffer, out uint size);
             byte[] block = buffer.ReadByteBlock(size);
             value = Encoding.UTF8.GetString(block);
         }

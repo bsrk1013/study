@@ -1,45 +1,45 @@
 #pragma once
 
 namespace DBBD {
-	static const size_t HeaderSize = sizeof(size_t) + sizeof(size_t);
+	static const unsigned int HeaderSize = sizeof(unsigned int) + sizeof(unsigned int);
 
 	class Buffer
 	{
 	public:
-		Buffer(const size_t& size);
+		Buffer(const unsigned int& size);
 		Buffer(const char* bufferBlock);
 		~Buffer();
 
 	public:
 		void putByte(const char& byteData);
-		char* readByteBlock(const size_t& size);
-		char* viewByteBlock(const size_t& size);
+		char* readByteBlock(const unsigned int& size);
+		char* viewByteBlock(const unsigned int& size);
 		void adjust();
 		void clearBuffer();
 
 	public:
-		inline void increaseLastPos(size_t size) { bufferLastPos += size; }
+		inline void increaseLastPos(const unsigned int& size) { bufferLastPos += size; }
 
 	private:
-		char* readByte(const size_t& size);
+		char* readByte(const unsigned int& size);
 
 	public:
 		char* getBuffer() { return buffer; }
-		size_t getBufferLastPos() { return bufferLastPos; }
-		void setBufferLastPos(size_t value) { bufferLastPos = value; }
-		size_t getBufferOffset() { return bufferOffset; }
-		void setBufferOffset(size_t value) { bufferOffset = value; }
+		unsigned int getBufferLastPos() { return bufferLastPos; }
+		void setBufferLastPos(const unsigned int& value) { bufferLastPos = value; }
+		unsigned int getBufferOffset() { return bufferOffset; }
+		void setBufferOffset(const unsigned int& value) { bufferOffset = value; }
 
 	public:
-		static const size_t bit = 1;
-		static const size_t byte = 8 * bit;
+		static const unsigned int bit = 1;
+		static const unsigned int byte = 8 * bit;
 
 	private:
 		char* buffer = nullptr;
 		char* block = nullptr;
-		size_t blockSize = 0;
-		size_t bufferOffset = 0;
-		size_t bufferLastPos = 0;
-		size_t bufferCapacity = 0;
+		unsigned int blockSize = 0;
+		unsigned int bufferOffset = 0;
+		unsigned int bufferLastPos = 0;
+		unsigned int bufferCapacity = 0;
 	};
 }

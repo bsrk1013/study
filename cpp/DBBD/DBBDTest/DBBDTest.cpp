@@ -45,7 +45,7 @@ namespace DBBDTest
 			item.deserialize(buffer);
 		}
 
-		virtual size_t getLength() {
+		virtual unsigned int getLength() {
 			return Request::getLength() + item.getLength();
 		}
 		virtual std::string toString() { return ""; }
@@ -596,7 +596,7 @@ namespace DBBDTest
 					Deserialize::read(buffer, uid);
 				}
 
-				virtual size_t getLength() {
+				virtual unsigned int getLength() {
 					return sizeof(BYTE) + sizeof(size_t) + name.size() + sizeof(long);
 				}
 
@@ -623,7 +623,7 @@ namespace DBBDTest
 					Deserialize::read(buffer, enchant);
 				}
 
-				virtual size_t getLength() {
+				virtual unsigned int getLength() {
 					return ItemBase::getLength() + sizeof(int);
 				}
 

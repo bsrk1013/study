@@ -2,7 +2,7 @@
 #include "Buffer.h"
 
 namespace DBBD {
-	Buffer::Buffer(const size_t& size) {
+	Buffer::Buffer(const unsigned int& size) {
 		bufferCapacity = size;
 		buffer = new char[size];
 		blockSize = size / 16;
@@ -10,7 +10,7 @@ namespace DBBD {
 	}
 
 	Buffer::Buffer(const char* bufferBlock) {
-		bufferCapacity = strlen(bufferBlock);
+		bufferCapacity = (unsigned int)strlen(bufferBlock);
 		memcpy(buffer, bufferBlock, bufferCapacity);
 	}
 
@@ -30,11 +30,11 @@ namespace DBBD {
 		buffer[bufferLastPos++] = byteData;
 	}
 
-	char* Buffer::viewByteBlock(const size_t& size) {
+	char* Buffer::viewByteBlock(const unsigned int& size) {
 		return readByte(size);;
 	}
 
-	char* Buffer::readByteBlock(const size_t& size) {
+	char* Buffer::readByteBlock(const unsigned int& size) {
 		/*if ((bufferOffset + size) > bufferLastPos) {
 			throw std::exception("Out of Range");
 		}*/
@@ -46,15 +46,15 @@ namespace DBBD {
 		return block;
 	}
 
-	char* Buffer::readByte(const size_t& size) {
+	char* Buffer::readByte(const unsigned int& size) {
 		if (size > blockSize) {
 			blockSize *= 2;
 			delete[] block;
 			block = new char[blockSize];
 		}
 
-		size_t dataIndex = 0;
-		for (size_t i = bufferOffset; i < bufferOffset + size; i++) {
+		unsigned int dataIndex = 0;
+		for (unsigned int i = bufferOffset; i < bufferOffset + size; i++) {
 			block[dataIndex++] = buffer[i];
 		}
 
@@ -62,7 +62,7 @@ namespace DBBD {
 	}
 
 	void Buffer::adjust() {
-		size_t spare = bufferLastPos - bufferOffset;
+		unsigned int spare = bufferLastPos - bufferOffset;
 		if (spare > bufferCapacity
 			|| spare == 0) {
 			bufferOffset = 0;

@@ -11,19 +11,19 @@ namespace DBBD {
 	public:
 		virtual void serialize(Buffer& buffer) = 0;
 		virtual void deserialize(Buffer& buffer) = 0;
-		virtual size_t getLength() = 0;
+		virtual unsigned int getLength() = 0;
 		virtual std::string toString() = 0;
 	};
 
 	struct Header {
 		Header(char* block) {
-			size_t pos = 0;
-			memcpy(&length, block + pos, sizeof(size_t));
-			pos += sizeof(size_t);
-			memcpy(&typeId, (block + pos), sizeof(size_t));
+			unsigned int pos = 0;
+			memcpy(&length, block + pos, sizeof(unsigned int));
+			pos += sizeof(unsigned int);
+			memcpy(&typeId, (block + pos), sizeof(unsigned int));
 		}
 
-		size_t length;
-		size_t typeId;
+		unsigned int length;
+		unsigned int typeId;
 	};
 }

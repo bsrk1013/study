@@ -5,7 +5,7 @@ namespace DBBD {
 	class TcpSessionBase : public SessionBase
 	{
 	public:
-		TcpSessionBase(IoContextSP , SocketSP, size_t);
+		TcpSessionBase(IoContextSP , SocketSP, unsigned int);
 		virtual ~TcpSessionBase();
 
 	public:
@@ -19,10 +19,10 @@ namespace DBBD {
 		virtual void startInternal() = 0;
 
 		virtual void read() override;
-		virtual void handleRead(const boost::system::error_code&, size_t) override;
+		virtual void handleRead(const boost::system::error_code&, unsigned int) override;
 		virtual void readInternal(DBBD::Header) = 0;
 		virtual void write() override;
-		virtual void handleWrite(const boost::system::error_code&, size_t) override;
+		virtual void handleWrite(const boost::system::error_code&, unsigned int) override;
 		virtual void writeInternal()  = 0;
 
 	protected:

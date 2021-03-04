@@ -11,8 +11,8 @@ namespace DBBD
 	public:
 		template<typename T>
 		static void write(Buffer& buffer, const T& value) {
-			size_t size = sizeof(T);
-			for (size_t i = 0; i < size; i++) {
+			unsigned int size = sizeof(T);
+			for (unsigned int i = 0; i < size; i++) {
 				char data = (char)(value >> i * DBBD::Buffer::byte);
 				buffer.putByte(data);
 			}
@@ -26,9 +26,9 @@ namespace DBBD
 	public:
 		template<typename T, size_t size>
 		static void writeArray(Buffer& buffer, const T(&values)[size]) {
-			size_t arraySize = size;
+			unsigned int arraySize = size;
 			write(buffer, arraySize);
-			for (size_t i = 0; i < arraySize; i++) {
+			for (unsigned int i = 0; i < arraySize; i++) {
 				T value = values[i];
 				write(buffer, value);
 			}

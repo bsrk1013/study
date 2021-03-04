@@ -138,7 +138,19 @@ namespace DBBDTest
         [Test]
         public void DeSerializeTest()
         {
+            DBBD.Buffer buffer = new DBBD.Buffer(8192);
 
+            string nickname = "빵칼법사";
+            int level = 10;
+
+            Serialize.Write(buffer, nickname);
+            Serialize.Write(buffer, level);
+
+            Deserialize.Read(buffer, out string nickname2);
+            Deserialize.Read(buffer, out int level2);
+
+            Assert.AreEqual(nickname, nickname2);
+            Assert.AreEqual(level, level2);
         }
 
         [Test]

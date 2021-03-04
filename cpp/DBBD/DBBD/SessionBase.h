@@ -25,11 +25,11 @@ namespace DBBD
 		virtual void startInternal() = 0;
 
 		virtual void read() = 0;
-		virtual void handleRead(const boost::system::error_code&, size_t) = 0;
+		virtual void handleRead(const boost::system::error_code&, unsigned int) = 0;
 		virtual void readInternal(DBBD::Header) = 0;
 
 		virtual void write() = 0;
-		virtual void handleWrite(const boost::system::error_code&, size_t) = 0;
+		virtual void handleWrite(const boost::system::error_code&, unsigned int) = 0;
 		virtual void writeInternal() = 0;
 
 	protected:
