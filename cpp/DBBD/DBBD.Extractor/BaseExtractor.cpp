@@ -5,7 +5,7 @@ using namespace tinyxml2;
 BaseExtractor::BaseExtractor(ExtractorType type, 
 	std::filesystem::path basePath, std::vector<std::string>& fileList)
 	: type(type), basePath(basePath), fileList(fileList) {
-	baseOutputPath = basePath / "Output";
+	baseOutputPath = basePath / "output";
 }
 
 void BaseExtractor::start() {
@@ -54,12 +54,44 @@ std::string BaseExtractor::getPropertyType(std::string type) {
 		else if (this->type == ExtractorType::Csharp) { return "string"; }
 		break;
 	case HashCode("int64"):
-		return "long";
+		if (this->type == ExtractorType::Cpp) { return "__int64"; }
+		else if (this->type == ExtractorType::Csharp) { return "long"; }
+		break;
+	case HashCode("uint64"):
+		if (this->type == ExtractorType::Cpp) { return "unsigned __int64"; }
+		else if (this->type == ExtractorType::Csharp) { return "ulong"; }
+		break;
 	case HashCode("int32"):
-		return "int";
+		if (this->type == ExtractorType::Cpp) { return "int"; }
+		else if (this->type == ExtractorType::Csharp) { return "int"; }
+		break;
+	case HashCode("uint32"):
+		if (this->type == ExtractorType::Cpp) { return "unsigned int"; }
+		else if (this->type == ExtractorType::Csharp) { return "uint"; }
+		break;
+	case HashCode("int16"):
+		if (this->type == ExtractorType::Cpp) { return "short"; }
+		else if (this->type == ExtractorType::Csharp) { return "short"; }
+		break;
+	case HashCode("uint16"):
+		if (this->type == ExtractorType::Cpp) { return "unsigned short"; }
+		else if (this->type == ExtractorType::Csharp) { return "ushort"; }
+		break;
+	case HashCode("bool"):
+		if (this->type == ExtractorType::Cpp) { return "bool"; }
+		else if (this->type == ExtractorType::Csharp) { return "bool"; }
+		break;
+	case HashCode("char"):
+		if (this->type == ExtractorType::Cpp) { return "wchar_t"; }
+		else if (this->type == ExtractorType::Csharp) { return "char"; }
+		break;
+
 	default:
 		break;
 	}
+
+	int a = 10;
+	long b = 10;
 }
 
 void BaseExtractor::parseXml(std::string fileName) {

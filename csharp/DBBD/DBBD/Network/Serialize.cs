@@ -7,6 +7,7 @@ namespace DBBD
 {
     public class Serialize
     {
+        #region Variable
         public static void Write(Buffer buffer, char value)
         {
             buffer.PutByte((byte)value);
@@ -118,5 +119,152 @@ namespace DBBD
                 Write(buffer, data);
             }
         }
+
+        public static void Write(Buffer buffer, ICell value)
+        {
+            value.Serialize(buffer);
+        }
+        #endregion
+        #region List
+        public static void Write(Buffer buffer, List<char> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach(var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<byte> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<sbyte> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<bool> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<short> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<ushort> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<int> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<uint> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<long> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<ulong> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<float> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<double> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<string> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach (var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+
+        public static void Write(Buffer buffer, List<ICell> values)
+        {
+            uint size = (uint)values.Count;
+            Write(buffer, size);
+            foreach(var val in values)
+            {
+                Write(buffer, val);
+            }
+        }
+        #endregion
     }
 }

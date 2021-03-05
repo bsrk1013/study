@@ -229,7 +229,7 @@ namespace DBBDTest
 
 				size_t lastPos = sendBuffer.getBufferLastPos();
 				if (transfrred + currentOffset > lastPos) {
-					transfrred = transfrred + currentOffset - lastPos;
+					transfrred = lastPos - currentOffset;
 				}
 
 				char* block1 = sendBuffer.readByteBlock(static_cast<size_t>(transfrred));

@@ -2,6 +2,8 @@
 using DBBD;
 using System;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DBBDTest
 {
@@ -136,6 +138,12 @@ namespace DBBDTest
         }
 
         [Test]
+        public void BufferStreamTest()
+        {
+
+        }
+
+        [Test]
         public void DeSerializeTest()
         {
             DBBD.Buffer buffer = new DBBD.Buffer(8192);
@@ -151,6 +159,130 @@ namespace DBBDTest
 
             Assert.AreEqual(nickname, nickname2);
             Assert.AreEqual(level, level2);
+        }
+
+        class User : ICell
+        {
+            public User()
+            {
+                fingerPrinter.AddRange(Enumerable.Repeat(false, 2));
+            }
+            public void Serialize(DBBD.Buffer buffer)
+            {
+                DBBD.Serialize.Write(buffer, fingerPrinter);
+                if (fingerPrinter[0]) { DBBD.Serialize.Write(buffer, nickname); }
+                if (fingerPrinter[1]) { DBBD.Serialize.Write(buffer, level); }
+            }
+
+            public void Deserialize(DBBD.Buffer buffer)
+            {
+                DBBD.Deserialize.Read(buffer, out fingerPrinter);
+                if (fingerPrinter[0]) { DBBD.Deserialize.Read(buffer, out nickname); }
+                if (fingerPrinter[1]) { DBBD.Deserialize.Read(buffer, out level); }
+            }
+
+            public uint GetLength()
+            {
+                uint totalLength = (uint)(sizeof(uint) + fingerPrinter.Count);
+                if (fingerPrinter[0]) { totalLength += (uint)(sizeof(uint) + Encoding.UTF8.GetByteCount(nickname)); }
+                if (fingerPrinter[1]){ totalLength += (uint)(sizeof(short)); }
+                return totalLength;
+            }
+
+            public string Nickname { get { return nickname; } set { nickname = value; fingerPrinter[1] = true; } }
+            public short Level { get { return level; } set { level = value; fingerPrinter[1] = true; } }
+
+            private List<bool> fingerPrinter = new List<bool>();
+            private string nickname;
+            private short level;
+        }
+
+        class LoginReq : Request
+        {
+            public LoginReq() 
+            { 
+                typeId = 1;
+                fingerPrinter.AddRange(Enumerable.Repeat(false, 1));
+            }
+
+            public override void Serialize(DBBD.Buffer buffer)
+            {
+                base.WriteHeader(buffer, GetLength());
+                DBBD.Serialize.Write(buffer, fingerPrinter);
+                if (fingerPrinter[0]) { DBBD.Serialize.Write(buffer, user); }
+            }
+
+            public override void Deserialize(DBBD.Buffer buffer)
+            {
+                base.ReadHeader(buffer);
+                DBBD.Deserialize.Read(buffer, out fingerPrinter);
+                if (fingerPrinter[0]) { DBBD.Deserialize.Read(buffer, out user); }
+            }
+
+            public override uint GetLength()
+            {
+                return (uint)(base.GetLength() + sizeof(uint) + fingerPrinter.Count + user.GetLength());
+            }
+
+            public User User { get { return user; } set { user = value; fingerPrinter[0] = true; } }
+
+            private List<bool> fingerPrinter = new List<bool>();
+            private User user;
+        }
+
+        [Test]
+        public void RequestTest()
+        {
+            LoginReq req = new LoginReq();
+            User user = new User();
+            user.Level = 15;
+
+            req.User = user;
+
+            DBBD.Buffer sendBuffer = new DBBD.Buffer(8192);
+            DBBD.Buffer receiveBuffer = new DBBD.Buffer(8192);
+
+            DBBD.Serialize.Write(sendBuffer, req);
+            sendBuffer.BufferOffset = 0;
+            LoginReq loginReq;
+            while (true)
+            {
+                uint currentOffset = sendBuffer.BufferOffset;
+                uint transfrred = 5;
+
+                uint lastPos = sendBuffer.BufferLastPos;
+                if(transfrred + currentOffset > lastPos)
+                {
+                    transfrred = lastPos - currentOffset;//transfrred + currentOffset - lastPos;
+                }
+
+                byte[] block = sendBuffer.ReadByteBlock(transfrred);
+                for(uint i = 0; i < transfrred; i++)
+                {
+                    receiveBuffer.PutByte(block[i]);
+                }
+
+                if(DBBD.Header.HeaderSize > receiveBuffer.BufferLastPos)
+                {
+                    continue;
+                }
+
+                byte[] headerBlock = receiveBuffer.ViewByteBlock(DBBD.Header.HeaderSize);
+                DBBD.Header header = new DBBD.Header(headerBlock);
+                if(receiveBuffer.BufferLastPos < header.Length)
+                {
+                    continue;
+                }
+
+                if(header.TypeId == 1)
+                {
+                    DBBD.Deserialize.Read(receiveBuffer, out loginReq);
+                    break;
+                }
+            }
+
+            Assert.AreEqual(req.TypeId, loginReq.TypeId);
+            Assert.AreEqual(req.User.Level, loginReq.User.Level);
         }
 
         [Test]
