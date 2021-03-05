@@ -138,12 +138,6 @@ namespace DBBDTest
         }
 
         [Test]
-        public void BufferStreamTest()
-        {
-
-        }
-
-        [Test]
         public void DeSerializeTest()
         {
             DBBD.Buffer buffer = new DBBD.Buffer(8192);

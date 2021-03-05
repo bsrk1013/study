@@ -17,8 +17,8 @@ DBBD::TcpSessionBase::~TcpSessionBase()
 
 void DBBD::TcpSessionBase::start()
 {
-	read();
 	startInternal();
+	read();
 }
 
 void DBBD::TcpSessionBase::stop()
