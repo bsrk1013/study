@@ -14,11 +14,9 @@ namespace DBBD
         protected abstract void StartInternal();
 
         protected abstract void Read();
-        protected abstract void HandleRead();
         protected abstract void ReadInternal(Header header);
 
         protected abstract void Write();
-        protected abstract void HandleWrite();
         protected abstract void WriteInternal();
 
         public ulong SessionId { get; set; }

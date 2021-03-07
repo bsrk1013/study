@@ -1,0 +1,15 @@
+Redis:
+  ip: 118.67.134.160
+  port: 6379
+  psw: 1231013a
+
+MariaDB:
+  ip: 118.67.134.160
+  port: 3306
+  id: root
+  psw: 1231013a
+  db: Test
+
+TelegramBot:
+  token: 1670808230:AAGEc-LmpQhvk1tx5KfEPkTV3L_EV4A1Ijc
+  chatid: -576790544

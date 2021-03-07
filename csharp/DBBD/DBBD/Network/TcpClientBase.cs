@@ -6,33 +6,69 @@ using System.Text;
 
 namespace DBBD
 {
-    public class TcpClientBase : ClientBase
+    public abstract class TcpClientBase : ClientBase
     {
-        public override void Connect(IPAddress ip, int port)
+        public void Start(string address, int port, bool tryReconnect)
         {
-            ConnectInternal(new IPEndPoint(ip, port));
+            Start(IPAddress.Parse(address), port, tryReconnect);
         }
 
-        public override void Disconnect()
+        public override void Start(IPAddress address, int port, bool tryReconnect)
+        {
+            this.tryReconnect = tryReconnect;
+
+            endPoint = new IPEndPoint(address, port);
+
+            socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            connectEventArgs = new SocketAsyncEventArgs();
+            connectEventArgs.Completed += ConnectEventArgs_Completed;
+            
+            connectEventArgs.RemoteEndPoint = endPoint;
+            connectEventArgs.UserToken = socket;
+
+            bool pending = socket.ConnectAsync(connectEventArgs);
+            if(!pending)
+            {
+                OnConnect(connectEventArgs);
+            }
+        }
+
+        public override void Stop()
         {
         }
 
-        public override void Send()
+        public override void Send(ICell data)
         {
-        }
-
-        protected override void ConnectInternal(IPEndPoint endPoint)
-        {
-            Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.BeginConnect(endPoint, HandleConnect, socket);
-        }
-
-        protected override void HandleConnect(IAsyncResult result)
-        {
+            session.Send(data);
         }
 
         protected override void DisconnectInternal()
         {
         }
+
+        private void ConnectEventArgs_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            OnConnect(e);
+        }
+
+        private void OnConnect(SocketAsyncEventArgs e)
+        {
+            if(e.SocketError == SocketError.Success)
+            {
+                connectEventArgs.Completed -= ConnectEventArgs_Completed;
+                connectEventArgs.Dispose();
+                connectEventArgs = null;
+
+                session = new TcpClientSession((Socket)e.UserToken, 8192, ReadInternal);
+                session.Start();
+            }
+            else
+            {
+
+            }
+        }
+
+        private TcpClientSession session;
+        private SocketAsyncEventArgs connectEventArgs;
     }
 }

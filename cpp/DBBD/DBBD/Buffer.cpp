@@ -9,9 +9,12 @@ namespace DBBD {
 		block = new char[blockSize];
 	}
 
-	Buffer::Buffer(const char* bufferBlock) {
-		bufferCapacity = (unsigned int)strlen(bufferBlock);
-		memcpy(buffer, bufferBlock, bufferCapacity);
+	Buffer::Buffer(const char* bufferBlock, const unsigned int& size) {
+		bufferCapacity = size;
+		buffer = new char[size];
+		blockSize = size;
+		block = new char[blockSize];
+		memcpy(buffer, bufferBlock, size);
 	}
 
 	Buffer::~Buffer() {

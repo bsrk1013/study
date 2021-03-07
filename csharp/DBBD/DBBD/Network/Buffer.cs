@@ -9,17 +9,23 @@ namespace DBBD
         public Buffer(uint size) 
         {
             bufferCapacity = size;
-            buffer = new sbyte[size];
+            buffer = new byte[size];
         }
         
+        public Buffer(byte[] block)
+        {
+            bufferCapacity = (uint)block.Length;
+            this.buffer = block;
+        }
+
         public void PutByte(byte byteData)
         {
-            buffer[bufferLastPos++] = (sbyte)byteData;
+            buffer[bufferLastPos++] = (byte)byteData;
         }
 
         public void PutByte(sbyte byteData)
         {
-            buffer[bufferLastPos++] = byteData;
+            buffer[bufferLastPos++] = (byte)byteData;
         }
 
         public byte[] ViewByteBlock(uint size) 
@@ -47,7 +53,7 @@ namespace DBBD
             }
             else if(bufferOffset > 0 && spare > 0)
             {
-                sbyte[] tempArray = new sbyte[spare];
+                byte[] tempArray = new byte[spare];
                 for(uint i = 0; i < spare; i++)
                 {
                     tempArray[i] = buffer[bufferOffset + i];
@@ -85,11 +91,11 @@ namespace DBBD
             bufferLastPos = 0;
         }
 
-        public sbyte[] RawBuffer { get { return buffer; } }
+        public byte[] RawBuffer { get { return buffer; } }
         public uint BufferLastPos { get { return bufferLastPos; } set { bufferLastPos = value; } }
         public uint BufferOffset { get { return bufferOffset; } set { bufferOffset = value; } }
 
-        private sbyte[] buffer;
+        private byte[] buffer;
         private uint bufferOffset = 0;
         private uint bufferLastPos = 0;
         private uint bufferCapacity = 0;

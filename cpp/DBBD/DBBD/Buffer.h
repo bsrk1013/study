@@ -7,7 +7,7 @@ namespace DBBD {
 	{
 	public:
 		Buffer(const unsigned int& size);
-		Buffer(const char* bufferBlock);
+		Buffer(const char* bufferBlock, const unsigned int& size);
 		~Buffer();
 
 	public:

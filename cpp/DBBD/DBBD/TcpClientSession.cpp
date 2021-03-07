@@ -1,8 +1,8 @@
 #include "TcpClientSession.h"
 
-DBBD::TcpClientSession::TcpClientSession(IoContextSP context, SocketSP socket, size_t sessionId,
+DBBD::TcpClientSession::TcpClientSession(IoContextSP context, SocketSP socket, unsigned int bufferSize,
 	std::function<void(DBBD::Buffer)> method)
-	: TcpSessionBase(context, socket, sessionId)
+	: TcpSessionBase(context, socket, bufferSize)
 	, bindReadInternal(method)
 {
 }
@@ -18,7 +18,7 @@ void DBBD::TcpClientSession::startInternal()
 void DBBD::TcpClientSession::readInternal(DBBD::Header header)
 {
 	char* block = readBuffer->readByteBlock(header.length);
-	Buffer buffer(block);
+	Buffer buffer(block, header.length);
 	bindReadInternal(buffer);
 }
 

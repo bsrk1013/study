@@ -4,6 +4,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace DBBDTest
 {
@@ -183,7 +184,7 @@ namespace DBBDTest
                 return totalLength;
             }
 
-            public string Nickname { get { return nickname; } set { nickname = value; fingerPrinter[1] = true; } }
+            public string Nickname { get { return nickname; } set { nickname = value; fingerPrinter[0] = true; } }
             public short Level { get { return level; } set { level = value; fingerPrinter[1] = true; } }
 
             private List<bool> fingerPrinter = new List<bool>();
@@ -215,7 +216,9 @@ namespace DBBDTest
 
             public override uint GetLength()
             {
-                return (uint)(base.GetLength() + sizeof(uint) + fingerPrinter.Count + user.GetLength());
+                uint totalLength = base.GetLength() + (uint)(sizeof(uint) + fingerPrinter.Count);
+                if (fingerPrinter[0]) { totalLength += user.GetLength(); }
+                return totalLength;
             }
 
             public User User { get { return user; } set { user = value; fingerPrinter[0] = true; } }
@@ -277,6 +280,89 @@ namespace DBBDTest
 
             Assert.AreEqual(req.TypeId, loginReq.TypeId);
             Assert.AreEqual(req.User.Level, loginReq.User.Level);
+        }
+
+        class LoginResp : Response
+        {
+            public LoginResp()
+            {
+                typeId = 2;
+                fingerPrinter.AddRange(Enumerable.Repeat(false, 1));
+            }
+
+            public override void Serialize(DBBD.Buffer buffer)
+            {
+                base.WriteHeader(buffer, GetLength());
+                DBBD.Serialize.Write(buffer, fingerPrinter);
+                if (fingerPrinter[0]) { DBBD.Serialize.Write(buffer, loginResult); }
+            }
+
+            public override void Deserialize(DBBD.Buffer buffer)
+            {
+                base.ReadHeader(buffer);
+                DBBD.Deserialize.Read(buffer, out fingerPrinter);
+                if (fingerPrinter[0]) { DBBD.Deserialize.Read(buffer, out loginResult); }
+            }
+
+            public override uint GetLength()
+            {
+                uint totalLength = (uint)(base.GetLength() + sizeof(uint) + fingerPrinter.Count);
+                totalLength += sizeof(bool);
+                return totalLength;
+            }
+
+            public bool LoginResult { get { return loginResult; } set { loginResult = value; fingerPrinter[0] = true; } }
+
+            private List<bool> fingerPrinter = new List<bool>();
+            private bool loginResult;
+        }
+
+        class GameClient : TcpClientBase
+        {
+            protected override void ReadInternal(DBBD.Buffer buffer)
+            {
+                byte[] headerBlock = buffer.ViewByteBlock(Header.HeaderSize);
+                Header header = new Header(headerBlock);
+
+                switch (header.TypeId)
+                {
+                    case 2:
+                        LoginResp loginResp;
+                        Deserialize.Read(buffer, out loginResp);
+
+                        Assert.IsTrue(loginResp.LoginResult);
+                        break;
+                }
+            }
+
+            protected override void StartInternal()
+            {
+            }
+
+            protected override void StopInternal()
+            {
+            }
+        }
+
+        [Test]
+        public void CppServerTest()
+        {
+            GameClient client = new GameClient();
+
+            client.Start("127.0.0.1", 8101, true);
+
+            LoginReq loginReq = new LoginReq();
+            User user = new User();
+            user.Nickname = "빵칼법사";
+            user.Level = 80;
+
+            loginReq.User = user;
+
+            Thread.Sleep(1000);
+
+            client.Send(loginReq);
+
+            Thread.Sleep(1000 * 60 * 5);
         }
 
         [Test]

@@ -8,21 +8,15 @@ namespace DBBD
 {
     public abstract class ClientBase
     {
-        protected class ConnectContext
-        {
-            public Socket Socket { get; set; }
-            public EndPoint RemoteEndPoint { get; set; }
-        }
-        protected ConnectContext context;
+        public abstract void Start(IPAddress address, int port, bool tryReconnect);
+        public abstract void Stop();
+        public abstract void Send(ICell data);
 
-        public abstract void Connect(IPAddress ip, int port);
-        public abstract void Disconnect();
-        public abstract void Send();
+        protected abstract void StartInternal();
+        protected abstract void StopInternal();
 
-        protected abstract void ConnectInternal(IPEndPoint endPoint);
-        protected abstract void HandleConnect(IAsyncResult result);
+        protected abstract void ReadInternal(Buffer buffer);
         protected abstract void DisconnectInternal();
-        protected virtual void ReadInternal() { }
 
         protected IPEndPoint endPoint;
         protected bool tryReconnect = false;

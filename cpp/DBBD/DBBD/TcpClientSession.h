@@ -6,7 +6,7 @@ namespace DBBD
 	class TcpClientSession : public TcpSessionBase
 	{
 	public:
-		TcpClientSession(IoContextSP, SocketSP, size_t,
+		TcpClientSession(IoContextSP, SocketSP, unsigned int,
 			std::function<void(DBBD::Buffer)>);
 		virtual ~TcpClientSession();
 

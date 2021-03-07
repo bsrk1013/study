@@ -4,6 +4,7 @@
 #include "DBBD/Response.h"
 #include "DBBD/Cell.h"
 #include "DBBD/Random.h"
+#include "DBBD/TcpServerBase.h"
 #include <map>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -317,6 +318,13 @@ namespace DBBDTest
 
 			Assert::AreEqual(req.token, tempReq.token);
 			Assert::AreEqual(req.deviceId, tempReq.deviceId);*/
+		}
+
+		TEST_METHOD(CsharpClientTest) {
+			class GameServer : public DBBD::TcpServerBase
+			{
+
+			};
 		}
 	};
 }

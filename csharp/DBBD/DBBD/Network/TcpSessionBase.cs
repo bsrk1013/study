@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DBBD
 {
-    public class TcpSessionBase : SessionBase
+    public abstract class TcpSessionBase : SessionBase
     {
         public TcpSessionBase(Socket socket, uint bufferSize) 
         {
@@ -15,6 +15,9 @@ namespace DBBD
 
             readEventArgs = new SocketAsyncEventArgs();
             sendEventArgs = new SocketAsyncEventArgs();
+
+            readEventArgs.SetBuffer(readBuffer.RawBuffer, 0, (int)bufferSize);
+            sendEventArgs.SetBuffer(writeBuffer.RawBuffer, 0, (int)bufferSize);
 
             readEventArgs.Completed += ReadEventArgs_Completed;
             sendEventArgs.Completed += SendEventArgs_Completed;
@@ -48,27 +51,76 @@ namespace DBBD
             readBuffer.Adjust();
             if(socket != null && socket.Connected)
             {
-                socket.ReceiveAsync(readEventArgs);
+                bool pending = socket.ReceiveAsync(readEventArgs);
+                if (!pending)
+                {
+                    OnReceive(readEventArgs);
+                }
+            }
+        }
+
+        protected override void Write()
+        {
+            WriteInternal();
+            bool pending = socket.SendAsync(sendEventArgs);
+            if (!pending)
+            {
+                OnSend(sendEventArgs);
             }
         }
 
         private void SendEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
-            e.BufferList = null;
-
-            if(e.SocketError == SocketError.Success)
-            {
-
-            }
-            else
-            {
-
-            }
+            OnSend(e);
         }
 
         private void ReadEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
+            OnReceive(e);
+        }
 
+        private void OnReceive(SocketAsyncEventArgs e)
+        {
+            if(e.SocketError == SocketError.Success)
+            {
+                readBuffer.BufferLastPos += (uint)e.BytesTransferred;
+                while(true)
+                {
+                    if(readBuffer.BufferLastPos < Header.HeaderSize)
+                    {
+                        break;
+                    }
+
+                    byte[] headerBlock = readBuffer.ViewByteBlock(Header.HeaderSize);
+                    Header header = new Header(headerBlock);
+
+                    if(readBuffer.BufferLastPos < header.Length)
+                    {
+                        break;
+                    }
+
+                    ReadInternal(header);
+                    break;
+                }
+                Read();
+            }
+            else
+            {
+                Stop();
+            }
+        }
+
+        private void OnSend(SocketAsyncEventArgs e)
+        {
+            if(e.SocketError == SocketError.Success)
+            {
+                writeBuffer.BufferOffset += (uint)e.BytesTransferred;
+                writeBuffer.Adjust();
+            }
+            else
+            {
+                Stop();
+            }
         }
 
         private SocketAsyncEventArgs readEventArgs;
