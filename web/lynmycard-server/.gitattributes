@@ -1,0 +1,11 @@
+* text=auto
+
+*.ts text eol=LF
+*.js text eol=LF
+*.tsx text eol=LF
+*.jsx text eol=LF
+*.json text eol=LF
+*.md text eol=LF
+*.html text eol=LF
+*.css text eol=LF
+*.txt text eol=LF

@@ -1,0 +1,51 @@
+env: production
+
+aws:
+  accessKeyId: AKIAIFICUWFTKCAS2D6Q
+  secretAccessKey: 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
+  region: ap-northeast-2
+  sesSourceMail: admin@webtoonedu.com
+
+mysql:
+  host: webtoonedu.chc1zbvar41j.ap-northeast-2.rds.amazonaws.com
+  user: toon_live
+  password: ghQkdaos1!
+  port: 3306
+  database: edu_toon
+  connectionLimit: 10
+
+redis:
+  Host: "52.78.14.168"
+  Port: 6379
+  Password: webtooneduredis
+  LogDb: 0
+  EventDb: 1
+  RankingDb: 2
+
+server:
+  Host: "15.164.142.183"
+  Port: 80
+  ClientOrigin: https://webtoonedu.com
+  Origins:
+    - "*"
+    - http://webtoonedu.com
+    - http://www.webtoonedu.com
+    - https://webtoonedu.com
+    - https://www.webtoonedu.com
+  AllowUrl:
+    - /api/product/subscription/return
+    - /api/product/subscription/callback
+
+telegrambot:
+  token: 1179402397:AAFIco6mc6b6_HjDKD9gIU4FKDmbeCqd1wE
+  chatid: "-404565044"
+
+payletter:
+  BaseUrl: https://pgapi.payletter.com
+  ApiUrl: api.webtoonedu.com
+  ApiBillingKey: MjFFOUY1QjkxMTYxRENDQkIwNzFCNURCRkRCMjhDODA=
+  ApiReadKey: Mjc5MEY0QzlCQUQ3OEU3NDhENEFDOUJCMzY1MDg2NkM=
+  ClientId: wtoonedu
+  KeyId: e1ff702fbfd9dc07
+  KeyVersion: "001"
+  KeyValue: fef52f67b551997a08662877e158dfa5
