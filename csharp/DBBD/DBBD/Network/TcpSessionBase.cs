@@ -17,7 +17,6 @@ namespace DBBD
             sendEventArgs = new SocketAsyncEventArgs();
 
             readEventArgs.SetBuffer(readBuffer.RawBuffer, 0, (int)bufferSize);
-            sendEventArgs.SetBuffer(writeBuffer.RawBuffer, 0, (int)bufferSize);
 
             readEventArgs.Completed += ReadEventArgs_Completed;
             sendEventArgs.Completed += SendEventArgs_Completed;
@@ -62,6 +61,7 @@ namespace DBBD
         protected override void Write()
         {
             WriteInternal();
+            sendEventArgs.SetBuffer(writeBuffer.RawBuffer, 0, (int)writeBuffer.BufferLastPos);
             bool pending = socket.SendAsync(sendEventArgs);
             if (!pending)
             {
