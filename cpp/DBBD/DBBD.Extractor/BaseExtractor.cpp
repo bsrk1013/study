@@ -3,7 +3,7 @@
 using namespace tinyxml2;
 
 BaseExtractor::BaseExtractor(ExtractorType type, 
-	std::filesystem::path basePath, std::vector<std::string>& fileList)
+	std::filesystem::path basePath, const std::vector<std::string>& fileList)
 	: type(type), basePath(basePath), fileList(fileList) {
 	baseOutputPath = basePath / "output";
 }
@@ -85,13 +85,17 @@ std::string BaseExtractor::getPropertyType(std::string type) {
 		if (this->type == ExtractorType::Cpp) { return "wchar_t"; }
 		else if (this->type == ExtractorType::Csharp) { return "char"; }
 		break;
-
+	case HashCode("byte"):
+		if (this->type == ExtractorType::Cpp) { return "unsigned char"; }
+		else if (this->type == ExtractorType::Csharp) { return "byte"; }
+		break;
+	case HashCode("sbyte"):
+		if (this->type == ExtractorType::Cpp) { return "char"; }
+		else if (this->type == ExtractorType::Csharp) { return "sbyte"; }
+		break;
 	default:
 		break;
 	}
-
-	int a = 10;
-	long b = 10;
 }
 
 void BaseExtractor::parseXml(std::string fileName) {

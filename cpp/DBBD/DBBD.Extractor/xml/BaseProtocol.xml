@@ -3,7 +3,7 @@
 	</cells>
 	<protocols>
 		<protocol name="ServerConnectReq" type="ServerConnectReq" base="Request">
-			<property name="SessionId" type="int64" base="default"/>
+			<property name="sessionId" type="int64" base="default"/>
 		</protocol>
 		<protocol name="ServerConnectResp" type="ServerConnectResp" base="Response" />
 

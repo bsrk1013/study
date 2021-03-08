@@ -142,12 +142,14 @@
   <ItemGroup>
     <ClCompile Include="BaseExtractor.cpp" />
     <ClCompile Include="CppExtractor.cpp" />
+    <ClCompile Include="CsharpExtractor.cpp" />
     <ClCompile Include="DBBD.Extractor.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseExtractor.h" />
     <ClInclude Include="CppExtractor.h" />
+    <ClInclude Include="CsharpExtractor.h" />
     <ClInclude Include="tinyxml2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

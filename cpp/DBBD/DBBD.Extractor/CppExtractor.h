@@ -4,7 +4,7 @@
 class CppExtractor : public BaseExtractor
 {
 public:
-	CppExtractor(std::filesystem::path basePath, std::vector<std::string>& fileList);
+	CppExtractor(std::filesystem::path basePath, const std::vector<std::string>& fileList);
 	virtual ~CppExtractor() {}
 protected:
 	virtual void writeHeader(std::ofstream& ofs) override;

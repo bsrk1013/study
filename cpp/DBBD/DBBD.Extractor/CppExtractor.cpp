@@ -3,7 +3,7 @@
 
 using namespace std;
 
-CppExtractor::CppExtractor(std::filesystem::path basePath, std::vector<std::string>& fileList)
+CppExtractor::CppExtractor(std::filesystem::path basePath, const std::vector<std::string>& fileList)
 	: BaseExtractor(ExtractorType::Cpp, basePath, fileList) {
 
 }
@@ -40,7 +40,8 @@ void CppExtractor::writeProtocol(ofstream& ofs) {
 void CppExtractor::writeConst(ofstream& ofs, string fileName) {
 	size_t pos = fileName.find(".");
 	auto namespaceName = fileName.substr(0, pos);
-	ofs << "#include <map>" << endl << endl;
+	ofs << "#include <map>" << endl;
+	ofs << "#include <string>" << endl << endl;
 	ofs << "namespace " << namespaceName << " {" << endl;
 	ofs << "\tenum Value {" << endl;
 	for (auto info : headerInfoList) {
@@ -48,13 +49,13 @@ void CppExtractor::writeConst(ofstream& ofs, string fileName) {
 	}
 	ofs << "\t};" << endl;
 
-	ofs << "\tstd::map<Value, std::string> stringMap = {" << endl;
+	ofs << "\tstd::map<Value, std::wstring> stringMap = {" << endl;
 	for (auto info : headerInfoList) {
-		ofs << "\t\t{ Value::" << info.name << ", \"" << info.name << "\" }," << endl;
+		ofs << "\t\t{ Value::" << info.name << ", L\"" << info.name << "\" }," << endl;
 	}
 	ofs << "\t};" << endl;
 
-	ofs << "\tstd::string Get(Value value) {" << endl;
+	ofs << "\tstd::wstring Get(Value value) {" << endl;
 	ofs << "\t\tauto iter = " << namespaceName << "::stringMap.find(value);" << endl;
 	ofs << "\t\tif (iter == " << namespaceName << "::stringMap.end()) {" << endl;
 	ofs << "\t\t\treturn \"\";" << endl;
@@ -81,32 +82,33 @@ void CppExtractor::writeContentsHeader(ofstream& ofs) {
 			else if (info.fileType == XmlElementType::Protocol) {
 				ofs << "\t" << info.name << "() {" << endl;
 				ofs << "\t\ttypeId = ProtocolType::" << info.type << ";" << endl;
-				ofs << "\t}";
+				ofs << "\t}" << endl;
 			}
+			ofs << endl;
 
-			vector<FileInfo> realContents;
-			for (auto contentsInfo : contentsInfoList) {
-				if (contentsInfo.fileType != XmlElementType::Property) { continue; }
-				realContents.push_back(contentsInfo);
-			}
-			if (realContents.size() > 0) {
-				ofs << "\t" << info.name << "(";
-				for (size_t i = 0; i < realContents.size(); i++) {
-					if (i > 0) { ofs << ", "; }
-					auto propertyInfo = realContents[i];
-					ofs << getPropertyType(propertyInfo.type) << " " << propertyInfo.name;
-				}
-				ofs << ")" << endl;
-				ofs << "\t\t: ";
-				for (size_t i = 0; i < realContents.size(); i++) {
-					if (i > 0) { ofs << ", "; }
-					auto propertyInfo = realContents[i];
-					ofs << propertyInfo.name << "(" << propertyInfo.name << ")";
-				}
-				ofs << endl << "\t{}" << endl;
-			}
+			//vector<FileInfo> realContents;
+			//for (auto contentsInfo : contentsInfoList) {
+			//	if (contentsInfo.fileType != XmlElementType::Property) { continue; }
+			//	realContents.push_back(contentsInfo);
+			//}
+			//if (realContents.size() > 0) {
+			//	ofs << "\t" << info.name << "(";
+			//	for (size_t i = 0; i < realContents.size(); i++) {
+			//		if (i > 0) { ofs << ", "; }
+			//		auto propertyInfo = realContents[i];
+			//		ofs << getPropertyType(propertyInfo.type) << " " << propertyInfo.name;
+			//	}
+			//	ofs << ")" << endl;
+			//	ofs << "\t\t: ";
+			//	for (size_t i = 0; i < realContents.size(); i++) {
+			//		if (i > 0) { ofs << ", "; }
+			//		auto propertyInfo = realContents[i];
+			//		ofs << propertyInfo.name << "(" << propertyInfo.name << ")";
+			//	}
+			//	ofs << endl << "\t{}" << endl;
+			//}
 
-			ofs << "\t" << "virtual ~" << info.name << "() {}" << endl;
+			ofs << "\t" << "virtual ~" << info.name << "() {}" << endl << endl;
 			break;
 		}
 		}
@@ -126,10 +128,6 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		if (headerInfo.fileType == XmlElementType::Cell) { header.push_back(headerInfo); break; }
 	}
 
-	/*std::string temp = R"(public:
-	virtual void serialize(DBBD::Buffer& buffer) {
-		DBBD::Serialize::writeArray(buffer, fingerPrinter);)";*/
-
 	ofs << "public:" << endl;
 	ofs << "\tvirtual void serialize(DBBD::Buffer& buffer) {" << endl;
 	if (realContents.size() > 0) {
@@ -139,7 +137,7 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 			ofs << "\t\tif (fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, true) << " }" << endl;
 		}
 	}
-	ofs << "\t}" << endl;;
+	ofs << "\t}" << endl << endl;
 
 	ofs << "\tvirtual void deserialize(DBBD::Buffer& buffer) {" << endl;
 	if (realContents.size() > 0) {
@@ -149,19 +147,19 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 			ofs << "\t\tif (fingerPrinter[" << i << "]) { " << getDeSerialize(info.base, info.type, info.name, false) << " }" << endl;
 		}
 	}
-	ofs << "\t}" << endl;;
+	ofs << "\t}" << endl << endl;
 
 	ofs << "\tvirtual unsigned int getLength() {" << endl;
 	ofs << "\t\tunsigned int totalLength = 0;" << endl;
 	if (realContents.size() > 0) {
-		ofs << "\t\ttotalLength = sizeof(unsigned int) + sizeof(fingerPrinter);" << endl;
+		ofs << "\t\ttotalLength += sizeof(unsigned int) + sizeof(fingerPrinter);" << endl;
 		for (size_t i = 0; i < realContents.size(); i++) {
 			auto info = realContents[i];
 			ofs << "\t\tif (fingerPrinter[" << i << "]) { totalLength += " << getLength(info.type, info.name) << "; }" << endl;
 		}
 	}
 	ofs << "\t\treturn totalLength;" << endl;
-	ofs << "\t}" << endl;
+	ofs << "\t}" << endl << endl;
 
 	// FIXME 내용물 toString 해줘야함
 	ofs << "\tvirtual std::string toString() { " << endl;
@@ -174,7 +172,7 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		}*/
 		ofs << " }\";" << endl;
 	}
-	ofs << "\t}" << endl;
+	ofs << "\t}" << endl << endl;
 
 	ofs << "\tstd::string toJson() {" << endl;
 	ofs << "\t\tnlohmann::json j;" << endl;
@@ -190,7 +188,7 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		ofs << "; }" << endl;
 	}
 	ofs << "\t\treturn j.dump();" << endl;
-	ofs << "\t}" << endl;
+	ofs << "\t}" << endl << endl;
 
 	ofs << "\tvoid fromJson(std::string rawJson) {" << endl;
 	ofs << "\t\tnlohmann::json j = nlohmann::json::parse(rawJson);" << endl;
@@ -337,6 +335,15 @@ string CppExtractor::getDeSerialize(string base, string type, string name, bool 
 	switch (HashCode(type.c_str())) {
 	case HashCode("string"):
 	case HashCode("int64"):
+	case HashCode("uint64"):
+	case HashCode("int32"):
+	case HashCode("uint32"):
+	case HashCode("int16"):
+	case HashCode("uint16"):
+	case HashCode("bool"):
+	case HashCode("char"):
+	case HashCode("byte"):
+	case HashCode("sbyte"):
 		return baseProcess + "(buffer, " + name + ");";
 	default:
 		if (strcmp(base.c_str(), "cell") == 0

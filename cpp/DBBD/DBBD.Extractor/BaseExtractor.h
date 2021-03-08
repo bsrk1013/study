@@ -60,7 +60,7 @@ class BaseExtractor
 {
 public:
 	BaseExtractor(ExtractorType type, 
-		std::filesystem::path basePath, std::vector<std::string>& fileList);
+		std::filesystem::path basePath, const std::vector<std::string>& fileList);
 	virtual ~BaseExtractor() {}
 
 public:

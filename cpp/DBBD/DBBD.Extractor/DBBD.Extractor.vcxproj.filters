@@ -33,6 +33,9 @@
     <ClCompile Include="BaseExtractor.cpp">
       <Filter>소스 파일\Extractor</Filter>
     </ClCompile>
+    <ClCompile Include="CsharpExtractor.cpp">
+      <Filter>소스 파일\Extractor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tinyxml2.h">
@@ -42,6 +45,9 @@
       <Filter>헤더 파일\Extractor</Filter>
     </ClInclude>
     <ClInclude Include="BaseExtractor.h">
+      <Filter>헤더 파일\Extractor</Filter>
+    </ClInclude>
+    <ClInclude Include="CsharpExtractor.h">
       <Filter>헤더 파일\Extractor</Filter>
     </ClInclude>
   </ItemGroup>
