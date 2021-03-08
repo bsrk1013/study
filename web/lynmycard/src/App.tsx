@@ -4,6 +4,8 @@ import * as mui from "@material-ui/core";
 import { TypographyH1 } from "./components/common/TypographyH1";
 import { TypographyH2 } from "./components/common/TypographyH2";
 import * as products from "./products";
+import axios, { AxiosRequestConfig } from "axios";
+import { Response, responseReturn } from "./Response";
 
 const useStyles = mui.makeStyles((theme: mui.Theme) =>
   mui.createStyles({
@@ -75,18 +77,28 @@ export default function App() {
     });
   }
 
-  function onBuy() {
+  async function onBuy() {
     const id = document.getElementById("uniqueId") as HTMLInputElement;
     const reid = document.getElementById("reuniqueId") as HTMLInputElement;
-
-    console.log(id.value);
-    console.log(reid.value);
-    console.log(state.product);
 
     const strId = id.value;
     const strReId = reid.value;
 
-    if (strId.localeCompare(strReId) !== 0) {
+    var result: boolean = strId.localeCompare(strReId) === 0;
+    if (result) {
+      const checkResp = await axios.get<Response<{ result: number }>>(
+        "http://127.0.0.7:4100/mycard/checkAccount",
+        {
+          params: {
+            userId: strId,
+          },
+        },
+      );
+
+      result = (checkResp.data as any).result === 1;
+    }
+
+    if (!result) {
       setErrorState({
         ...errorState,
         idError: "check unique id",
