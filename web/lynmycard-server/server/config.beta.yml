@@ -1,11 +1,5 @@
 env: beta
 
-aws:
-  accessKeyId: AKIAIFICUWFTKCAS2D6Q
-  secretAccessKey: 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
-  region: ap-northeast-2
-  sesSourceMail: admin@webtoonedu.com
-
 mysql:
   host: webtoonedu-dev-beta.chc1zbvar41j.ap-northeast-2.rds.amazonaws.com
   user: toon_live
