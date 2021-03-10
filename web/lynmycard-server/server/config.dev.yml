@@ -1,11 +1,5 @@
 env: dev
 
-aws:
-  accessKeyId: AKIAIFICUWFTKCAS2D6Q
-  secretAccessKey: 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
-  region: ap-northeast-2
-  sesSourceMail: admin@webtoonedu.com
-
 mysql:
   host: "118.67.134.160"
   user: root
