@@ -2,14 +2,22 @@
 	<cells>
 	</cells>
 	<protocols>
-		<protocol name="ServerConnectReq" type="ServerConnectReq" base="Request">
-			<property name="sessionId" type="int64" base="default"/>
+		<protocol name="ServerConnectReq" type="ServerConnectReq" base="Request"/>
+		<protocol name="ServerConnectResp" type="ServerConnectResp" base="Response">
+			<property name="sessionId" type="int32" base="default"/>
 		</protocol>
-		<protocol name="ServerConnectResp" type="ServerConnectResp" base="Response" />
 
-		<!-- 핑 요청 -->
-		<protocol name="PingCheckReq" type="PingCheckReq" base="Request" />
-		<!-- 핑 응답 -->
-		<protocol name="PingCheckResp" type="PingCheckResp" base="Response" />
+		<protocol name="RelayNoti" type="RelayNoti" base="Request">
+			<property name="userId" type="int32" base="default"/>
+			<property name="relayType" type="int32" base="default"/>
+			<property name="intValue01" type="int32" base="default"/>
+			<property name="intValue02" type="int32" base="default"/>
+			<property name="intValue03" type="int32" base="default"/>
+			<property name="intValue04" type="int32" base="default"/>
+			<property name="floatValue01" type="float" base="default"/>
+			<property name="floatValue02" type="float" base="default"/>
+			<property name="floatValue03" type="float" base="default"/>
+			<property name="floatValue04" type="float" base="default"/>
+		</protocol>
 	</protocols>
 </root>

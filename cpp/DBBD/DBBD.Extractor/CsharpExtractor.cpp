@@ -297,6 +297,8 @@ string CsharpExtractor::getLength(string type, string name) {
 	case HashCode("uint32"):
 	case HashCode("int16"):
 	case HashCode("uint16"):
+	case HashCode("double"):
+	case HashCode("float"):
 	case HashCode("bool"):
 	case HashCode("char"):
 	case HashCode("byte"):

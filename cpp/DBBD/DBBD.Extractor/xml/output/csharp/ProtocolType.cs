@@ -8,13 +8,15 @@ using System.Collections.Generic;
 {
 	public enum Value
 	{
-		PingCheckReq = 1001,
-		PingCheckResp = 1002,
+		ServerConnectReq = 1001,
+		ServerConnectResp = 1002,
+		RelayNoti = 1003,
 	}
 	private static Dictionary<Value, string> stringMap = new Dictionary<Value, string>
 	{
-		{ Value.PingCheckReq, "PingCheckReq" },
-		{ Value.PingCheckResp, "PingCheckResp" },
+		{ Value.ServerConnectReq, "ServerConnectReq" },
+		{ Value.ServerConnectResp, "ServerConnectResp" },
+		{ Value.RelayNoti, "RelayNoti" },
 	}
 	public static string Get(Value value)
 	{

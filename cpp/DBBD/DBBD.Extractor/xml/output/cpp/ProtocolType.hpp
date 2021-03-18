@@ -10,12 +10,14 @@
 
 namespace ProtocolType {
 	enum Value {
-		PingCheckReq = 1001,
-		PingCheckResp = 1002,
+		ServerConnectReq = 1001,
+		ServerConnectResp = 1002,
+		RelayNoti = 1003,
 	};
 	std::map<Value, std::wstring> stringMap = {
-		{ Value::PingCheckReq, L"PingCheckReq" },
-		{ Value::PingCheckResp, L"PingCheckResp" },
+		{ Value::ServerConnectReq, L"ServerConnectReq" },
+		{ Value::ServerConnectResp, L"ServerConnectResp" },
+		{ Value::RelayNoti, L"RelayNoti" },
 	};
 	std::wstring Get(Value value) {
 		auto iter = ProtocolType::stringMap.find(value);

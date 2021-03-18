@@ -226,10 +226,9 @@ void CppExtractor::writeCellContents(ofstream& ofs) {
 		}
 
 		ofs << "\t" << getPropertyType(info.type) << " get" << newName << "() { return " << info.name << "; }" << endl;
-		ofs << "\tvoid set" << newName << "(" << getPropertyType(info.type) << " value) {" << endl;
-		ofs << "\t\t" << info.name << " = value;" << endl;
-		ofs << "\t\tfingerPrinter[" << i << "] = true;" << endl;
-		ofs << "\t}" << endl;
+		ofs << "\tvoid set" << newName << "(" << getPropertyType(info.type) << " value) { ";
+		ofs << info.name << " = value; ";
+		ofs << "fingerPrinter[" << i << "] = true; }" << endl;
 	}
 	ofs << endl;
 
@@ -340,6 +339,8 @@ string CppExtractor::getDeSerialize(string base, string type, string name, bool 
 	case HashCode("uint32"):
 	case HashCode("int16"):
 	case HashCode("uint16"):
+	case HashCode("double"):
+	case HashCode("float"):
 	case HashCode("bool"):
 	case HashCode("char"):
 	case HashCode("byte"):
@@ -360,6 +361,17 @@ string CppExtractor::getDeSerialize(string base, string type, string name, bool 
 string CppExtractor::getLength(string type, string name) {
 	switch (HashCode(type.c_str())) {
 	case HashCode("int64"):
+	case HashCode("uint64"):
+	case HashCode("int32"):
+	case HashCode("uint32"):
+	case HashCode("int16"):
+	case HashCode("uint16"):
+	case HashCode("double"):
+	case HashCode("float"):
+	case HashCode("bool"):
+	case HashCode("char"):
+	case HashCode("byte"):
+	case HashCode("sbyte"):
 		return "sizeof(" + getPropertyType(type) + ")";
 		break;
 	case HashCode("string"):

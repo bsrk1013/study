@@ -77,6 +77,14 @@ std::string BaseExtractor::getPropertyType(std::string type) {
 		if (this->type == ExtractorType::Cpp) { return "unsigned short"; }
 		else if (this->type == ExtractorType::Csharp) { return "ushort"; }
 		break;
+	case HashCode("double"):
+		if (this->type == ExtractorType::Cpp) { return "double"; }
+		else if (this->type == ExtractorType::Csharp) { return "double"; }
+		break;
+	case HashCode("float"):
+		if (this->type == ExtractorType::Cpp) { return "float"; }
+		else if (this->type == ExtractorType::Csharp) { return "float"; }
+		break;
 	case HashCode("bool"):
 		if (this->type == ExtractorType::Cpp) { return "bool"; }
 		else if (this->type == ExtractorType::Csharp) { return "bool"; }
