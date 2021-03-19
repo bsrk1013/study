@@ -47,7 +47,7 @@ class PingCheckReq : DBBD.Request
 {
 	public PingCheckReq()
 	{
-		typeId = (uint)ProtocolType.Value.PingCheckReq;
+		typeId = (uint)Base.Value.PingCheckReq;
 	}
 
 	public override void Serialize(DBBD.Buffer buffer)
@@ -71,7 +71,7 @@ class PingCheckResp : DBBD.Response
 {
 	public PingCheckResp()
 	{
-		typeId = (uint)ProtocolType.Value.PingCheckResp;
+		typeId = (uint)Base.Value.PingCheckResp;
 	}
 
 	public override void Serialize(DBBD.Buffer buffer)

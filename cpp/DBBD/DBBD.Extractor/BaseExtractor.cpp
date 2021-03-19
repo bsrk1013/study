@@ -138,9 +138,16 @@ void BaseExtractor::parseRoot(std::ofstream& ofs, XMLElement* elem, std::string 
 			parseContents(ofs, elem, fileName);
 			break;
 		case HashCode("consts"):
+		{
+			auto find = elem->FindAttribute("name");
+			if (!find)
+				throw std::exception("consts name is empty");
+			auto constsName = find->Value();
 			parseContents(ofs, elem, fileName);
-			writeConst(ofs, fileName);
+			writeConst(ofs, constsName);
+			headerInfoList.clear();
 			break;
+		}
 		default:
 			break;
 		}
@@ -151,6 +158,12 @@ void BaseExtractor::parseRoot(std::ofstream& ofs, XMLElement* elem, std::string 
 
 void BaseExtractor::parseContents(std::ofstream& ofs, XMLElement* root, std::string fileName) {
 	int index = 0;
+	auto a = root->FindAttribute("name");
+	if (a)
+	{
+		auto b = a->Value();
+		std::string c = b;
+	}
 	auto child = root->FirstChild();
 	XmlElementType type = XmlElementType::None;
 	while (child) {

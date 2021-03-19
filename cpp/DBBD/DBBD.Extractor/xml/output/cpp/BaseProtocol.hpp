@@ -8,7 +8,7 @@
 class ServerConnectReq : public DBBD::Request {
 public:
 	ServerConnectReq() {
-		typeId = ProtocolType::ServerConnectReq;
+		typeId = Base::ServerConnectReq;
 	}
 
 	virtual ~ServerConnectReq() {}
@@ -30,7 +30,7 @@ public:
 class ServerConnectResp : public DBBD::Response {
 public:
 	ServerConnectResp() {
-		typeId = ProtocolType::ServerConnectResp;
+		typeId = Base::ServerConnectResp;
 	}
 
 	virtual ~ServerConnectResp() {}
@@ -69,7 +69,7 @@ protected:
 class RelayNoti : public DBBD::Request {
 public:
 	RelayNoti() {
-		typeId = ProtocolType::RelayNoti;
+		typeId = Relay::RelayNoti;
 	}
 
 	virtual ~RelayNoti() {}

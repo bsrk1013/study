@@ -8,7 +8,7 @@ class ServerConnectReq : DBBD.Request
 {
 	public ServerConnectReq()
 	{
-		typeId = (uint)ProtocolType.Value.ServerConnectReq;
+		typeId = (uint)Base.Value.ServerConnectReq;
 	}
 
 	public override void Serialize(DBBD.Buffer buffer)
@@ -32,7 +32,7 @@ class ServerConnectResp : DBBD.Response
 {
 	public ServerConnectResp()
 	{
-		typeId = (uint)ProtocolType.Value.ServerConnectResp;
+		typeId = (uint)Base.Value.ServerConnectResp;
 		fingerPrinter.AddRange(Enumerable.Repeat(false, 1));
 	}
 
@@ -68,7 +68,7 @@ class RelayNoti : DBBD.Request
 {
 	public RelayNoti()
 	{
-		typeId = (uint)ProtocolType.Value.RelayNoti;
+		typeId = (uint)Relay.Value.RelayNoti;
 		fingerPrinter.AddRange(Enumerable.Repeat(false, 10));
 	}
 
@@ -114,10 +114,10 @@ class RelayNoti : DBBD.Request
 		if (fingerPrinter[3]) { totalLength += (uint)(sizeof(int)); }
 		if (fingerPrinter[4]) { totalLength += (uint)(sizeof(int)); }
 		if (fingerPrinter[5]) { totalLength += (uint)(sizeof(int)); }
-		if (fingerPrinter[6]) { totalLength += (uint)(floatValue01.GetLength()); }
-		if (fingerPrinter[7]) { totalLength += (uint)(floatValue02.GetLength()); }
-		if (fingerPrinter[8]) { totalLength += (uint)(floatValue03.GetLength()); }
-		if (fingerPrinter[9]) { totalLength += (uint)(floatValue04.GetLength()); }
+		if (fingerPrinter[6]) { totalLength += (uint)(sizeof(float)); }
+		if (fingerPrinter[7]) { totalLength += (uint)(sizeof(float)); }
+		if (fingerPrinter[8]) { totalLength += (uint)(sizeof(float)); }
+		if (fingerPrinter[9]) { totalLength += (uint)(sizeof(float)); }
 		return totalLength;
 	}
 

@@ -58,15 +58,9 @@ public:
 
 public:
 	std::wstring getNickname() { return nickname; }
-	void setNickname(std::wstring value) {
-		nickname = value;
-		fingerPrinter[0] = true;
-	}
+	void setNickname(std::wstring value) { nickname = value; fingerPrinter[0] = true; }
 	__int64 getLevel() { return level; }
-	void setLevel(__int64 value) {
-		level = value;
-		fingerPrinter[1] = true;
-	}
+	void setLevel(__int64 value) { level = value; fingerPrinter[1] = true; }
 
 protected:
 	bool fingerPrinter[2] = { false, };
@@ -79,7 +73,7 @@ protected:
 class PingCheckReq : public DBBD::Request {
 public:
 	PingCheckReq() {
-		typeId = ProtocolType::PingCheckReq;
+		typeId = Base::PingCheckReq;
 	}
 
 	virtual ~PingCheckReq() {}
@@ -101,7 +95,7 @@ public:
 class PingCheckResp : public DBBD::Response {
 public:
 	PingCheckResp() {
-		typeId = ProtocolType::PingCheckResp;
+		typeId = Base::PingCheckResp;
 	}
 
 	virtual ~PingCheckResp() {}

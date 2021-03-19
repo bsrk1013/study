@@ -9,7 +9,7 @@
 		</cell>
 	</cells>
 	<protocols>
-		<protocol name="PingCheckReq" type="PingCheckReq" base="Request" />
-		<protocol name="PingCheckResp" type="PingCheckResp" base="Response" />
+		<protocol name="PingCheckReq" type="Base.PingCheckReq" base="Request" />
+		<protocol name="PingCheckResp" type="Base.PingCheckResp" base="Response" />
 	</protocols>
 </root>

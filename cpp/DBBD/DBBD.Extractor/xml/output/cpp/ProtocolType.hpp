@@ -8,20 +8,40 @@
 #include <map>
 #include <string>
 
-namespace ProtocolType {
+namespace Base {
 	enum Value {
 		ServerConnectReq = 1001,
 		ServerConnectResp = 1002,
-		RelayNoti = 1003,
+		PingCheckReq = 1003,
+		PingCheckResp = 1004,
 	};
 	std::map<Value, std::wstring> stringMap = {
 		{ Value::ServerConnectReq, L"ServerConnectReq" },
 		{ Value::ServerConnectResp, L"ServerConnectResp" },
+		{ Value::PingCheckReq, L"PingCheckReq" },
+		{ Value::PingCheckResp, L"PingCheckResp" },
+	};
+	std::wstring Get(Value value) {
+		auto iter = Base::stringMap.find(value);
+		if (iter == Base::stringMap.end()) {
+			return "";
+		}
+		return iter->second;
+	}
+}
+#include <map>
+#include <string>
+
+namespace Relay {
+	enum Value {
+		RelayNoti = 2001,
+	};
+	std::map<Value, std::wstring> stringMap = {
 		{ Value::RelayNoti, L"RelayNoti" },
 	};
 	std::wstring Get(Value value) {
-		auto iter = ProtocolType::stringMap.find(value);
-		if (iter == ProtocolType::stringMap.end()) {
+		auto iter = Relay::stringMap.find(value);
+		if (iter == Relay::stringMap.end()) {
 			return "";
 		}
 		return iter->second;

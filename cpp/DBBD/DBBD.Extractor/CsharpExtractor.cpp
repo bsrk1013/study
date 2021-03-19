@@ -41,9 +41,7 @@ void CsharpExtractor::writeProtocol(std::ofstream& ofs)
 
 void CsharpExtractor::writeConst(std::ofstream& ofs, std::string fileName)
 {
-	size_t pos = fileName.find(".");
-	auto namespaceName = fileName.substr(0, pos);
-	ofs << " static class " << namespaceName << endl;
+	ofs << " static class " << fileName << endl;
 	ofs << "{" << endl;
 
 	ofs << "\tpublic enum Value" << endl;
@@ -103,7 +101,13 @@ void CsharpExtractor::writeContentsHeader(std::ofstream& ofs)
 				}
 			}
 			else if (info.fileType == XmlElementType::Protocol) {
-				ofs << "\t\ttypeId = (uint)ProtocolType.Value." << info.type << ";" << endl;
+				size_t pos = info.type.find(".");
+				if (pos >= 256)
+					throw std::exception("illegal protocol type format");
+				auto namespaceName = info.type.substr(0, pos);
+				auto valueName = info.type.substr(pos + 1, info.type.size() - 1);
+
+				ofs << "\t\ttypeId = (uint)" << namespaceName << ".Value." << valueName << ";" << endl;
 				if (realContents.size() > 0) {
 					ofs << "\t\tfingerPrinter.AddRange(Enumerable.Repeat(false, " << realContents.size() << "));" << endl;
 				}

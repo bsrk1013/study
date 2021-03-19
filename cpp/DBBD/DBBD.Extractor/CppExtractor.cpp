@@ -38,11 +38,9 @@ void CppExtractor::writeProtocol(ofstream& ofs) {
 }
 
 void CppExtractor::writeConst(ofstream& ofs, string fileName) {
-	size_t pos = fileName.find(".");
-	auto namespaceName = fileName.substr(0, pos);
 	ofs << "#include <map>" << endl;
 	ofs << "#include <string>" << endl << endl;
-	ofs << "namespace " << namespaceName << " {" << endl;
+	ofs << "namespace " << fileName << " {" << endl;
 	ofs << "\tenum Value {" << endl;
 	for (auto info : headerInfoList) {
 		ofs << "\t\t" << info.name << " = " << info.value << "," << endl;
@@ -56,8 +54,8 @@ void CppExtractor::writeConst(ofstream& ofs, string fileName) {
 	ofs << "\t};" << endl;
 
 	ofs << "\tstd::wstring Get(Value value) {" << endl;
-	ofs << "\t\tauto iter = " << namespaceName << "::stringMap.find(value);" << endl;
-	ofs << "\t\tif (iter == " << namespaceName << "::stringMap.end()) {" << endl;
+	ofs << "\t\tauto iter = " << fileName << "::stringMap.find(value);" << endl;
+	ofs << "\t\tif (iter == " << fileName << "::stringMap.end()) {" << endl;
 	ofs << "\t\t\treturn \"\";" << endl;
 	ofs << "\t\t}" << endl;
 	ofs << "\t\treturn iter->second;" << endl;
@@ -80,33 +78,17 @@ void CppExtractor::writeContentsHeader(ofstream& ofs) {
 				ofs << "\t" << info.name << "() {}" << endl;
 			}
 			else if (info.fileType == XmlElementType::Protocol) {
+				size_t pos = info.type.find(".");
+				if (pos >= 256)
+					throw std::exception("illegal protocol type format");
+				auto namespaceName = info.type.substr(0, pos);
+				auto valueName = info.type.substr(pos + 1, info.type.size() - 1);
+
 				ofs << "\t" << info.name << "() {" << endl;
-				ofs << "\t\ttypeId = ProtocolType::" << info.type << ";" << endl;
+				ofs << "\t\ttypeId = " << namespaceName <<"::" << valueName << ";" << endl;
 				ofs << "\t}" << endl;
 			}
 			ofs << endl;
-
-			//vector<FileInfo> realContents;
-			//for (auto contentsInfo : contentsInfoList) {
-			//	if (contentsInfo.fileType != XmlElementType::Property) { continue; }
-			//	realContents.push_back(contentsInfo);
-			//}
-			//if (realContents.size() > 0) {
-			//	ofs << "\t" << info.name << "(";
-			//	for (size_t i = 0; i < realContents.size(); i++) {
-			//		if (i > 0) { ofs << ", "; }
-			//		auto propertyInfo = realContents[i];
-			//		ofs << getPropertyType(propertyInfo.type) << " " << propertyInfo.name;
-			//	}
-			//	ofs << ")" << endl;
-			//	ofs << "\t\t: ";
-			//	for (size_t i = 0; i < realContents.size(); i++) {
-			//		if (i > 0) { ofs << ", "; }
-			//		auto propertyInfo = realContents[i];
-			//		ofs << propertyInfo.name << "(" << propertyInfo.name << ")";
-			//	}
-			//	ofs << endl << "\t{}" << endl;
-			//}
 
 			ofs << "\t" << "virtual ~" << info.name << "() {}" << endl << endl;
 			break;

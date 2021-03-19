@@ -1,7 +1,11 @@
 <root>
-	<consts>
+	<consts name="Base">
 		<const name="ServerConnectReq">1001</const>
 		<const name="ServerConnectResp">1002</const>
-		<const name="RelayNoti">1003</const>
+		<const name="PingCheckReq">1003</const>
+		<const name="PingCheckResp">1004</const>
+	</consts>
+	<consts name="Relay">
+		<const name="RelayNoti">2001</const>
 	</consts>
 </root>
