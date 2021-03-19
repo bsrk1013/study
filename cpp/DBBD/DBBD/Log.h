@@ -34,6 +34,12 @@ namespace DBBD
 		{
 			log(level, fileName, line, strFormat(msg, args...));
 		}
+		void log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg);
+		template <typename ... Args>
+		void log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg, const Args&... args)
+		{
+			log(level, fileName, line, strFormat(msg, args...));
+		}
 
 	public:
 		bool IsInit() { return isInit; }
@@ -44,9 +50,16 @@ namespace DBBD
 		void warning(const std::string& msg);
 		void error(const std::string& msg);
 
+		void debug(const std::wstring& msg);
+		void info(const std::wstring& msg);
+		void warning(const std::wstring& msg);
+		void error(const std::wstring& msg);
+
 	private:
 		void writeLog(LogLevel level, const std::string& msg);
+		void writeLog(LogLevel level, const std::wstring& msg);
 		void sendTelegramBot(LogLevel level, const std::string& msg);
+		void sendTelegramBot(LogLevel level, const std::wstring& msg);
 		void updateTelegram();
 		std::shared_ptr<spdlog::logger> getFileLogger(LogLevel level);
 

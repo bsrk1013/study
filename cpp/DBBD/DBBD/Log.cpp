@@ -45,7 +45,32 @@ namespace DBBD
 		if (!isInit) { return; }
 		auto fileNameVec = strSplit(fileName, '\\');
 		std::string originFileName = fileNameVec[fileNameVec.size() - 1];
-		std::string resultMsg = "[" + originFileName + "](" + std::to_string(line) + ") << " + msg;
+		//std::string resultMsg = "[" + originFileName + "](" + std::to_string(line) + ") << " + msg;
+		std::string resultMsg = strFormat("[{}]({}) << {}", originFileName, std::to_string(line), msg);
+
+		switch (level) {
+		case LogLevel::Debug:
+			debug(resultMsg);
+			break;
+		case LogLevel::Info:
+			info(resultMsg);
+			break;
+		case LogLevel::Warning:
+			warning(resultMsg);
+			break;
+		case LogLevel::Error:
+			error(resultMsg);
+			break;
+		}
+	}
+
+	void Log::log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg)
+	{
+		if (!isInit) { return; }
+		auto fileNameVec = strSplit(fileName, '\\');
+		std::string originFileName = fileNameVec[fileNameVec.size() - 1];
+		std::wstring resultMsg = strFormat(L"[{}]({}) << {}", strconv(originFileName), std::to_string(line), msg);
+		//std::wstring resultMsg = "[" + originFileName + "](" + std::to_string(line) + ") << " + msg;
 
 		switch (level) {
 		case LogLevel::Debug:
@@ -90,7 +115,47 @@ namespace DBBD
 		writeLog(LogLevel::Error, msg);
 	}
 
+	void Log::debug(const std::wstring& msg)
+	{
+		consoleLogger->set_level(spdlog::level::debug);
+		fileLogger->set_level(spdlog::level::debug);
+		writeLog(LogLevel::Debug, msg);
+	}
+
+	void Log::info(const std::wstring& msg)
+	{
+		consoleLogger->set_level(spdlog::level::info);
+		fileLogger->set_level(spdlog::level::info);
+		writeLog(LogLevel::Info, msg);
+	}
+
+	void Log::warning(const std::wstring& msg)
+	{
+		consoleLogger->set_level(spdlog::level::warn);
+		fileLogger->set_level(spdlog::level::warn);
+		writeLog(LogLevel::Warning, msg);
+	}
+	void Log::error(const std::wstring& msg)
+	{
+		consoleLogger->set_level(spdlog::level::err);
+		fileLogger->set_level(spdlog::level::err);
+		writeLog(LogLevel::Error, msg);
+	}
+
 	void Log::writeLog(LogLevel level, const std::string& msg)
+	{
+		switch (level) {
+		case LogLevel::Debug: consoleLogger->debug(msg); break;
+		case LogLevel::Info: consoleLogger->info(msg); fileLogger->info(msg); break;
+		case LogLevel::Warning: consoleLogger->warn(msg); fileLogger->warn(msg);  break;
+		case LogLevel::Error: consoleLogger->error(msg); fileLogger->error(msg); break;
+		}
+		fileLogger->flush();
+
+		sendTelegramBot(level, msg);
+	}
+
+	void Log::writeLog(LogLevel level, const std::wstring& msg)
 	{
 		switch (level) {
 		case LogLevel::Debug: consoleLogger->debug(msg); break;
@@ -126,6 +191,22 @@ namespace DBBD
 
 		/*auto res = telegramClient->Get(strFormat("/bot{}/sendmessage?chat_id={}&text={}",
 			telegramToken, telegramChatId, convertMsg).c_str());*/
+	}
+
+	void Log::sendTelegramBot(LogLevel level, const std::wstring& msg)
+	{
+		if (!telegramBot
+			|| level < LogLevel::Warning) {
+			return;
+		}
+
+		std::wstring levelStr = level == LogLevel::Warning ? L"Warn" : L"Error";
+		std::wstring telegramMsg = strFormat(L"[{}] [{}] [{}] {}",
+			getNowString(), name, levelStr, msg);
+
+		std::string convertMsg = toUrlString(telegramMsg);
+
+		telegramMsgQueue.push(convertMsg);
 	}
 
 	void Log::updateTelegram() {

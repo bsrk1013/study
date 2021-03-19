@@ -73,6 +73,56 @@ namespace DBBD {
 		return resultStr;
 	}
 
+	template <typename ... Args>
+	static std::wstring strFormat(const std::wstring& str, const Args&... args) {
+		std::vector<std::any> argVec = { args... };
+
+		std::vector<std::wstring> strArray;
+		std::wstring temp;
+		char prev = ' ';
+		int literalCount = 0;
+		for (auto c : str) {
+			if (c == '{') {
+				prev = c;
+				continue;
+			}
+			if (prev == '{' && c == '}') {
+				strArray.push_back(temp);
+				temp = "";
+				prev = c;
+				literalCount++;
+				continue;
+			}
+
+			temp += c;
+		}
+		strArray.push_back(temp);
+
+		if (literalCount != argVec.size()) {
+			throw std::exception("invalid log argument size...");
+		}
+
+		std::wstring resultStr = "";
+		for (size_t i = 0; i < strArray.size(); i++) {
+			resultStr += strArray[i];
+
+			if (i < literalCount) {
+				auto arg = argVec[i];
+				if (arg._Cast<std::wstring>()) { resultStr += *arg._Cast<std::wstring>(); }
+				else if (arg._Cast<char>()) { resultStr += std::to_string(*arg._Cast<char>()); }
+				else if (arg._Cast <byte>()) { resultStr += std::to_string(*arg._Cast<byte>()); }
+				else if (arg._Cast<int>()) { resultStr += std::to_string(*arg._Cast<int>()); }
+				else if (arg._Cast<unsigned int>()) { resultStr += std::to_string(*arg._Cast<unsigned int>()); }
+				else if (arg._Cast<short>()) { resultStr += std::to_string(*arg._Cast<short>()); }
+				else if (arg._Cast<size_t>()) { resultStr += std::to_string(*arg._Cast<size_t>()); }
+				else if (arg._Cast<float>()) { resultStr += std::to_string(*arg._Cast<float>()); }
+				//else if (arg._Cast<Cell>()) { resultStr += *arg._Cast<Cell>().toString(); }
+			}
+		}
+
+		return resultStr;
+	}
+
 	static std::vector<std::string> strSplit(std::string input, char delimiter) {
 		std::vector<std::string> answer;
 		std::stringstream ss(input);
