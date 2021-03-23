@@ -9,7 +9,7 @@ boost_1_74_0/
 cpp_redis/
 
 ### DB ###
-DB/
+cpp/module/DB/
 
 ### Yaml-cpp ###
 yaml-cpp/
