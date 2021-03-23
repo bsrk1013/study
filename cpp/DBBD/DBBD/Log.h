@@ -28,40 +28,44 @@ namespace DBBD
 		virtual void release() override;
 
 	public:
+		bool IsInit() { return isInit; }
+
+#pragma region string
+	public:
 		void log(const LogLevel& level, const std::string& fileName, const long& line, const std::string& msg);
 		template<typename ... Args>
 		void log(const LogLevel& level, const std::string& fileName, const long& line, const std::string& msg, const Args&... args)
 		{
 			log(level, fileName, line, strFormat(msg, args...));
 		}
-		void log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg);
-		template <typename ... Args>
-		void log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg, const Args&... args)
-		{
-			log(level, fileName, line, strFormat(msg, args...));
-		}
-
-	public:
-		bool IsInit() { return isInit; }
-
 	private:
 		void debug(const std::string& msg);
 		void info(const std::string& msg);
 		void warning(const std::string& msg);
 		void error(const std::string& msg);
+		void writeLog(LogLevel level, const std::string& msg);
+		void sendTelegramBot(LogLevel level, const std::string& msg);
+#pragma endregion
 
-		void debug(const std::wstring& msg);
-		void info(const std::wstring& msg);
-		void warning(const std::wstring& msg);
-		void error(const std::wstring& msg);
+#pragma region wstring
+	//public:
+	//	void log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg);
+	//	template <typename ... Args>
+	//	void log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg, const Args&... args)
+	//	{
+	//		log(level, fileName, line, strFormat(msg, args...));
+	//	}
+	//private:
+	//	void debug(const std::wstring& msg);
+	//	void info(const std::wstring& msg);
+	//	void warning(const std::wstring& msg);
+	//	void error(const std::wstring& msg);
+	//	void writeLog(LogLevel level, const std::wstring& msg);
+	//	void sendTelegramBot(LogLevel level, const std::wstring& msg);
+#pragma endregion
 
 	private:
-		void writeLog(LogLevel level, const std::string& msg);
-		void writeLog(LogLevel level, const std::wstring& msg);
-		void sendTelegramBot(LogLevel level, const std::string& msg);
-		void sendTelegramBot(LogLevel level, const std::wstring& msg);
 		void updateTelegram();
-		std::shared_ptr<spdlog::logger> getFileLogger(LogLevel level);
 
 	private:
 		std::string name;

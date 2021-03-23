@@ -40,6 +40,7 @@ namespace DBBD
 		}
 	}
 
+#pragma region string
 	void Log::log(const LogLevel& level, const std::string& fileName, const long& line, const std::string& msg)
 	{
 		if (!isInit) { return; }
@@ -64,44 +65,18 @@ namespace DBBD
 		}
 	}
 
-	void Log::log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg)
-	{
-		if (!isInit) { return; }
-		auto fileNameVec = strSplit(fileName, '\\');
-		std::string originFileName = fileNameVec[fileNameVec.size() - 1];
-		std::wstring resultMsg = strFormat(L"[{}]({}) << {}", strconv(originFileName), std::to_string(line), msg);
-		//std::wstring resultMsg = "[" + originFileName + "](" + std::to_string(line) + ") << " + msg;
-
-		switch (level) {
-		case LogLevel::Debug:
-			debug(resultMsg);
-			break;
-		case LogLevel::Info:
-			info(resultMsg);
-			break;
-		case LogLevel::Warning:
-			warning(resultMsg);
-			break;
-		case LogLevel::Error:
-			error(resultMsg);
-			break;
-		}
-	}
-
 	void Log::debug(const std::string& msg)
 	{
 		consoleLogger->set_level(spdlog::level::debug);
 		fileLogger->set_level(spdlog::level::debug);
 		writeLog(LogLevel::Debug, msg);
 	}
-
 	void Log::info(const std::string& msg)
 	{
 		consoleLogger->set_level(spdlog::level::info);
 		fileLogger->set_level(spdlog::level::info);
 		writeLog(LogLevel::Info, msg);
 	}
-
 	void Log::warning(const std::string& msg)
 	{
 		consoleLogger->set_level(spdlog::level::warn);
@@ -115,50 +90,10 @@ namespace DBBD
 		writeLog(LogLevel::Error, msg);
 	}
 
-	void Log::debug(const std::wstring& msg)
-	{
-		consoleLogger->set_level(spdlog::level::debug);
-		fileLogger->set_level(spdlog::level::debug);
-		writeLog(LogLevel::Debug, msg);
-	}
-
-	void Log::info(const std::wstring& msg)
-	{
-		consoleLogger->set_level(spdlog::level::info);
-		fileLogger->set_level(spdlog::level::info);
-		writeLog(LogLevel::Info, msg);
-	}
-
-	void Log::warning(const std::wstring& msg)
-	{
-		consoleLogger->set_level(spdlog::level::warn);
-		fileLogger->set_level(spdlog::level::warn);
-		writeLog(LogLevel::Warning, msg);
-	}
-	void Log::error(const std::wstring& msg)
-	{
-		consoleLogger->set_level(spdlog::level::err);
-		fileLogger->set_level(spdlog::level::err);
-		writeLog(LogLevel::Error, msg);
-	}
-
 	void Log::writeLog(LogLevel level, const std::string& msg)
 	{
 		switch (level) {
-		case LogLevel::Debug: consoleLogger->debug(msg); break;
-		case LogLevel::Info: consoleLogger->info(msg); fileLogger->info(msg); break;
-		case LogLevel::Warning: consoleLogger->warn(msg); fileLogger->warn(msg);  break;
-		case LogLevel::Error: consoleLogger->error(msg); fileLogger->error(msg); break;
-		}
-		fileLogger->flush();
-
-		sendTelegramBot(level, msg);
-	}
-
-	void Log::writeLog(LogLevel level, const std::wstring& msg)
-	{
-		switch (level) {
-		case LogLevel::Debug: consoleLogger->debug(msg); break;
+		case LogLevel::Debug: consoleLogger->debug(msg); return;
 		case LogLevel::Info: consoleLogger->info(msg); fileLogger->info(msg); break;
 		case LogLevel::Warning: consoleLogger->warn(msg); fileLogger->warn(msg);  break;
 		case LogLevel::Error: consoleLogger->error(msg); fileLogger->error(msg); break;
@@ -192,22 +127,87 @@ namespace DBBD
 		/*auto res = telegramClient->Get(strFormat("/bot{}/sendmessage?chat_id={}&text={}",
 			telegramToken, telegramChatId, convertMsg).c_str());*/
 	}
+#pragma endregion
 
-	void Log::sendTelegramBot(LogLevel level, const std::wstring& msg)
-	{
-		if (!telegramBot
-			|| level < LogLevel::Warning) {
-			return;
-		}
+#pragma region wstring
+	//void Log::log(const LogLevel& level, const std::string& fileName, const long& line, const std::wstring& msg)
+	//{
+	//	if (!isInit) { return; }
+	//	auto fileNameVec = strSplit(fileName, '\\');
+	//	std::string originFileName = fileNameVec[fileNameVec.size() - 1];
+	//	std::wstring resultMsg = strFormat(L"[{}]({}) << {}", strconv(originFileName), std::to_wstring(line), msg);
+	//	//std::wstring resultMsg = "[" + originFileName + "](" + std::to_string(line) + ") << " + msg;
 
-		std::wstring levelStr = level == LogLevel::Warning ? L"Warn" : L"Error";
-		std::wstring telegramMsg = strFormat(L"[{}] [{}] [{}] {}",
-			getNowString(), name, levelStr, msg);
+	//	switch (level) {
+	//	case LogLevel::Debug:
+	//		debug(resultMsg);
+	//		break;
+	//	case LogLevel::Info:
+	//		info(resultMsg);
+	//		break;
+	//	case LogLevel::Warning:
+	//		warning(resultMsg);
+	//		break;
+	//	case LogLevel::Error:
+	//		error(resultMsg);
+	//		break;
+	//	}
+	//}
 
-		std::string convertMsg = toUrlString(telegramMsg);
+	//void Log::debug(const std::wstring& msg)
+	//{
+	//	consoleLogger->set_level(spdlog::level::debug);
+	//	fileLogger->set_level(spdlog::level::debug);
+	//	writeLog(LogLevel::Debug, msg);
+	//}
+	//void Log::info(const std::wstring& msg)
+	//{
+	//	consoleLogger->set_level(spdlog::level::info);
+	//	fileLogger->set_level(spdlog::level::info);
+	//	writeLog(LogLevel::Info, msg);
+	//}
+	//void Log::warning(const std::wstring& msg)
+	//{
+	//	consoleLogger->set_level(spdlog::level::warn);
+	//	fileLogger->set_level(spdlog::level::warn);
+	//	writeLog(LogLevel::Warning, msg);
+	//}
+	//void Log::error(const std::wstring& msg)
+	//{
+	//	consoleLogger->set_level(spdlog::level::err);
+	//	fileLogger->set_level(spdlog::level::err);
+	//	writeLog(LogLevel::Error, msg);
+	//}
 
-		telegramMsgQueue.push(convertMsg);
-	}
+	//void Log::writeLog(LogLevel level, const std::wstring& msg)
+	//{
+	//	switch (level) {
+	//	case LogLevel::Debug: consoleLogger->debug(msg); return;
+	//	case LogLevel::Info: consoleLogger->info(msg); fileLogger->info(msg); break;
+	//	case LogLevel::Warning: consoleLogger->warn(msg); fileLogger->warn(msg);  break;
+	//	case LogLevel::Error: consoleLogger->error(msg); fileLogger->error(msg); break;
+	//	}
+	//	fileLogger->flush();
+
+	//	sendTelegramBot(level, msg);
+	//}
+
+	//void Log::sendTelegramBot(LogLevel level, const std::wstring& msg)
+	//{
+	//	if (!telegramBot
+	//		|| level < LogLevel::Warning) {
+	//		return;
+	//	}
+
+	//	std::wstring levelStr = level == LogLevel::Warning ? L"Warn" : L"Error";
+	//	std::wstring telegramMsg = strFormat(L"[{}] [{}] [{}] {}",
+	//		getNowString(), name, levelStr, msg);
+
+	//	std::string convertMsg = toUrlString(telegramMsg);
+
+	//	telegramMsgQueue.push(convertMsg);
+	//}
+#pragma endregion
 
 	void Log::updateTelegram() {
 		while (true) {

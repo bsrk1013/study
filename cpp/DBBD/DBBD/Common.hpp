@@ -79,16 +79,16 @@ namespace DBBD {
 
 		std::vector<std::wstring> strArray;
 		std::wstring temp;
-		char prev = ' ';
+		wchar_t prev = L' ';
 		int literalCount = 0;
 		for (auto c : str) {
-			if (c == '{') {
+			if (c == L'{') {
 				prev = c;
 				continue;
 			}
-			if (prev == '{' && c == '}') {
+			if (prev == L'{' && c == L'}') {
 				strArray.push_back(temp);
-				temp = "";
+				temp = L"";
 				prev = c;
 				literalCount++;
 				continue;
@@ -102,20 +102,21 @@ namespace DBBD {
 			throw std::exception("invalid log argument size...");
 		}
 
-		std::wstring resultStr = "";
+		std::wstring resultStr = L"";
 		for (size_t i = 0; i < strArray.size(); i++) {
 			resultStr += strArray[i];
 
 			if (i < literalCount) {
 				auto arg = argVec[i];
 				if (arg._Cast<std::wstring>()) { resultStr += *arg._Cast<std::wstring>(); }
-				else if (arg._Cast<char>()) { resultStr += std::to_string(*arg._Cast<char>()); }
-				else if (arg._Cast <byte>()) { resultStr += std::to_string(*arg._Cast<byte>()); }
-				else if (arg._Cast<int>()) { resultStr += std::to_string(*arg._Cast<int>()); }
-				else if (arg._Cast<unsigned int>()) { resultStr += std::to_string(*arg._Cast<unsigned int>()); }
-				else if (arg._Cast<short>()) { resultStr += std::to_string(*arg._Cast<short>()); }
-				else if (arg._Cast<size_t>()) { resultStr += std::to_string(*arg._Cast<size_t>()); }
-				else if (arg._Cast<float>()) { resultStr += std::to_string(*arg._Cast<float>()); }
+				else if (arg._Cast<std::string>()) { resultStr += strconv(*arg._Cast<std::string>()); }
+				else if (arg._Cast<char>()) { resultStr += std::to_wstring(*arg._Cast<char>()); }
+				else if (arg._Cast <byte>()) { resultStr += std::to_wstring(*arg._Cast<byte>()); }
+				else if (arg._Cast<int>()) { resultStr += std::to_wstring(*arg._Cast<int>()); }
+				else if (arg._Cast<unsigned int>()) { resultStr += std::to_wstring(*arg._Cast<unsigned int>()); }
+				else if (arg._Cast<short>()) { resultStr += std::to_wstring(*arg._Cast<short>()); }
+				else if (arg._Cast<size_t>()) { resultStr += std::to_wstring(*arg._Cast<size_t>()); }
+				else if (arg._Cast<float>()) { resultStr += std::to_wstring(*arg._Cast<float>()); }
 				//else if (arg._Cast<Cell>()) { resultStr += *arg._Cast<Cell>().toString(); }
 			}
 		}
