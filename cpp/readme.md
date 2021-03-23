@@ -1,3 +1,11 @@
+## 서버 프로젝트 설정
+1. 추가 포함 디렉터리
+  - $(SolutionDir)..\DBBD;$(SolutionDir)..\module\boost_1_74_0;$(SolutionDir)..\module\cpp_redis\includes;$(SolutionDir)..\module\cpp_redis\tacopie\includes;$(SolutionDir)..\module\DB\MariaDB Connector\include;$(SolutionDir)..\module\yaml-cpp\include;$(SolutionDir)..\module\spdlog\include;$(SolutionDir)..\module\OpenSSL-Win64\include;%(AdditionalIncludeDirectories)
+2. 추가 라이브러리 디렉터리
+   - $(SolutionDir)..\DBBD\x64\Debug;$(SolutionDir)..\module\boost_1_74_0\stage\lib;$(SolutionDir)..\module\cpp_redis\msvc15\x64\Debug;$(SolutionDir)..\module\DB\MariaDB Connector\lib;$(SolutionDir)..\module\yaml-cpp\build\Debug;$(SolutionDir)..\module\spdlog\build\Debug;$(SolutionDir)..\module\OpenSSL-Win64\lib\VC;%(AdditionalLibraryDirectories)
+3. 추가 종속성
+   - cpp_redis.lib;tacopie.lib;libmariadb.lib;yaml-cppd.lib;spdlogd.lib;libcrypto64MDd.lib;libcrypto64MTd.lib;libssl64MDd.lib;libssl64MTd.lib;%(AdditionalDependencies)
+
 # TelegramBot 설정 방법
 1. 
 
